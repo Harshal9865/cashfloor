@@ -49,7 +49,8 @@ export default function MarketingPage() {
           <p className="mb-4 text-xs max-w-2xl mx-auto">
             <strong>Disclaimer:</strong> Calm Ledger is an educational simulation tool designed to model hypothetical cash flow scenarios for freelancers. It does not provide financial, tax, or legal advice.
           </p>
-          <div className="flex justify-center gap-6">
+          <div className="flex flex-wrap justify-center gap-6 text-xs">
+            <a href="/blog/the-20th-percentile-math" className="text-[#2F6F62] hover:underline font-semibold transition-colors">The 20th Percentile Rule (Guide)</a>
             <a href="/privacy" className="hover:text-[#16232B] transition-colors">Privacy Policy</a>
             <a href="/terms" className="hover:text-[#16232B] transition-colors">Terms of Service</a>
           </div>
