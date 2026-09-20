@@ -22,6 +22,7 @@ import { loadUserLedger, saveUserLedger, SyncStatus } from '@/lib/supabase/ledge
 import { useAuth } from '@/lib/auth/AuthContext';
 import { useEffect, useRef } from 'react';
 import { RealDataWizardModal } from '@/components/RealDataWizardModal';
+import { DailyPaymentLog } from '@/components/DailyPaymentLog';
 import { LegalDisclaimer } from '@/components/LegalDisclaimer';
 import { Share2, BookOpen, Download, Printer, Sparkles, ShieldCheck, HelpCircle } from 'lucide-react';
 
@@ -367,6 +368,11 @@ export default function Home() {
             taxReservePct={assumptions.taxReservePct}
             currencySymbol={currencySymbol}
           />
+        </section>
+
+        {/* Daily Payment Feed & Cash Stream */}
+        <section id="daily-log" className="dash-card p-6 md:p-8">
+          <DailyPaymentLog currencySymbol={currencySymbol} />
         </section>
 
         {/* Waterfall */}

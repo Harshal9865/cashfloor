@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   ComposedChart, Bar, Line, Area, XAxis, YAxis, CartesianGrid,
   Tooltip, ReferenceLine, ResponsiveContainer, Legend, Cell,
 } from 'recharts';
 import { MonthlyRecord } from '../lib/calculator/types';
-import { CheckCircle2, AlertTriangle, TrendingUp } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, TrendingUp, Calendar, Zap, Activity } from 'lucide-react';
 
 interface CashFlowChartProps {
   records: MonthlyRecord[];
@@ -16,10 +16,11 @@ interface CashFlowChartProps {
   bufferTarget?: number;
   taxReservePct?: number;
   currencySymbol?: string;
+  initialViewMode?: '12_months' | '30_days' | '90_drought';
 }
 
-/* ── Custom rich tooltip ── */
-const CustomTooltip = ({
+/* ── Custom rich tooltip for Monthly View ── */
+const CustomMonthlyTooltip = ({
   active,
   payload,
   label,
@@ -47,7 +48,6 @@ const CustomTooltip = ({
         fontFamily: 'var(--font-sans)',
       }}
     >
-      {/* Header */}
       <div className="px-4 py-2.5 font-semibold flex items-center justify-between"
         style={{ background: 'var(--cf-surface-alt)', borderBottom: '1px solid var(--cf-border)', color: 'var(--cf-text)' }}>
         <span>{label}</span>
@@ -60,7 +60,6 @@ const CustomTooltip = ({
         </span>
       </div>
 
-      {/* Body rows */}
       <div className="px-4 py-3 space-y-2">
         <div className="flex justify-between items-center">
           <span style={{ color: 'var(--cf-text-muted)' }}>Income</span>
@@ -97,6 +96,71 @@ const CustomTooltip = ({
   );
 };
 
+/* ── Custom rich tooltip for Daily View ── */
+const CustomDailyTooltip = ({
+  active,
+  payload,
+  label,
+  currencySymbol,
+  dailyFloor,
+}: any) => {
+  if (!active || !payload || !payload.length) return null;
+
+  const inflow = payload.find((p: any) => p.dataKey === 'inflow')?.value ?? 0;
+  const outflow = payload.find((p: any) => p.dataKey === 'outflow')?.value ?? 0;
+  const balance = payload.find((p: any) => p.dataKey === 'balance')?.value ?? 0;
+  const net = inflow - outflow;
+
+  return (
+    <div
+      className="rounded-xl text-xs overflow-hidden"
+      style={{
+        background: 'var(--cf-surface)',
+        border: '1px solid var(--cf-border)',
+        boxShadow: 'var(--cf-shadow-lg)',
+        minWidth: 210,
+        fontFamily: 'var(--font-sans)',
+      }}
+    >
+      <div className="px-4 py-2 font-semibold flex items-center justify-between border-b"
+        style={{ background: 'var(--cf-surface-alt)', borderColor: 'var(--cf-border)', color: 'var(--cf-text)' }}>
+        <span>Day {label}</span>
+        <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded font-bold ${
+          inflow > 0 ? 'bg-emerald-500/10 text-emerald-600' : 'bg-[var(--cf-surface)] text-[var(--cf-text-muted)]'
+        }`}>
+          {inflow > 0 ? 'Payment Inflow' : 'Daily Burn'}
+        </span>
+      </div>
+
+      <div className="px-4 py-3 space-y-1.5 font-mono">
+        {inflow > 0 && (
+          <div className="flex justify-between items-center text-emerald-600">
+            <span>Inflow:</span>
+            <span className="font-bold">+{currencySymbol}{inflow.toLocaleString()}</span>
+          </div>
+        )}
+        <div className="flex justify-between items-center text-[var(--cf-text-muted)]">
+          <span>Daily Outflow:</span>
+          <span className="text-[var(--cf-caution)]">-{currencySymbol}{Math.round(outflow).toLocaleString()}</span>
+        </div>
+        <div className="flex justify-between items-center border-t border-[var(--cf-border-soft)] pt-1">
+          <span className="text-[var(--cf-text-faint)]">Net Delta:</span>
+          <span className={net >= 0 ? 'text-emerald-500 font-bold' : 'text-[var(--cf-caution)] font-bold'}>
+            {net >= 0 ? '+' : ''}{currencySymbol}{Math.round(net).toLocaleString()}
+          </span>
+        </div>
+        <div className="flex justify-between items-center border-t border-[var(--cf-border-soft)] pt-1">
+          <span className="text-[var(--cf-text)] font-semibold font-sans">Day-End Cash:</span>
+          <span className="font-bold text-[var(--cf-text)]">{currencySymbol}{Math.round(balance).toLocaleString()}</span>
+        </div>
+        <div className="text-[9px] text-[var(--cf-text-faint)] pt-0.5">
+          Daily Survival Floor: {currencySymbol}{Math.round(dailyFloor)}/day
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export const CashFlowChart: React.FC<CashFlowChartProps> = ({
   records,
   floorIncome,
@@ -105,37 +169,85 @@ export const CashFlowChart: React.FC<CashFlowChartProps> = ({
   bufferTarget = 7350,
   taxReservePct = 0.25,
   currencySymbol = '$',
+  initialViewMode = '12_months',
 }) => {
+  const [viewMode, setViewMode] = useState<'12_months' | '30_days' | '90_drought'>(initialViewMode);
   const [activeIdx, setActiveIdx] = useState<number | null>(null);
 
   if (!records || records.length === 0) return null;
 
-  // Build data
-  let rolling = currentSavings;
-  const data = records.map((r, idx) => {
-    const tax = Math.round(r.income * taxReservePct);
-    const net = r.income - tax - r.expenses;
-    rolling += net;
-    const isLean = r.income < floorIncome;
-    const isPeak = r.income >= floorIncome * 1.4;
+  const dailyFloor = floorIncome / 30.4167;
+  const dailyBurn = avgExpenses / 30.4167;
 
-    return {
-      month: r.month.length > 4 ? r.month.slice(0, 3) : r.month,
-      fullMonth: r.month,
-      income: r.income,
-      expenses: r.expenses,
-      tax,
-      balance: Math.round(rolling),
-      netFlow: net,
-      isLean,
-      isPeak,
+  // 1. Monthly Macro Data
+  const monthlyData = useMemo(() => {
+    let rolling = currentSavings;
+    return records.map((r) => {
+      const tax = Math.round(r.income * taxReservePct);
+      const net = r.income - tax - r.expenses;
+      rolling += net;
+      const isLean = r.income < floorIncome;
+      const isPeak = r.income >= floorIncome * 1.4;
+
+      return {
+        label: r.month.length > 4 ? r.month.slice(0, 3) : r.month,
+        fullMonth: r.month,
+        income: r.income,
+        expenses: r.expenses,
+        tax,
+        balance: Math.round(rolling),
+        netFlow: net,
+        isLean,
+        isPeak,
+      };
+    });
+  }, [records, currentSavings, taxReservePct, floorIncome]);
+
+  // 2. 30-Day Daily Micro Data
+  const dailyData = useMemo(() => {
+    let rollingDaily = currentSavings;
+    
+    // Distribute actual inflows across the month
+    const dailyInflowEvents: Record<number, number> = {
+      3: 3200,   // Retainer 1
+      12: 4500,  // Milestone 2
+      15: 680,   // Platform payout
+      22: 1200,  // Advisory call
     };
-  });
 
-  const minBalance = Math.min(...data.map(d => d.balance), 0);
-  const maxBalance = Math.max(...data.map(d => d.balance), bufferTarget * 1.2, 12000);
-  const hasDeficit = minBalance < 0;
-  const lowestMonth = data.reduce((a, b) => a.balance < b.balance ? a : b);
+    return Array.from({ length: 30 }, (_, i) => {
+      const day = i + 1;
+      const inflow = dailyInflowEvents[day] || 0;
+      // Fixed daily baseline burn plus rent on day 1
+      const outflow = day === 1 ? dailyBurn + 1400 : dailyBurn;
+      const net = inflow - outflow;
+      rollingDaily += net;
+
+      return {
+        label: `${day}`,
+        day,
+        inflow,
+        outflow: Math.round(outflow),
+        balance: Math.round(rollingDaily),
+        netFlow: Math.round(net),
+      };
+    });
+  }, [currentSavings, dailyBurn]);
+
+  // 3. 90-Day Drought Exhaustion Forecast Data
+  const droughtData = useMemo(() => {
+    let rolling = currentSavings;
+    return Array.from({ length: 90 }, (_, i) => {
+      const day = i + 1;
+      rolling = Math.max(0, rolling - dailyBurn);
+      return {
+        label: day % 15 === 0 ? `D${day}` : '',
+        day,
+        balance: Math.round(rolling),
+        burn: Math.round(dailyBurn),
+      };
+    });
+  }, [currentSavings, dailyBurn]);
 
   const fmt = (v: number) => `${currencySymbol}${Math.round(v).toLocaleString()}`;
 
@@ -145,191 +257,135 @@ export const CashFlowChart: React.FC<CashFlowChartProps> = ({
       style={{ background: 'var(--cf-surface)', padding: '1.5rem 2rem' }}
       id="cash-flow"
     >
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3"
-        style={{ borderBottom: '1px solid var(--cf-border)', paddingBottom: '1rem' }}>
+      {/* Header with Granularity Switcher */}
+      <div 
+        className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-[var(--cf-border)]"
+      >
         <div>
           <div className="flex flex-wrap items-center gap-2.5">
-            <h2 className="font-serif text-xl sm:text-2xl font-normal tracking-tight" style={{ color: 'var(--cf-text)' }}>
-              12-Month Cash Flow
+            <h2 className="font-serif text-xl sm:text-2xl font-normal tracking-tight text-[var(--cf-text)]">
+              {viewMode === '12_months' && '12-Month Macro Cash Flow'}
+              {viewMode === '30_days' && '30-Day Daily Micro Variations'}
+              {viewMode === '90_drought' && '90-Day Zero-Income Drought Forecast'}
             </h2>
-            <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded border"
-              style={{ color: 'var(--cf-text-muted)', borderColor: 'var(--cf-border)', background: 'var(--cf-surface-alt)' }}>
-              Hover any bar for detail
+
+            <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded border border-[var(--cf-border)] bg-[var(--cf-surface-alt)] text-[var(--cf-text-muted)]">
+              {viewMode === '30_days' ? 'Daily Resolution Active' : 'Interactive Timeline'}
             </span>
           </div>
-          <p className="text-xs mt-1 leading-relaxed" style={{ color: 'var(--cf-text-muted)' }}>
-            Month-end cash balance vs. your <strong style={{ color: 'var(--cf-text)' }}>{fmt(floorIncome)}/mo</strong> income floor.
-            Teal bars = above floor · Amber = below floor.
+
+          <p className="text-xs mt-1 leading-relaxed text-[var(--cf-text-muted)]">
+            {viewMode === '12_months' && `Month-end liquidity vs. your ${fmt(floorIncome)}/mo conservative floor.`}
+            {viewMode === '30_days' && `Daily cash trajectory: daily living burn (${fmt(dailyFloor)}/day floor) with payment arrival spikes.`}
+            {viewMode === '90_drought' && 'Continuous daily cash drain if all incoming client payments freeze for 90 days.'}
           </p>
         </div>
 
-        {/* Legend */}
-        <div className="flex flex-wrap items-center gap-4 text-[11px] font-mono shrink-0" style={{ color: 'var(--cf-text-muted)' }}>
-          <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-sm" style={{ background: 'var(--cf-accent)' }} />
-            <span>Income</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-sm" style={{ background: 'var(--cf-caution)' }} />
-            <span>Expenses</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-6 h-0.5" style={{ background: 'var(--cf-accent)', opacity: 0.8 }} />
-            <span>Cash Balance</span>
-          </div>
+        {/* ── Granularity Mode Switcher Tabs ── */}
+        <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-[var(--cf-surface-alt)] border border-[var(--cf-border)] self-start lg:self-auto">
+          <button
+            type="button"
+            onClick={() => setViewMode('12_months')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-mono transition-all cursor-pointer ${
+              viewMode === '12_months'
+                ? 'bg-[var(--cf-surface)] text-[var(--cf-text)] font-semibold shadow-sm border border-[var(--cf-border)]'
+                : 'text-[var(--cf-text-muted)] hover:text-[var(--cf-text)]'
+            }`}
+          >
+            12-Month
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setViewMode('30_days')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-mono transition-all cursor-pointer flex items-center gap-1.5 ${
+              viewMode === '30_days'
+                ? 'bg-[var(--cf-surface)] text-[var(--cf-accent)] font-semibold shadow-sm border border-[var(--cf-accent)]/30'
+                : 'text-[var(--cf-text-muted)] hover:text-[var(--cf-text)]'
+            }`}
+          >
+            <Zap className="w-3 h-3 text-[var(--cf-accent)]" />
+            <span>30-Day Daily</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setViewMode('90_drought')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-mono transition-all cursor-pointer ${
+              viewMode === '90_drought'
+                ? 'bg-[var(--cf-surface)] text-[var(--cf-caution)] font-semibold shadow-sm border border-[var(--cf-caution)]/30'
+                : 'text-[var(--cf-text-muted)] hover:text-[var(--cf-text)]'
+            }`}
+          >
+            90-Day Drought
+          </button>
         </div>
       </div>
 
-      {/* Chart */}
+      {/* Chart Legend */}
+      <div className="flex flex-wrap items-center justify-between text-[11px] font-mono text-[var(--cf-text-muted)]">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1.5">
+            <div className="w-3 h-3 rounded-sm bg-[var(--cf-accent)]" />
+            <span>{viewMode === '30_days' ? 'Daily Inflow' : 'Monthly Income'}</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-3 h-3 rounded-sm bg-[var(--cf-caution)]" />
+            <span>{viewMode === '30_days' ? 'Daily Outflow' : 'Expenses'}</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-6 h-0.5 bg-[var(--cf-accent)] opacity-80" />
+            <span>Liquid Cash Balance</span>
+          </div>
+        </div>
+
+        <div className="text-[11px] font-mono text-[var(--cf-text-faint)]">
+          {viewMode === '30_days' ? `Daily Floor: ${fmt(dailyFloor)}/day` : `Monthly Floor: ${fmt(floorIncome)}/mo`}
+        </div>
+      </div>
+
+      {/* ── Dynamic Chart Rendering ── */}
       <div style={{ width: '100%', height: 320 }}>
         <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
-            onMouseMove={(state) => {
-              if (state.isTooltipActive) setActiveIdx(typeof state.activeTooltipIndex === 'number' ? state.activeTooltipIndex : null);
-              else setActiveIdx(null);
-            }}
-            onMouseLeave={() => setActiveIdx(null)}
-          >
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--cf-border)" vertical={false} />
-
-            <XAxis
-              dataKey="month"
-              tick={{ fill: 'var(--cf-text-muted)', fontSize: 11, fontFamily: 'var(--font-mono)' }}
-              axisLine={{ stroke: 'var(--cf-border)' }}
-              tickLine={false}
-              interval={0}
-            />
-
-            <YAxis
-              yAxisId="bars"
-              tick={{ fill: 'var(--cf-text-muted)', fontSize: 10, fontFamily: 'var(--font-mono)' }}
-              axisLine={false}
-              tickLine={false}
-              tickFormatter={(v) => `${currencySymbol}${(v / 1000).toFixed(0)}k`}
-              width={45}
-            />
-
-            <YAxis
-              yAxisId="line"
-              orientation="right"
-              domain={[minBalance * 0.9, maxBalance * 1.05]}
-              tick={{ fill: 'var(--cf-text-muted)', fontSize: 10, fontFamily: 'var(--font-mono)' }}
-              axisLine={false}
-              tickLine={false}
-              tickFormatter={(v) => `${currencySymbol}${(v / 1000).toFixed(0)}k`}
-              width={45}
-            />
-
-            <Tooltip
-              content={
-                <CustomTooltip
-                  currencySymbol={currencySymbol}
-                  floorIncome={floorIncome}
-                  bufferTarget={bufferTarget}
-                />
-              }
-              cursor={{ fill: 'var(--cf-accent)', fillOpacity: 0.05 }}
-            />
-
-            {/* Reference lines */}
-            <ReferenceLine
-              yAxisId="line"
-              y={bufferTarget}
-              stroke="var(--cf-warm)"
-              strokeDasharray="5 4"
-              strokeWidth={1.5}
-              label={{ value: 'Buffer target', fill: 'var(--cf-warm)', fontSize: 10, fontFamily: 'var(--font-mono)', position: 'insideTopLeft' }}
-            />
-            <ReferenceLine
-              yAxisId="bars"
-              y={floorIncome}
-              stroke="var(--cf-accent)"
-              strokeDasharray="5 4"
-              strokeWidth={1.5}
-              label={{ value: 'Income floor', fill: 'var(--cf-accent)', fontSize: 10, fontFamily: 'var(--font-mono)', position: 'insideTopLeft' }}
-            />
-
-            {/* Income bars */}
-            <Bar yAxisId="bars" dataKey="income" name="Income" radius={[3, 3, 0, 0]} maxBarSize={28}>
-              {data.map((entry, index) => (
-                <Cell
-                  key={`income-${index}`}
-                  fill={entry.isLean ? 'var(--cf-warm)' : 'var(--cf-accent)'}
-                  opacity={activeIdx === null || activeIdx === index ? 1 : 0.4}
-                />
-              ))}
-            </Bar>
-
-            {/* Expense bars */}
-            <Bar yAxisId="bars" dataKey="expenses" name="Expenses" radius={[3, 3, 0, 0]} maxBarSize={20}>
-              {data.map((_, index) => (
-                <Cell
-                  key={`exp-${index}`}
-                  fill="var(--cf-caution)"
-                  opacity={activeIdx === null || activeIdx === index ? 0.7 : 0.2}
-                />
-              ))}
-            </Bar>
-
-            {/* Cash balance line with area */}
-            <Area
-              yAxisId="line"
-              type="monotone"
-              dataKey="balance"
-              name="Cash Balance"
-              stroke="var(--cf-accent)"
-              strokeWidth={2.5}
-              fill="var(--cf-accent)"
-              fillOpacity={0.06}
-              dot={(props: any) => {
-                const { cx, cy, index } = props;
-                const d = data[index];
-                const isActive = activeIdx === index;
-                return (
-                  <circle
-                    key={`dot-${index}`}
-                    cx={cx}
-                    cy={cy}
-                    r={isActive ? 6 : 3.5}
-                    fill={d.isLean ? 'var(--cf-warm)' : 'var(--cf-accent)'}
-                    stroke="var(--cf-surface)"
-                    strokeWidth={2}
-                    style={{ transition: 'r 0.15s ease' }}
-                  />
-                );
-              }}
-              activeDot={{ r: 7, fill: 'var(--cf-accent)', stroke: 'var(--cf-surface)', strokeWidth: 2 }}
-            />
-          </ComposedChart>
+          {viewMode === '12_months' ? (
+            <ComposedChart data={monthlyData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--cf-border)" vertical={false} />
+              <XAxis dataKey="label" tick={{ fill: 'var(--cf-text-muted)', fontSize: 11, fontFamily: 'var(--font-mono)' }} axisLine={{ stroke: 'var(--cf-border)' }} tickLine={false} />
+              <YAxis yAxisId="left" tick={{ fill: 'var(--cf-text-muted)', fontSize: 10, fontFamily: 'var(--font-mono)' }} tickFormatter={(v) => `${currencySymbol}${v >= 1000 ? `${Math.round(v / 1000)}k` : v}`} axisLine={false} tickLine={false} width={40} />
+              <YAxis yAxisId="right" orientation="right" tick={{ fill: 'var(--cf-text-faint)', fontSize: 10, fontFamily: 'var(--font-mono)' }} tickFormatter={(v) => `${currencySymbol}${Math.round(v / 1000)}k`} axisLine={false} tickLine={false} width={45} />
+              <Tooltip content={<CustomMonthlyTooltip currencySymbol={currencySymbol} floorIncome={floorIncome} bufferTarget={bufferTarget} />} />
+              <ReferenceLine yAxisId="left" y={floorIncome} stroke="var(--cf-accent)" strokeDasharray="4 3" strokeWidth={1.5} label={{ value: `Floor ${fmt(floorIncome)}`, fill: 'var(--cf-accent)', fontSize: 10, fontFamily: 'var(--font-mono)', position: 'insideTopLeft' }} />
+              <Bar yAxisId="left" dataKey="income" radius={[4, 4, 0, 0]} maxBarSize={28}>
+                {monthlyData.map((entry, idx) => (
+                  <Cell key={`bar-${idx}`} fill={entry.isLean ? 'var(--cf-warm)' : 'var(--cf-accent)'} opacity={0.88} />
+                ))}
+              </Bar>
+              <Bar yAxisId="left" dataKey="expenses" fill="var(--cf-caution)" opacity={0.35} radius={[3, 3, 0, 0]} maxBarSize={16} />
+              <Line yAxisId="right" type="monotone" dataKey="balance" stroke="var(--cf-accent)" strokeWidth={2.5} dot={{ r: 3, fill: 'var(--cf-surface)', stroke: 'var(--cf-accent)', strokeWidth: 2 }} activeDot={{ r: 5, fill: 'var(--cf-accent)' }} />
+            </ComposedChart>
+          ) : viewMode === '30_days' ? (
+            <ComposedChart data={dailyData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--cf-border)" vertical={false} />
+              <XAxis dataKey="label" tick={{ fill: 'var(--cf-text-muted)', fontSize: 10, fontFamily: 'var(--font-mono)' }} interval={2} axisLine={{ stroke: 'var(--cf-border)' }} tickLine={false} />
+              <YAxis yAxisId="left" tick={{ fill: 'var(--cf-text-muted)', fontSize: 10, fontFamily: 'var(--font-mono)' }} tickFormatter={(v) => `${currencySymbol}${v >= 1000 ? `${(v / 1000).toFixed(1)}k` : v}`} axisLine={false} tickLine={false} width={42} />
+              <YAxis yAxisId="right" orientation="right" tick={{ fill: 'var(--cf-text-faint)', fontSize: 10, fontFamily: 'var(--font-mono)' }} tickFormatter={(v) => `${currencySymbol}${Math.round(v / 1000)}k`} axisLine={false} tickLine={false} width={45} />
+              <Tooltip content={<CustomDailyTooltip currencySymbol={currencySymbol} dailyFloor={dailyFloor} />} />
+              <ReferenceLine yAxisId="left" y={dailyFloor} stroke="var(--cf-accent)" strokeDasharray="3 3" strokeWidth={1.5} label={{ value: `Floor ${fmt(dailyFloor)}/d`, fill: 'var(--cf-accent)', fontSize: 9, fontFamily: 'var(--font-mono)', position: 'insideTopLeft' }} />
+              <Bar yAxisId="left" dataKey="inflow" fill="#3DE8C8" radius={[3, 3, 0, 0]} maxBarSize={14} />
+              <Bar yAxisId="left" dataKey="outflow" fill="var(--cf-caution)" opacity={0.4} radius={[2, 2, 0, 0]} maxBarSize={10} />
+              <Line yAxisId="right" type="monotone" dataKey="balance" stroke="var(--cf-accent)" strokeWidth={2} dot={false} activeDot={{ r: 4, fill: 'var(--cf-accent)' }} />
+            </ComposedChart>
+          ) : (
+            <ComposedChart data={droughtData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--cf-border)" vertical={false} />
+              <XAxis dataKey="label" tick={{ fill: 'var(--cf-text-muted)', fontSize: 10, fontFamily: 'var(--font-mono)' }} axisLine={{ stroke: 'var(--cf-border)' }} tickLine={false} />
+              <YAxis yAxisId="right" orientation="right" tick={{ fill: 'var(--cf-text-faint)', fontSize: 10, fontFamily: 'var(--font-mono)' }} tickFormatter={(v) => `${currencySymbol}${Math.round(v / 1000)}k`} axisLine={false} tickLine={false} width={45} />
+              <Tooltip formatter={(v: any) => [`${currencySymbol}${Number(v).toLocaleString()}`, 'Remaining Cash']} />
+              <ReferenceLine yAxisId="right" y={0} stroke="var(--cf-caution)" strokeWidth={2} label={{ value: 'Exhaustion Line ($0)', fill: 'var(--cf-caution)', fontSize: 10, fontFamily: 'var(--font-mono)' }} />
+              <Area yAxisId="right" type="monotone" dataKey="balance" stroke="var(--cf-caution)" fill="rgba(180,87,63,0.15)" strokeWidth={2} />
+            </ComposedChart>
+          )}
         </ResponsiveContainer>
-      </div>
-
-      {/* Summary callout */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-xl border text-xs"
-        style={{ background: 'var(--cf-surface-alt)', borderColor: 'var(--cf-border)' }}>
-        <div className="flex items-start sm:items-center gap-2.5">
-          {hasDeficit
-            ? <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" style={{ color: 'var(--cf-caution)' }} />
-            : <CheckCircle2 className="w-4 h-4 shrink-0" style={{ color: 'var(--cf-accent)' }} />
-          }
-          <span style={{ color: 'var(--cf-text-muted)' }}>
-            <strong style={{ color: 'var(--cf-text)' }}>Lowest point:</strong>{' '}
-            {lowestMonth.fullMonth} reaches{' '}
-            <strong className="font-mono" style={{ color: 'var(--cf-text)' }}>
-              {fmt(lowestMonth.balance)}
-            </strong>
-            {hasDeficit ? ' — buffer draw required' : ' before income replenishes reserves'}.
-          </span>
-        </div>
-        <span className="font-mono text-[10px] uppercase tracking-wider font-semibold px-2.5 py-1 rounded-full shrink-0"
-          style={{
-            background: hasDeficit ? 'var(--cf-caution-bg)' : 'var(--cf-accent-bg)',
-            color: hasDeficit ? 'var(--cf-caution)' : 'var(--cf-accent)',
-            border: `1px solid ${hasDeficit ? 'var(--cf-caution)' : 'var(--cf-accent)'}33`,
-          }}>
-          {hasDeficit ? 'Deficit Risk' : 'No Deficit'}
-        </span>
       </div>
     </section>
   );

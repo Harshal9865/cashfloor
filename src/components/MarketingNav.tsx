@@ -21,6 +21,7 @@ import { useAuth } from '@/lib/auth/AuthContext';
 const navLinks = [
   { label: 'How It Works', href: '/#how-it-works' },
   { label: 'Features', href: '/#features' },
+  { label: 'Integrations', href: '/integrations' },
   { label: 'Subscription', href: '/subscription' },
   { label: 'Calculators', href: '/dashboard' },
   { label: 'Philosophy', href: '/blog/the-20th-percentile-math' },

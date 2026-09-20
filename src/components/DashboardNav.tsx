@@ -21,11 +21,11 @@ interface DashboardNavProps {
 }
 
 const NAV_SECTIONS = [
-  { label: 'Runway', href: '#runway' },
-  { label: 'Pillars', href: '#partitions' },
-  { label: 'Timeline', href: '#cash-flow' },
-  { label: 'Levers', href: '#assumptions' },
-  { label: 'Ledger', href: '#ledger-archive' },
+  { label: 'Runway', href: '/dashboard#runway' },
+  { label: 'Timeline', href: '/dashboard#cash-flow' },
+  { label: 'Daily Stream', href: '/daily' },
+  { label: 'Integrations', href: '/integrations' },
+  { label: 'Ledger', href: '/dashboard#ledger-archive' },
 ];
 
 export default function DashboardNav({
