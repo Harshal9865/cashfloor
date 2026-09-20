@@ -4,8 +4,8 @@ import React, { useState, useMemo } from 'react';
 import { MonthlyRecord, CalculatorAssumptions } from '@/lib/calculator/types';
 import { computeFullLedger } from '@/lib/calculator/engine';
 import { exportLedgerToCsv } from '@/lib/export/csvExport';
-import Header from '@/components/Header';
-import { ScenarioSelectorBar } from '@/components/ScenarioSelectorBar';
+import DashboardNav from '@/components/DashboardNav';
+import { ScenarioPillBar } from '@/components/ScenarioPillBar';
 import { HeroRunway } from '@/components/HeroRunway';
 import { LedgerRows } from '@/components/LedgerRows';
 import { CashFlowChart } from '@/components/CashFlowChart';
@@ -239,8 +239,8 @@ export default function Home() {
 
   return (
     <main className="min-h-screen flex flex-col bg-[#F1F4F2] text-[#16232B] selection:bg-[#2F6F62] selection:text-white">
-      {/* 1. Google Stitch Top Navigation Bar */}
-      <Header
+      {/* 1. Clean Dashboard Navigation Bar */}
+      <DashboardNav
         onResetData={handleResetData}
         onLoadSample={handleLoadSample}
         onExportCsv={handleExportCsv}
@@ -251,8 +251,8 @@ export default function Home() {
         lastSavedAt={lastSavedAt}
       />
 
-      {/* 2. Google Stitch Sub-Header Scenario Selector Bar */}
-      <ScenarioSelectorBar
+      {/* 2. Scenario Pill Bar */}
+      <ScenarioPillBar
         assumptions={assumptions}
         onChange={setAssumptions}
         liquidCash={calculation.currentSavings}
@@ -261,93 +261,109 @@ export default function Home() {
         currencySymbol={currencySymbol}
       />
 
-      {/* 3. Main Editorial Canvas (max-w-7xl) */}
-      <div className="flex-1 max-w-7xl mx-auto w-full px-4 md:px-12 py-10 space-y-12">
-        {/* Monumental Hero Runway Section */}
-        <HeroRunway
-          runwayMonths={calculation.runwayMonths}
-          isInfiniteRunway={calculation.isInfiniteRunway}
-          currentSavings={calculation.currentSavings}
-          avgMonthlyExpenses={calculation.avgMonthlyExpenses}
-          floorIncome={calculation.floorIncome}
-          exhaustionDate={calculation.exhaustionDate}
-          dailyBurnVelocity={calculation.dailyBurnVelocity}
-          surplusMargin={calculation.surplusMargin}
-          bufferFundingPercentage={calculation.bufferFundingPercentage}
-          bufferMonthsMultiplier={assumptions.bufferMonthsMultiplier}
-          currencySymbol={currencySymbol}
-        />
+      {/* 3. Main Canvas */}
+      <div className="flex-1 max-w-7xl mx-auto w-full px-4 md:px-8 py-8 space-y-6">
+        {/* Hero Runway */}
+        <section id="runway" className="dash-card p-6 md:p-8">
+          <HeroRunway
+            runwayMonths={calculation.runwayMonths}
+            isInfiniteRunway={calculation.isInfiniteRunway}
+            currentSavings={calculation.currentSavings}
+            avgMonthlyExpenses={calculation.avgMonthlyExpenses}
+            floorIncome={calculation.floorIncome}
+            exhaustionDate={calculation.exhaustionDate}
+            dailyBurnVelocity={calculation.dailyBurnVelocity}
+            surplusMargin={calculation.surplusMargin}
+            bufferFundingPercentage={calculation.bufferFundingPercentage}
+            bufferMonthsMultiplier={assumptions.bufferMonthsMultiplier}
+            currencySymbol={currencySymbol}
+          />
+        </section>
 
         <TaxDeadlineReminders />
 
-        {/* Capital Partitioning & Reserve Pillars 5-Column Table */}
-        <LedgerRows
-          result={calculation}
-          assumptions={assumptions}
-          currencySymbol={currencySymbol}
-        />
+        {/* Capital Partitioning */}
+        <section id="partitions" className="dash-card p-6 md:p-8">
+          <LedgerRows
+            result={calculation}
+            assumptions={assumptions}
+            currencySymbol={currencySymbol}
+          />
+        </section>
 
-        {/* 12-Month Cash Flow Horizon & Floor Overlay Timeline Chart */}
-        <CashFlowChart
-          records={records}
-          floorIncome={calculation.floorIncome}
-          avgExpenses={calculation.avgMonthlyExpenses}
-          currentSavings={calculation.currentSavings}
-          bufferTarget={calculation.bufferTarget}
-          taxReservePct={assumptions.taxReservePct}
-          currencySymbol={currencySymbol}
-        />
+        {/* Timeline Chart */}
+        <section id="cash-flow" className="dash-card p-6 md:p-8">
+          <CashFlowChart
+            records={records}
+            floorIncome={calculation.floorIncome}
+            avgExpenses={calculation.avgMonthlyExpenses}
+            currentSavings={calculation.currentSavings}
+            bufferTarget={calculation.bufferTarget}
+            taxReservePct={assumptions.taxReservePct}
+            currencySymbol={currencySymbol}
+          />
+        </section>
 
-        {/* Real-time Cash Flow Allocation Waterfall */}
-        <CashFlowWaterfall
-          steps={calculation.waterfallSteps}
-          currencySymbol={currencySymbol}
-        />
+        {/* Waterfall */}
+        <section className="dash-card p-6 md:p-8">
+          <CashFlowWaterfall
+            steps={calculation.waterfallSteps}
+            currencySymbol={currencySymbol}
+          />
+        </section>
 
-        {/* Dynamic Stress Testing & Scenario Simulator */}
-        <ScenarioSimulator
-          assumptions={assumptions}
-          onChange={setAssumptions}
-          windfallAllocation={calculation.windfallAllocation}
-          currencySymbol={currencySymbol}
-          scenarioImpactDescription={calculation.scenarioImpactDescription}
-          isLocked={!isAuthenticated}
-          onUnlockRequest={() => handleUnlockRequest('Advanced Stress Testing')}
-        />
+        {/* Stress Testing */}
+        <section className="dash-card p-6 md:p-8">
+          <ScenarioSimulator
+            assumptions={assumptions}
+            onChange={setAssumptions}
+            windfallAllocation={calculation.windfallAllocation}
+            currencySymbol={currencySymbol}
+            scenarioImpactDescription={calculation.scenarioImpactDescription}
+            isLocked={!isAuthenticated}
+            onUnlockRequest={() => handleUnlockRequest('Advanced Stress Testing')}
+          />
+        </section>
 
-        {/* Equilibrium Levers & Sensitivity Modeling */}
-        <AssumptionControls
-          assumptions={assumptions}
-          onChange={setAssumptions}
-          currencySymbol={currencySymbol}
-          onCurrencyChange={handleCurrencyChange}
-          floorIncome={calculation.floorIncome}
-          sensitivityDaysPer150={calculation.sensitivityDaysPer150}
-          onRevertDefaults={handleRevertDefaults}
-        />
+        {/* Levers */}
+        <section id="assumptions" className="dash-card p-6 md:p-8">
+          <AssumptionControls
+            assumptions={assumptions}
+            onChange={setAssumptions}
+            currencySymbol={currencySymbol}
+            onCurrencyChange={handleCurrencyChange}
+            floorIncome={calculation.floorIncome}
+            sensitivityDaysPer150={calculation.sensitivityDaysPer150}
+            onRevertDefaults={handleRevertDefaults}
+          />
+        </section>
 
-        {/* Volatility & Concentration Risk Radar */}
-        <RiskVolatilityRadar
-          volatility={calculation.volatility}
-          clientConcentrations={calculation.clientConcentrations}
-          currencySymbol={currencySymbol}
-          isLocked={!isAuthenticated}
-          onUnlockRequest={() => handleUnlockRequest('Client Concentration Radar')}
-        />
+        {/* Risk Radar */}
+        <section className="dash-card p-6 md:p-8">
+          <RiskVolatilityRadar
+            volatility={calculation.volatility}
+            clientConcentrations={calculation.clientConcentrations}
+            currencySymbol={currencySymbol}
+            isLocked={!isAuthenticated}
+            onUnlockRequest={() => handleUnlockRequest('Client Concentration Radar')}
+          />
+        </section>
 
-        {/* Detailed Double-Entry Cash Ledger & Forecast Table */}
-        <InputTable
-          records={records}
-          onChange={setRecords}
-          onOpenPasteModal={() => setIsPasteModalOpen(true)}
-          taxReservePct={assumptions.taxReservePct}
-          sustainablePaycheck={calculation.sustainablePaycheck}
-          initialSavings={calculation.currentSavings}
-          floorIncome={calculation.floorIncome}
-          currencySymbol={currencySymbol}
-          isLocked={!isAuthenticated}
-          onUnlockRequest={() => handleUnlockRequest('12-Month Ledger')}
-        />
+        {/* Ledger Table */}
+        <section id="ledger-archive" className="dash-card p-6 md:p-8">
+          <InputTable
+            records={records}
+            onChange={setRecords}
+            onOpenPasteModal={() => setIsPasteModalOpen(true)}
+            taxReservePct={assumptions.taxReservePct}
+            sustainablePaycheck={calculation.sustainablePaycheck}
+            initialSavings={calculation.currentSavings}
+            floorIncome={calculation.floorIncome}
+            currencySymbol={currencySymbol}
+            isLocked={!isAuthenticated}
+            onUnlockRequest={() => handleUnlockRequest('12-Month Ledger')}
+          />
+        </section>
 
         {/* Philosophy Drawer & Action Bar */}
         <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 hairline-t">
@@ -406,36 +422,21 @@ export default function Home() {
         )}
       </div>
 
-      {/* 4. Google Stitch Editorial Footer */}
-      <footer className="w-full hairline-t bg-[#E8EDE9] py-8 px-4 md:px-12 mt-12 text-xs font-mono text-[#5C6D77]">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
-          <div className="flex items-center space-x-3">
-            <span className="font-serif text-[#16232B] text-sm font-semibold">Calm Ledger</span>
-            <span className="opacity-40">•</span>
-            <span>A Quiet Tool for Solitary Craft &amp; Variable Cash Horizons</span>
+      {/* Footer */}
+      <footer className="w-full bg-[#E8EDE9] py-6 px-4 md:px-8 mt-4" style={{ borderTop: '1px solid rgba(22,35,43,0.08)' }}>
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3">
+          <div className="flex items-center gap-2">
+            <div className="w-5 h-5 bg-gradient-to-br from-[#16232B] to-[#2F6F62] rounded flex items-center justify-center">
+              <span className="text-white font-serif text-[10px] font-bold">C</span>
+            </div>
+            <span className="font-serif text-[#16232B] text-sm font-semibold">CashFloor</span>
+            <span className="text-[#8E9EA7] text-xs">· Freelance Runway Calculator</span>
           </div>
-          <div className="flex flex-wrap items-center space-x-6 text-[11px]">
-            <button
-              type="button"
-              onClick={handleExportCsv}
-              className="hover:text-[#2F6F62] transition-colors cursor-pointer"
-            >
-              Reconcile &amp; Export CSV
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsShareModalOpen(true)}
-              className="hover:text-[#2F6F62] transition-colors cursor-pointer"
-            >
-              Pinterest 1000x1500 Card
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowPhilosophy(true)}
-              className="hover:text-[#2F6F62] transition-colors cursor-pointer"
-            >
-              20th Percentile Math
-            </button>
+          <div className="flex items-center gap-4 text-[11px] font-mono text-[#8E9EA7]">
+            <button type="button" onClick={handleExportCsv} className="hover:text-[#2F6F62] transition-colors cursor-pointer">Export CSV</button>
+            <button type="button" onClick={() => setIsShareModalOpen(true)} className="hover:text-[#2F6F62] transition-colors cursor-pointer">Share Card</button>
+            <a href="/blog/the-20th-percentile-math" className="hover:text-[#2F6F62] transition-colors">Guide</a>
+            <a href="/" className="hover:text-[#16232B] transition-colors">Home</a>
           </div>
         </div>
       </footer>
