@@ -47,5 +47,13 @@ next-env.d.ts
 /blob-report/
 /scratch/
 
-.vercel
-.env*
+# internal scripts & assistant notes
+/scripts/
+CLAUDE.md
+AGENTS.md
+
+# ide & editor
+.vscode/
+.idea/
+*.swp
+*.swo
