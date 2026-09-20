@@ -2,6 +2,7 @@ import MarketingNav from '@/components/MarketingNav';
 import HeroTeaser from '@/components/marketing/HeroTeaser';
 import FeaturesSection from '@/components/marketing/FeaturesSection';
 import CtaSection from '@/components/marketing/CtaSection';
+import ScrollAnimationSection from '@/components/marketing/ScrollAnimationSection';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -18,6 +19,9 @@ export default function MarketingPage() {
       <main>
         {/* Full-screen immersive hero */}
         <HeroTeaser />
+
+        {/* Scroll Animation Section */}
+        <ScrollAnimationSection />
 
         {/* Feature cards */}
         <FeaturesSection />

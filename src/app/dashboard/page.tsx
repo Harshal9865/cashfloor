@@ -244,36 +244,36 @@ export default function Home() {
           animate={{
             boxShadow: isViewingSample
               ? ['0 0 0px rgba(245,158,11,0)', '0 0 15px rgba(245,158,11,0.2)', '0 0 0px rgba(245,158,11,0)']
-              : '0 1px 2px rgba(0,0,0,0.05)',
+              : '0 1px 2px rgba(0,0,0,0.02)',
           }}
           transition={{ duration: 3, repeat: Infinity }}
-          className={`rounded-3xl border p-5 sm:p-6 shadow-sm transition-all flex flex-col md:flex-row md:items-center justify-between gap-5 relative overflow-hidden ${
-            isViewingSample ? 'bg-amber-500/5 border-amber-500/30' : 'bg-[var(--cf-surface-alt)] border-[var(--cf-border)]'
+          className={`rounded-2xl border p-4 shadow-sm transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative overflow-hidden ${
+            isViewingSample ? 'bg-amber-500/5 border-amber-500/30' : 'bg-[var(--cf-surface)] border-[var(--cf-border-soft)]'
           }`}
         >
           {isViewingSample && (
-            <div className="absolute top-0 left-0 w-1 h-full bg-amber-500 rounded-l-3xl" />
+            <div className="absolute top-0 left-0 w-1 h-full bg-amber-500 rounded-l-2xl" />
           )}
 
-          <div className="flex items-start sm:items-center gap-4 relative z-10">
+          <div className="flex items-center gap-3 relative z-10">
             <div 
-              className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 border"
+              className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border"
               style={{
                 background: isViewingSample ? 'rgba(245, 158, 11, 0.15)' : 'var(--cf-accent-bg)',
                 borderColor: isViewingSample ? 'rgba(245, 158, 11, 0.2)' : 'rgba(47,111,98,0.3)',
                 color: isViewingSample ? '#f59e0b' : 'var(--cf-accent)',
               }}
             >
-              {isViewingSample ? <AlertTriangle className="w-5 h-5" /> : <ShieldCheck className="w-5 h-5" />}
+              {isViewingSample ? <AlertTriangle className="w-4 h-4" /> : <ShieldCheck className="w-4 h-4" />}
             </div>
 
             <div>
-              <div className="flex items-center gap-2 mb-1">
+              <div className="flex items-center gap-2">
                 <span className="text-sm font-serif font-bold tracking-tight text-[var(--cf-text)]">
                   {isViewingSample ? 'Calibration Required' : 'Ledger Calibrated'}
                 </span>
                 <span 
-                  className="text-[10px] font-mono px-2 py-0.5 rounded-full font-semibold border"
+                  className="text-[9px] font-mono px-2 py-0.5 rounded-full font-semibold border hidden sm:inline-block"
                   style={{
                     background: isViewingSample ? 'rgba(245, 158, 11, 0.1)' : 'var(--cf-accent-bg)',
                     borderColor: isViewingSample ? 'rgba(245, 158, 11, 0.2)' : 'rgba(47,111,98,0.3)',
@@ -283,30 +283,34 @@ export default function Home() {
                   {isViewingSample ? 'Simulation Mode' : 'Real Numbers Active'}
                 </span>
               </div>
-              <p className="text-xs text-[var(--cf-text-muted)] max-w-xl leading-relaxed">
+              <p className="text-[11px] text-[var(--cf-text-muted)] max-w-xl leading-relaxed mt-0.5">
                 {isViewingSample
-                  ? 'Your survival floor is currently simulating with sample data. To get your true financial runway, we need to calibrate your real numbers.'
-                  : `Your real numbers are driving all 6 stress test models. Your guaranteed baseline income is locked at ${currencySymbol}${calculation.floorIncome.toLocaleString()}/mo.`}
+                  ? 'Your survival floor is simulating with sample data. Calibrate your real numbers to get your true runway.'
+                  : `Your real numbers are driving the models. Baseline locked at ${currencySymbol}${calculation.floorIncome.toLocaleString()}/mo.`}
               </p>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 self-end md:self-auto relative z-10">
+          <div className="flex items-center gap-2 relative z-10 self-end sm:self-auto">
             <button
               type="button"
               onClick={() => setIsWizardOpen(true)}
-              className={`inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-white transition-all shadow-md cursor-pointer hover:opacity-95 hover:scale-105`}
-              style={{ background: isViewingSample ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' : 'linear-gradient(135deg, #2F6F62 0%, #1a4f45 100%)' }}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all shadow-sm cursor-pointer hover:opacity-95`}
+              style={{ 
+                background: isViewingSample ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' : 'var(--cf-surface-alt)', 
+                color: isViewingSample ? 'white' : 'var(--cf-text)', 
+                border: isViewingSample ? 'none' : '1px solid var(--cf-border)' 
+              }}
             >
-              <Sparkles className="w-3.5 h-3.5" />
+              <Sparkles className="w-3.5 h-3.5" style={{ color: isViewingSample ? 'white' : 'var(--cf-accent)' }} />
               <span>{isViewingSample ? 'Calibrate My Runway' : 'Update Numbers'}</span>
             </button>
 
-            {isViewingSample && (
+            {!isViewingSample && (
               <button
                 type="button"
                 onClick={() => setIsPasteModalOpen(true)}
-                className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-mono border transition-all cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono border transition-all cursor-pointer"
                 style={{
                   color: 'var(--cf-text)',
                   background: 'var(--cf-surface)',
@@ -324,16 +328,16 @@ export default function Home() {
               <button
                 type="button"
                 onClick={handleResetData}
-                className="px-3 py-2 rounded-xl text-xs font-mono text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] transition-colors cursor-pointer"
+                className="px-3 py-1.5 rounded-lg text-xs font-mono font-medium text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors cursor-pointer"
                 title="Clear sample rows to start from zero"
               >
-                Clear to Blank
+                Clear Sample
               </button>
             ) : (
               <button
                 type="button"
                 onClick={handleLoadSample}
-                className="px-3 py-2 rounded-xl text-xs font-mono text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] transition-colors cursor-pointer"
+                className="px-2 py-1.5 rounded-lg text-[10px] font-mono font-medium text-[var(--cf-text-faint)] hover:text-[var(--cf-text-muted)] transition-colors cursor-pointer"
                 title="Restore Alex Vance sample data"
               >
                 Load Sample

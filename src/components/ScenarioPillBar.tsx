@@ -185,36 +185,8 @@ export function ScenarioPillBar({
             </button>
           </div>
 
-          {/* KPI chips */}
-          <div className="hidden md:flex items-center gap-5 shrink-0 divide-x divide-[var(--cf-border)]">
-            <KpiChip
-              label="Liquid Cash"
-              value={`${currencySymbol}${liquidCash.toLocaleString()}`}
-              color="var(--cf-text)"
-            />
-            <div className="pl-5">
-              <KpiChip
-                label="Income Floor"
-                value={`${currencySymbol}${floorIncome.toLocaleString()}`}
-                color="var(--cf-accent)"
-              />
-            </div>
-            <div className="pl-5">
-              <KpiChip
-                label="Exhaustion"
-                value={exhaustionDate}
-                color="var(--cf-accent-bright)"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* ── Active Scenario Quick Explainer Ribbon ── */}
-        <div 
-          className="px-4 md:px-8 py-1.5 text-[11px] font-mono border-t border-[var(--cf-border-soft)] flex items-center justify-between gap-4"
-          style={{ background: 'var(--cf-surface-alt)', color: 'var(--cf-text-muted)' }}
-        >
-          <div className="max-w-7xl mx-auto w-full flex items-center gap-2">
+          {/* Active Scenario Quick Explainer (Replaces KPIs on Desktop) */}
+          <div className="hidden lg:flex items-center gap-2 text-[11px] font-mono text-[var(--cf-text-muted)] border-l border-[var(--cf-border)] pl-4 truncate flex-1 min-w-0">
             <Icon className="w-3.5 h-3.5 shrink-0" style={{ color: activeScenarioMeta.color }} />
             <span className="truncate">
               <strong className="text-[var(--cf-text)] font-semibold">{activeScenarioMeta.label}:</strong>{' '}
