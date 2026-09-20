@@ -29,7 +29,7 @@ export default function MarketingNav() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled ? 'dark-nav shadow-lg shadow-black/20' : 'bg-transparent'
+          scrolled ? 'bg-[var(--cf-surface-alt)] shadow-lg shadow-[var(--cf-shadow-md)] border-b border-[var(--cf-border)] backdrop-blur-md' : 'bg-transparent'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 md:px-10 h-16 flex items-center justify-between">
@@ -41,8 +41,8 @@ export default function MarketingNav() {
                 <span className="text-white font-serif text-sm font-bold">C</span>
               </div>
             </div>
-            <span className="text-white font-serif text-lg tracking-tight font-medium">
-              Cash<span className="text-[#3DE8C8]">Floor</span>
+            <span className="text-[var(--cf-text)] font-serif text-lg tracking-tight font-medium">
+              Cash<span className="text-[var(--cf-accent-bright)]">Floor</span>
             </span>
           </Link>
 
@@ -52,7 +52,7 @@ export default function MarketingNav() {
               <a
                 key={link.label}
                 href={link.href}
-                className="px-4 py-2 text-sm text-[#9BAFBC] hover:text-white transition-colors duration-200 rounded-lg hover:bg-white/5"
+                className="px-4 py-2 text-sm text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] transition-colors duration-200 rounded-lg hover:bg-[var(--cf-text)]/5"
               >
                 {link.label}
               </a>
@@ -72,7 +72,7 @@ export default function MarketingNav() {
               {/* Shimmer overlay */}
               <span className="absolute inset-0 animate-shimmer opacity-0 group-hover:opacity-100 transition-opacity" />
               <span className="relative text-white">Get Started</span>
-              <ArrowRight className="relative w-3.5 h-3.5 text-[#3DE8C8] group-hover:translate-x-0.5 transition-transform" />
+              <ArrowRight className="relative w-3.5 h-3.5 text-[var(--cf-accent-bright)] group-hover:translate-x-0.5 transition-transform" />
             </Link>
 
             <ThemeToggle className="hidden sm:flex" />
@@ -80,7 +80,7 @@ export default function MarketingNav() {
             <button
               type="button"
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="md:hidden p-2 text-white/70 hover:text-white transition-colors cursor-pointer"
+              className="md:hidden p-2 text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] transition-colors cursor-pointer"
               aria-label="Toggle menu"
             >
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -97,7 +97,7 @@ export default function MarketingNav() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-x-0 top-16 z-40 dark-nav border-b border-white/10 md:hidden"
+            className="fixed inset-x-0 top-16 z-40 bg-[var(--cf-surface-alt)] border-b border-[var(--cf-border)] backdrop-blur-md md:hidden"
           >
             <div className="px-4 py-4 flex flex-col gap-1">
               {navLinks.map((link, i) => (
@@ -108,7 +108,7 @@ export default function MarketingNav() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.06 }}
                   onClick={() => setMobileOpen(false)}
-                  className="px-4 py-3 text-sm text-[#9BAFBC] hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                  className="px-4 py-3 text-sm text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-text)]/5 rounded-lg transition-colors"
                 >
                   {link.label}
                 </motion.a>

@@ -8,8 +8,7 @@ export default function CtaSection() {
   return (
     <section
       id="how-it-works"
-      className="relative w-full py-32 overflow-hidden"
-      style={{ background: '#060A0F' }}
+      className="relative w-full py-32 overflow-hidden bg-[var(--cf-bg-deep)]"
     >
       {/* Animated background grid */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -24,21 +23,21 @@ export default function CtaSection() {
         {/* Radial mask to fade grid edges */}
         <div className="absolute inset-0"
           style={{
-            background: 'radial-gradient(ellipse 70% 70% at 50% 50%, transparent 40%, #060A0F 100%)',
+            background: 'radial-gradient(ellipse 70% 70% at 50% 50%, transparent 40%, var(--cf-bg-deep) 100%)',
           }} />
       </div>
 
       {/* Central glow */}
       <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
         <div className="w-[600px] h-[300px] rounded-full animate-orb-pulse"
-          style={{ background: 'radial-gradient(ellipse, rgba(47,111,98,0.15) 0%, transparent 70%)' }} />
+          style={{ background: 'radial-gradient(ellipse, var(--cf-accent-bg) 0%, transparent 70%)' }} />
       </div>
 
       {/* Horizontal accent lines */}
       <div className="absolute top-0 inset-x-0 h-px"
-        style={{ background: 'linear-gradient(90deg, transparent, rgba(61,232,200,0.3), transparent)' }} />
+        style={{ background: 'linear-gradient(90deg, transparent, var(--cf-accent), transparent)' }} />
       <div className="absolute bottom-0 inset-x-0 h-px"
-        style={{ background: 'linear-gradient(90deg, transparent, rgba(61,232,200,0.3), transparent)' }} />
+        style={{ background: 'linear-gradient(90deg, transparent, var(--cf-accent), transparent)' }} />
 
       <div className="relative max-w-4xl mx-auto px-4 md:px-10 text-center">
         <motion.div
@@ -49,18 +48,18 @@ export default function CtaSection() {
           className="space-y-6"
         >
           {/* Overline */}
-          <div className="inline-block text-[10px] uppercase tracking-widest text-[#3DE8C8] font-mono bg-[#3DE8C8]/10 border border-[#3DE8C8]/20 px-4 py-1.5 rounded-full">
+          <div className="inline-block text-[10px] uppercase tracking-widest text-[var(--cf-accent-bright)] font-mono bg-[var(--cf-accent-bg)] border border-[var(--cf-accent)]/20 px-4 py-1.5 rounded-full">
             Free · No Bank Login · Privacy First
           </div>
 
           {/* Headline */}
-          <h2 className="text-5xl md:text-6xl font-serif text-white tracking-tight leading-tight">
+          <h2 className="text-5xl md:text-6xl font-serif text-[var(--cf-text)] tracking-tight leading-tight">
             Your financial floor,<br />
             <span className="gradient-text italic">calculated in seconds.</span>
           </h2>
 
           {/* Subtext */}
-          <p className="text-[#7A8B96] text-lg max-w-lg mx-auto leading-relaxed">
+          <p className="text-[var(--cf-text-muted)] text-lg max-w-lg mx-auto leading-relaxed">
             Join thousands of freelancers who stopped guessing and started knowing.
             No spreadsheets. No bank surveillance. Just clarity.
           </p>
@@ -73,9 +72,9 @@ export default function CtaSection() {
               { step: '03', label: 'Know your real runway', desc: 'Conservative floor, exhaustion date, and stress tests' },
             ].map((s) => (
               <div key={s.step} className="glass-card rounded-xl p-5">
-                <div className="text-[10px] font-mono text-[#3DE8C8] tracking-widest mb-2">{s.step}</div>
-                <div className="text-white font-semibold text-sm mb-1 leading-tight">{s.label}</div>
-                <div className="text-[#6A7D8A] text-xs leading-relaxed">{s.desc}</div>
+                <div className="text-[10px] font-mono text-[var(--cf-accent-bright)] tracking-widest mb-2">{s.step}</div>
+                <div className="text-[var(--cf-text)] font-semibold text-sm mb-1 leading-tight">{s.label}</div>
+                <div className="text-[var(--cf-text-muted)] text-xs leading-relaxed">{s.desc}</div>
               </div>
             ))}
           </div>
@@ -92,23 +91,19 @@ export default function CtaSection() {
             >
               <span className="absolute inset-0 animate-shimmer opacity-0 group-hover:opacity-100 transition-opacity" />
               <span className="relative text-white">Start for Free</span>
-              <ArrowRight className="relative w-4 h-4 text-[#3DE8C8] group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="relative w-4 h-4 text-[var(--cf-accent-bright)] group-hover:translate-x-1 transition-transform" />
             </Link>
 
             <a
               href="/blog/the-20th-percentile-math"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full text-sm font-medium transition-all duration-200 text-[#9BAFBC]"
-              style={{
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.1)',
-              }}
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full text-sm font-medium transition-all duration-200 text-[var(--cf-text-muted)] border border-[var(--cf-border)] bg-[var(--cf-surface)]/40 hover:border-[var(--cf-accent)]/40 hover:text-[var(--cf-text)]"
             >
               Read: The 20th Percentile Rule
             </a>
           </div>
 
           {/* Fine print */}
-          <p className="text-[#3A5060] text-xs">
+          <p className="text-[var(--cf-text-faint)] text-xs">
             No signup required to get started. Create an account to save your ledger to the cloud.
           </p>
         </motion.div>

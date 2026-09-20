@@ -11,10 +11,7 @@ export const metadata: Metadata = {
 
 export default function MarketingPage() {
   return (
-    <div
-      className="min-h-screen text-white selection:bg-[#2F6F62] selection:text-white"
-      style={{ background: '#080C10' }}
-    >
+    <div className="min-h-screen bg-[var(--cf-bg)] text-[var(--cf-text)] transition-colors duration-300">
       {/* Dark glassmorphism sticky navbar */}
       <MarketingNav />
 
@@ -31,26 +28,22 @@ export default function MarketingPage() {
 
       {/* Footer */}
       <footer
-        className="py-10 text-center"
-        style={{
-          background: '#060A0F',
-          borderTop: '1px solid rgba(255,255,255,0.06)',
-        }}
+        className="py-10 text-center bg-[var(--cf-bg-deep)] border-t border-[var(--cf-border)]"
       >
         <div className="max-w-5xl mx-auto px-4">
-          <div className="flex flex-wrap justify-center gap-6 text-xs mb-6" style={{ color: '#3A5060' }}>
-            <a href="/blog/the-20th-percentile-math" className="hover:text-[#3DE8C8] transition-colors font-semibold">
+          <div className="flex flex-wrap justify-center gap-6 text-xs mb-6 text-[var(--cf-text-muted)]">
+            <a href="/blog/the-20th-percentile-math" className="hover:text-[var(--cf-accent-bright)] transition-colors font-semibold">
               The 20th Percentile Rule
             </a>
-            <a href="/privacy" className="hover:text-[#9BAFBC] transition-colors">Privacy Policy</a>
-            <a href="/terms" className="hover:text-[#9BAFBC] transition-colors">Terms of Service</a>
-            <a href="/dashboard" className="hover:text-[#3DE8C8] transition-colors font-semibold">Dashboard →</a>
+            <a href="/privacy" className="hover:text-[var(--cf-text)] transition-colors">Privacy Policy</a>
+            <a href="/terms" className="hover:text-[var(--cf-text)] transition-colors">Terms of Service</a>
+            <a href="/dashboard" className="hover:text-[var(--cf-accent-bright)] transition-colors font-semibold">Dashboard →</a>
           </div>
-          <p className="text-xs max-w-xl mx-auto mb-4 leading-relaxed" style={{ color: '#2A3F4C' }}>
-            <strong className="text-[#3A5060]">Disclaimer:</strong> CashFloor is an educational simulation tool.
+          <p className="text-xs max-w-xl mx-auto mb-4 leading-relaxed text-[var(--cf-text-muted)]">
+            <strong className="text-[var(--cf-text)]">Disclaimer:</strong> CashFloor is an educational simulation tool.
             It does not provide financial, tax, or legal advice.
           </p>
-          <p style={{ color: '#2A3F4C' }} className="text-xs">
+          <p className="text-[var(--cf-text-muted)] text-xs">
             &copy; {new Date().getFullYear()} CashFloor. All rights reserved.
           </p>
         </div>

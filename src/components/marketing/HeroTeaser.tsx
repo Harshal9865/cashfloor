@@ -192,6 +192,21 @@ function TiltCard() {
 const WORDS = ['Know', 'your', 'numbers.', 'Not', 'the', 'average.'];
 
 export default function HeroTeaser() {
+  const containerRef = useRef<HTMLElement>(null);
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  // Smooth out the mouse movement for the spotlight
+  const smoothX = useSpring(mouseX, { stiffness: 50, damping: 20 });
+  const smoothY = useSpring(mouseY, { stiffness: 50, damping: 20 });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+    if (!containerRef.current) return;
+    const { left, top } = containerRef.current.getBoundingClientRect();
+    mouseX.set(e.clientX - left);
+    mouseY.set(e.clientY - top);
+  };
+
   const particles = Array.from({ length: 18 }, (_, i) => ({
     delay: (i * 0.7) % 5,
     x: (i * 13 + 7) % 90,
@@ -199,8 +214,22 @@ export default function HeroTeaser() {
   }));
 
   return (
-    <section className="relative w-full min-h-screen flex flex-col justify-center overflow-hidden"
-      style={{ background: 'linear-gradient(160deg, #080C10 0%, #0A1018 40%, #060E14 100%)' }}>
+    <section 
+      ref={containerRef}
+      onMouseMove={handleMouseMove}
+      className="relative w-full min-h-screen flex flex-col justify-center overflow-hidden"
+      style={{ background: 'var(--cf-bg)' }}
+    >
+      {/* ── Interactive Spotlight ── */}
+      <motion.div
+        className="absolute inset-0 pointer-events-none opacity-50 z-0"
+        style={{
+          background: useTransform(
+            [smoothX, smoothY],
+            ([x, y]) => `radial-gradient(800px circle at ${x}px ${y}px, var(--cf-accent-bg), transparent 80%)`
+          ),
+        }}
+      />
 
       {/* ── Ambient orbs ── */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -262,7 +291,7 @@ export default function HeroTeaser() {
             {/* Headline */}
             <h1 className="text-5xl sm:text-6xl md:text-7xl leading-[1.04] tracking-tight font-serif">
               <motion.span
-                className="block text-white"
+                className="block text-[var(--cf-text)]"
                 initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
@@ -270,7 +299,7 @@ export default function HeroTeaser() {
                 Stop guessing
               </motion.span>
               <motion.span
-                className="block text-white"
+                className="block text-[var(--cf-text)]"
                 initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
@@ -292,7 +321,7 @@ export default function HeroTeaser() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.65, ease: [0.16, 1, 0.3, 1] }}
-              className="text-lg text-[#7A8B96] leading-relaxed max-w-lg"
+              className="text-lg text-[var(--cf-text-muted)] leading-relaxed max-w-lg"
             >
               A professional ledger for irregular income. Calculate your conservative survival floor,
               auto-partition reserves, and stress-test cash flow before disaster strikes.
