@@ -191,7 +191,7 @@ export const CashFlowWaterfall: React.FC<CashFlowWaterfallProps> = ({
           return (
             <div
               key={i}
-              className="flex items-center justify-between px-3 py-2.5 rounded-lg border transition-all cursor-default"
+              className="flex items-center justify-between px-3 py-2.5 rounded-lg border transition-all cursor-default gap-2"
               style={{
                 borderColor: activeIdx === i ? step.color : 'var(--cf-border)',
                 background: activeIdx === i ? `${step.color}0D` : 'var(--cf-surface-alt)',
@@ -201,11 +201,11 @@ export const CashFlowWaterfall: React.FC<CashFlowWaterfallProps> = ({
               onTouchStart={() => setActiveIdx(i)}
               onTouchEnd={() => setActiveIdx(null)}
             >
-              <div className="flex items-center gap-2.5 text-xs">
+              <div className="flex items-center gap-2.5 text-xs flex-1 min-w-0">
                 <div className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ background: step.color }} />
-                <span style={{ color: 'var(--cf-text)' }}>{step.label}</span>
+                <span className="truncate" style={{ color: 'var(--cf-text)' }}>{step.label}</span>
               </div>
-              <div className="flex items-center gap-3 font-mono text-xs">
+              <div className="flex items-center gap-3 font-mono text-xs shrink-0">
                 <span style={{ color: isDeduction ? 'var(--cf-caution)' : 'var(--cf-accent)', fontWeight: 600 }}>
                   {isDeduction && step.amount < 0 ? '-' : '+'}{currencySymbol}{Math.abs(Math.round(step.amount)).toLocaleString()}
                 </span>

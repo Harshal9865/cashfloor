@@ -235,9 +235,10 @@ export default function DashboardNav({
                   <Share2 className="w-3.5 h-3.5" />
                   <span>Share</span>
                 </button>
-                <ThemeToggle className="hidden sm:flex" />
               </>
             )}
+            
+            <ThemeToggle className="hidden sm:flex" />
 
             {/* Auth / Avatar */}
             {isAuthenticated ? (

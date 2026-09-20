@@ -153,17 +153,17 @@ export const InputTable: React.FC<InputTableProps> = ({
       )}
 
       {/* Header */}
-      <div className="p-6 hairline-b flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#FBFDFB]">
+      <div className="p-6 border-b border-[var(--cf-border)] flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[var(--cf-surface-alt)]">
         <div>
           <div className="flex items-center space-x-3">
-            <h2 className="font-serif text-xl sm:text-2xl text-[#16232B] font-normal tracking-tight">
+            <h2 className="font-serif text-xl sm:text-2xl text-[var(--cf-text)] font-normal tracking-tight">
               Detailed Double-Entry Cash Ledger
             </h2>
-            <span className="text-xs font-mono bg-[#E8EDE9] px-2 py-0.5 border border-[#16232B]/10">
+            <span className="text-xs font-mono bg-[var(--cf-surface)] px-2 py-0.5 border border-[var(--cf-border)] rounded text-[var(--cf-text)]">
               12-Month Ledger Cycle
             </span>
           </div>
-          <p className="font-sans text-xs text-[#5C6D77] mt-0.5">
+          <p className="font-sans text-xs text-[var(--cf-text-muted)] mt-0.5">
             Auditable schedule accounting for confirmed retainers, variable contracts, tax escrow, and drawings.
           </p>
         </div>
@@ -172,15 +172,15 @@ export const InputTable: React.FC<InputTableProps> = ({
           <button
             type="button"
             onClick={onOpenPasteModal}
-            className="bg-[#F1F4F2] hover:bg-[#E8EDE9] text-[#16232B] px-3 py-1.5 hairline-all flex items-center space-x-1.5 transition-colors cursor-pointer"
+            className="bg-[var(--cf-surface)] hover:bg-[var(--cf-surface-hover)] text-[var(--cf-text)] px-3 py-1.5 border border-[var(--cf-border)] rounded flex items-center space-x-1.5 transition-colors cursor-pointer"
           >
-            <ClipboardPaste className="w-3.5 h-3.5 text-[#2F6F62]" />
+            <ClipboardPaste className="w-3.5 h-3.5 text-[var(--cf-accent)]" />
             <span>Paste CSV / TSV</span>
           </button>
           <button
             type="button"
             onClick={handleAddRow}
-            className="bg-[#16232B] hover:bg-[#2F6F62] text-[#F1F4F2] px-3 py-1.5 flex items-center space-x-1 transition-colors cursor-pointer"
+            className="bg-[var(--cf-text)] hover:bg-[var(--cf-accent)] text-[var(--cf-bg)] px-3 py-1.5 rounded flex items-center space-x-1 transition-colors cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Add Event Row</span>

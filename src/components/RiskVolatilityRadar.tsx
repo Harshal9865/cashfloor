@@ -205,10 +205,10 @@ export const RiskVolatilityRadar: React.FC<RiskVolatilityRadarProps> = ({
               { label: 'Monthly Std Deviation', value: `±${currencySymbol}${volatility.standardDeviation.toLocaleString()}` },
               { label: 'Peak / Trough', value: `${volatility.peakToTroughRatio}x (${currencySymbol}${volatility.maxMonth?.toLocaleString()} vs ${currencySymbol}${volatility.minMonth?.toLocaleString()})` },
             ].map(({ label, value }) => (
-              <div key={label} className="flex justify-between items-center py-1 border-b text-xs"
+              <div key={label} className="flex flex-col sm:flex-row sm:items-start justify-between py-1.5 border-b text-xs gap-1 sm:gap-2"
                 style={{ borderColor: 'var(--cf-border)' }}>
-                <span style={{ color: 'var(--cf-text-muted)' }}>{label}</span>
-                <span className="font-mono font-semibold" style={{ color: 'var(--cf-text)' }}>{value}</span>
+                <span className="shrink-0" style={{ color: 'var(--cf-text-muted)' }}>{label}</span>
+                <span className="font-mono font-semibold text-left sm:text-right break-words min-w-0" style={{ color: 'var(--cf-text)' }}>{value}</span>
               </div>
             ))}
           </div>
@@ -230,9 +230,9 @@ export const RiskVolatilityRadar: React.FC<RiskVolatilityRadarProps> = ({
                   onTouchStart={() => setActiveClient(i)}
                   onTouchEnd={() => setActiveClient(null)}
                 >
-                  <div className="flex justify-between items-center text-xs mb-1">
-                    <span className="font-medium truncate max-w-[140px]" style={{ color: 'var(--cf-text)' }}>{c.tag}</span>
-                    <div className="flex items-center gap-2">
+                  <div className="flex justify-between items-center text-xs mb-1 gap-2">
+                    <span className="font-medium truncate flex-1 min-w-0" style={{ color: 'var(--cf-text)' }}>{c.tag}</span>
+                    <div className="flex items-center gap-2 shrink-0">
                       <span className="font-mono font-semibold" style={{ color: 'var(--cf-text)' }}>{c.percentageOfTotal}%</span>
                       {c.isHighRisk && (
                         <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded"
