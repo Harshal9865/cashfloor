@@ -1,24 +1,57 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Mail, Lock, Eye, EyeOff, ShieldCheck, ArrowRight, Check } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
+import {
+  X,
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  ShieldCheck,
+  ArrowRight,
+  Check,
+  Sparkles,
+  User,
+  Zap,
+  Briefcase,
+  Layers,
+  ChevronRight,
+} from 'lucide-react';
+import { useAuth, DEMO_PERSONAS, DemoPersonaKey } from '@/lib/auth/AuthContext';
 
 interface AuthModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen?: boolean;
+  onClose?: () => void;
   message?: string;
-  defaultTab?: 'signin' | 'signup';
+  defaultTab?: 'signin' | 'signup' | 'demo';
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({
-  isOpen,
-  onClose,
-  message,
-  defaultTab = 'signin',
+  isOpen: propIsOpen,
+  onClose: propOnClose,
+  message: propMessage,
+  defaultTab: propDefaultTab,
 }) => {
-  const [tab, setTab] = useState<'signin' | 'signup' | 'magic'>(defaultTab);
+  const {
+    authModalOpen,
+    authModalMessage,
+    authModalDefaultTab,
+    closeAuthModal,
+    signInWithEmail,
+    signUpWithEmail,
+    signInWithDemo,
+    signInWithGoogle,
+  } = useAuth();
+
+  // Use props if passed, otherwise fall back to context state
+  const isOpen = propIsOpen !== undefined ? propIsOpen : authModalOpen;
+  const onClose = propOnClose !== undefined ? propOnClose : closeAuthModal;
+  const message = propMessage || authModalMessage;
+  const initialTab = propDefaultTab || authModalDefaultTab || 'signin';
+
+  const [tab, setTab] = useState<'signin' | 'signup' | 'demo'>(initialTab);
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -27,382 +60,349 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [successMessage, setSuccessMessage] = useState('');
   const [error, setError] = useState<string | null>(null);
 
-  const supabase = createClient();
+  useEffect(() => {
+    if (isOpen) {
+      setTab(initialTab);
+      setError(null);
+      setSuccess(false);
+      setLoading(false);
+    }
+  }, [isOpen, initialTab]);
 
-  const reset = () => {
+  const resetForm = () => {
     setEmail('');
     setPassword('');
+    setFullName('');
     setError(null);
     setSuccess(false);
     setLoading(false);
   };
 
-  const switchTab = (t: 'signin' | 'signup' | 'magic') => {
-    reset();
+  const handleTabChange = (t: 'signin' | 'signup' | 'demo') => {
+    setError(null);
     setTab(t);
   };
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email || !password) return;
     setLoading(true);
     setError(null);
-    try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
-      setSuccessMessage('Signed in! Redirecting…');
+
+    const res = await signInWithEmail(email, password);
+    setLoading(false);
+
+    if (res.success) {
+      setSuccessMessage('Welcome back! Full Pro suite unlocked.');
       setSuccess(true);
-      setTimeout(onClose, 1200);
-    } catch (err: any) {
-      setError(err.message === 'Invalid login credentials'
-        ? 'Wrong email or password. Please try again.'
-        : err.message || 'Sign in failed. Please try again.');
-    } finally {
-      setLoading(false);
+      setTimeout(() => {
+        onClose();
+        resetForm();
+      }, 450);
+    } else {
+      const errStr = res.error || 'Sign in failed.';
+      if (errStr.toLowerCase().includes('invalid login credentials')) {
+        setError('Incorrect password or account not found yet.');
+      } else {
+        setError(errStr);
+      }
     }
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email || !password) return;
     setLoading(true);
     setError(null);
-    try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
-        },
-      });
-      if (error) throw error;
-      setSuccessMessage('Account created! Check your email to confirm and you\'re in.');
+
+    const res = await signUpWithEmail(email, password, fullName);
+    setLoading(false);
+
+    if (res.success) {
+      setSuccessMessage(
+        res.autoConfirmed
+          ? 'Account created! Welcome to CashFloor Pro.'
+          : 'Welcome to CashFloor Pro! Instant access granted.'
+      );
       setSuccess(true);
-    } catch (err: any) {
-      setError(err.message || 'Sign up failed. Please try again.');
-    } finally {
-      setLoading(false);
+      setTimeout(() => {
+        onClose();
+        resetForm();
+      }, 450);
+    } else {
+      setError(res.error || 'Failed to create account.');
     }
   };
 
-  const handleMagicLink = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleDemoSelect = (key: DemoPersonaKey) => {
     setLoading(true);
-    setError(null);
+    signInWithDemo(key);
+    const p = DEMO_PERSONAS[key];
+    setSuccessMessage(`Signed in as ${p.name}! Pro features unlocked.`);
+    setSuccess(true);
+    setTimeout(() => {
+      onClose();
+      resetForm();
+    }, 450);
+  };
+
+  const handleGoogleClick = async () => {
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: { emailRedirectTo: `${window.location.origin}/dashboard` },
-      });
-      if (error) throw error;
-      setSuccessMessage(`Magic link sent to ${email}. Check your inbox.`);
-      setSuccess(true);
-    } catch (err: any) {
-      setError(err.message || 'Failed to send link.');
-    } finally {
+      setLoading(true);
+      await signInWithGoogle();
+    } catch (e: any) {
       setLoading(false);
+      setError('Google Sign-In failed. Please try email or 1-Click Demo.');
     }
-  };
-
-  const handleGoogleAuth = async () => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/dashboard`,
-        },
-      });
-      if (error) throw error;
-    } catch (err: any) {
-      setError('Google sign in failed. Please try another method.');
-    }
-  };
-
-  const titles = {
-    signin: 'Welcome back',
-    signup: 'Create your account',
-    magic: 'Sign in with email',
-  };
-
-  const subtitles = {
-    signin: 'Sign in to see your saved runway and history.',
-    signup: 'Free forever. No credit card needed.',
-    magic: 'We\'ll email you a secure link to sign in instantly.',
   };
 
   return (
     <AnimatePresence>
       {isOpen && (
-        <>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.15 }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+        >
           {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+          <div
             onClick={onClose}
-            className="fixed inset-0 z-50 bg-[var(--cf-text)]/40 backdrop-blur-sm"
+            className="fixed inset-0 bg-black/60 backdrop-blur-md"
           />
 
-          {/* Modal */}
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.96, y: 16 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.96, y: 16 }}
-              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-              className="w-full max-w-md pointer-events-auto rounded-2xl overflow-hidden"
+          {/* Dialog Container */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96, y: 14 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.96, y: 14 }}
+            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+            className="relative w-full max-w-lg rounded-2xl overflow-hidden z-10"
+            style={{
+              background: 'var(--cf-surface)',
+              border: '1px solid var(--cf-border)',
+              boxShadow: 'var(--cf-shadow-xl)',
+            }}
+          >
+            {/* Top decorative accent bar */}
+            <div
+              className="h-1.5 w-full"
               style={{
-                background: 'var(--cf-surface)',
-                border: '1px solid var(--cf-border)',
-                boxShadow: 'var(--cf-shadow-lg)',
+                background: 'linear-gradient(90deg, #2F6F62, #4E9B8A, #D4AF37, #2F6F62)',
+                backgroundSize: '200% 100%',
               }}
-            >
-              {/* Header */}
-              <div className="flex items-start justify-between p-6 pb-0">
-                <div>
-                  <h2 className="font-serif text-2xl font-semibold" style={{ color: 'var(--cf-text)' }}>
-                    {titles[tab]}
-                  </h2>
-                  <p className="text-sm mt-1" style={{ color: 'var(--cf-text-muted)' }}>
-                    {subtitles[tab]}
-                  </p>
+            />
+
+            {/* Header */}
+            <div className="p-6 pb-4 flex items-start justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span
+                    className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold tracking-wide uppercase"
+                    style={{
+                      background: 'var(--cf-accent-bg)',
+                      color: 'var(--cf-accent)',
+                      border: '1px solid var(--cf-accent-border)',
+                    }}
+                  >
+                    <Sparkles className="w-3 h-3" />
+                    Member Portal
+                  </span>
                 </div>
-                <button
-                  onClick={onClose}
-                  className="p-2 rounded-lg transition-colors ml-4 mt-1"
-                  style={{ color: 'var(--cf-text-faint)' }}
-                  onMouseEnter={e => (e.currentTarget.style.background = 'var(--cf-surface-alt)')}
-                  onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-                >
-                  <X className="w-4 h-4" />
-                </button>
+                <h2 className="font-serif text-2xl font-medium tracking-tight" style={{ color: 'var(--cf-text)' }}>
+                  {tab === 'signin' && 'Sign in to CashFloor'}
+                  {tab === 'signup' && 'Create Pro Account'}
+                  {tab === 'demo' && 'Instant 1-Click Access'}
+                </h2>
+                <p className="text-xs mt-1" style={{ color: 'var(--cf-text-muted)' }}>
+                  {tab === 'signin' && 'Access your synced cash runway, models, and conservative floor.'}
+                  {tab === 'signup' && 'Unlock the 12-month double-entry ledger, stress lab, and cloud sync.'}
+                  {tab === 'demo' && 'Explore the full unlocked suite immediately with pre-loaded scenarios.'}
+                </p>
               </div>
 
-              {/* Context message from feature gate */}
-              {message && (
-                <div className="mx-6 mt-4 px-4 py-3 rounded-lg border-l-2 text-sm"
-                  style={{
-                    background: 'var(--cf-accent-bg)',
-                    borderColor: 'var(--cf-accent)',
-                    color: 'var(--cf-text-muted)',
-                  }}>
-                  {message}
-                </div>
-              )}
+              <button
+                type="button"
+                onClick={onClose}
+                className="p-2 rounded-xl transition-colors cursor-pointer"
+                style={{ color: 'var(--cf-text-muted)' }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.background = 'var(--cf-surface-alt)';
+                  e.currentTarget.style.color = 'var(--cf-text)';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.color = 'var(--cf-text-muted)';
+                }}
+                aria-label="Close"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
 
-              <div className="p-6">
-                {/* Success state */}
-                {success ? (
-                  <motion.div
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-center py-4 space-y-4"
+            {/* Context message if triggered by locked feature */}
+            {message && (
+              <div
+                className="mx-6 mb-4 px-4 py-3 rounded-xl border flex items-center gap-3 text-xs"
+                style={{
+                  background: 'var(--cf-accent-bg)',
+                  borderColor: 'var(--cf-accent-border)',
+                  color: 'var(--cf-text)',
+                }}
+              >
+                <div
+                  className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+                  style={{ background: 'var(--cf-surface)', color: 'var(--cf-accent)' }}
+                >
+                  <Lock className="w-3.5 h-3.5" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold">{message}</p>
+                  <p className="text-[11px] opacity-80">Free sign-in instantly removes all feature locks.</p>
+                </div>
+              </div>
+            )}
+
+            {/* Body */}
+            <div className="p-6 pt-0">
+              {success ? (
+                /* Success View */
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="py-8 text-center space-y-4"
+                >
+                  <div
+                    className="w-16 h-16 rounded-full mx-auto flex items-center justify-center"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(47,111,98,0.2), rgba(47,111,98,0.4))',
+                      border: '2px solid var(--cf-accent)',
+                    }}
                   >
-                    <div className="mx-auto w-14 h-14 rounded-full flex items-center justify-center"
-                      style={{ background: 'var(--cf-accent-bg)' }}>
-                      <Check className="w-7 h-7" style={{ color: 'var(--cf-accent)' }} />
-                    </div>
-                    <p className="font-medium" style={{ color: 'var(--cf-text)' }}>
+                    <Check className="w-8 h-8 text-[var(--cf-accent)]" />
+                  </div>
+                  <div>
+                    <h3 className="font-serif text-lg font-medium" style={{ color: 'var(--cf-text)' }}>
+                      Authentication Verified
+                    </h3>
+                    <p className="text-xs mt-1 font-mono" style={{ color: 'var(--cf-text-muted)' }}>
                       {successMessage}
                     </p>
-                  </motion.div>
-                ) : (
-                  <>
-                    {/* Tab switcher */}
-                    <div className="flex rounded-xl p-1 mb-5 gap-1"
-                      style={{ background: 'var(--cf-surface-alt)' }}>
-                      {(['signin', 'signup'] as const).map((t) => (
-                        <button
-                          key={t}
-                          onClick={() => switchTab(t)}
-                          className="flex-1 py-2 rounded-lg text-sm font-medium transition-all duration-200"
-                          style={{
-                            background: tab === t ? 'var(--cf-surface)' : 'transparent',
-                            color: tab === t ? 'var(--cf-text)' : 'var(--cf-text-muted)',
-                            boxShadow: tab === t ? 'var(--cf-shadow-sm)' : 'none',
-                          }}
-                        >
-                          {t === 'signin' ? 'Sign In' : 'Sign Up'}
-                        </button>
-                      ))}
-                    </div>
-
-                    {/* Google button */}
+                  </div>
+                </motion.div>
+              ) : (
+                <>
+                  {/* Tab Selector */}
+                  <div
+                    className="grid grid-cols-3 rounded-xl p-1 mb-5 text-xs font-medium"
+                    style={{ background: 'var(--cf-surface-alt)' }}
+                  >
                     <button
                       type="button"
-                      onClick={handleGoogleAuth}
-                      className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl text-sm font-medium transition-all duration-200 mb-4 border"
+                      onClick={() => handleTabChange('signin')}
+                      className="py-2 rounded-lg transition-all cursor-pointer text-center"
                       style={{
-                        background: 'var(--cf-surface-alt)',
-                        borderColor: 'var(--cf-border)',
-                        color: 'var(--cf-text)',
+                        background: tab === 'signin' ? 'var(--cf-surface)' : 'transparent',
+                        color: tab === 'signin' ? 'var(--cf-text)' : 'var(--cf-text-muted)',
+                        boxShadow: tab === 'signin' ? 'var(--cf-shadow-sm)' : 'none',
+                        fontWeight: tab === 'signin' ? 600 : 500,
                       }}
-                      onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--cf-accent)')}
-                      onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--cf-border)')}
                     >
-                      <svg className="w-4 h-4" viewBox="0 0 24 24">
-                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                      </svg>
-                      Continue with Google
+                      Sign In
                     </button>
-
-                    {/* Divider */}
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="flex-1 h-px" style={{ background: 'var(--cf-border)' }} />
-                      <span className="text-xs" style={{ color: 'var(--cf-text-faint)' }}>or</span>
-                      <div className="flex-1 h-px" style={{ background: 'var(--cf-border)' }} />
-                    </div>
-
-                    {/* Email + Password Form */}
-                    <form
-                      onSubmit={tab === 'signin' ? handleSignIn : handleSignUp}
-                      className="space-y-4"
+                    <button
+                      type="button"
+                      onClick={() => handleTabChange('signup')}
+                      className="py-2 rounded-lg transition-all cursor-pointer text-center"
+                      style={{
+                        background: tab === 'signup' ? 'var(--cf-surface)' : 'transparent',
+                        color: tab === 'signup' ? 'var(--cf-text)' : 'var(--cf-text-muted)',
+                        boxShadow: tab === 'signup' ? 'var(--cf-shadow-sm)' : 'none',
+                        fontWeight: tab === 'signup' ? 600 : 500,
+                      }}
                     >
-                      {/* Email */}
-                      <div>
-                        <label htmlFor="auth-email" className="block text-xs font-medium mb-1.5"
-                          style={{ color: 'var(--cf-text-muted)' }}>
-                          Email address
-                        </label>
-                        <div className="relative">
-                          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
-                            style={{ color: 'var(--cf-text-faint)' }} />
-                          <input
-                            id="auth-email"
-                            type="email"
-                            required
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="you@example.com"
-                            className="w-full pl-10 pr-4 py-3 rounded-xl text-sm transition-colors"
-                            style={{
-                              background: 'var(--cf-surface-alt)',
-                              border: '1px solid var(--cf-border)',
-                              color: 'var(--cf-text)',
-                              outline: 'none',
-                            }}
-                            onFocus={e => (e.currentTarget.style.borderColor = 'var(--cf-accent)')}
-                            onBlur={e => (e.currentTarget.style.borderColor = 'var(--cf-border)')}
-                          />
-                        </div>
-                      </div>
+                      Create Account
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleTabChange('demo')}
+                      className="py-2 rounded-lg transition-all cursor-pointer text-center flex items-center justify-center gap-1"
+                      style={{
+                        background: tab === 'demo' ? 'var(--cf-surface)' : 'transparent',
+                        color: tab === 'demo' ? 'var(--cf-accent)' : 'var(--cf-text-muted)',
+                        boxShadow: tab === 'demo' ? 'var(--cf-shadow-sm)' : 'none',
+                        fontWeight: tab === 'demo' ? 600 : 500,
+                      }}
+                    >
+                      <Zap className="w-3 h-3 text-[var(--cf-accent)]" />
+                      1-Click Demo
+                    </button>
+                  </div>
 
-                      {/* Password */}
-                      <div>
-                        <label htmlFor="auth-password" className="block text-xs font-medium mb-1.5"
-                          style={{ color: 'var(--cf-text-muted)' }}>
-                          {tab === 'signup' ? 'Create a password' : 'Password'}
-                        </label>
-                        <div className="relative">
-                          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
-                            style={{ color: 'var(--cf-text-faint)' }} />
-                          <input
-                            id="auth-password"
-                            type={showPassword ? 'text' : 'password'}
-                            required
-                            minLength={6}
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder={tab === 'signup' ? 'At least 6 characters' : '••••••••'}
-                            className="w-full pl-10 pr-10 py-3 rounded-xl text-sm transition-colors"
-                            style={{
-                              background: 'var(--cf-surface-alt)',
-                              border: '1px solid var(--cf-border)',
-                              color: 'var(--cf-text)',
-                              outline: 'none',
-                            }}
-                            onFocus={e => (e.currentTarget.style.borderColor = 'var(--cf-accent)')}
-                            onBlur={e => (e.currentTarget.style.borderColor = 'var(--cf-border)')}
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2"
-                            style={{ color: 'var(--cf-text-faint)' }}
-                          >
-                            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Error */}
-                      {error && (
-                        <p className="text-sm px-3 py-2 rounded-lg"
-                          style={{ background: 'var(--cf-caution-bg)', color: 'var(--cf-caution)' }}>
-                          {error}
-                        </p>
-                      )}
-
-                      {/* Forgot password (sign in only) */}
-                      {tab === 'signin' && (
-                        <div className="text-right">
-                          <button
-                            type="button"
-                            onClick={() => switchTab('magic')}
-                            className="text-xs transition-colors"
-                            style={{ color: 'var(--cf-accent)' }}
-                          >
-                            Forgot password? Use magic link instead
-                          </button>
-                        </div>
-                      )}
-
-                      {/* Submit */}
+                  {/* TAB 1: SIGN IN */}
+                  {tab === 'signin' && (
+                    <div className="space-y-4">
+                      {/* Google SSO Button */}
                       <button
-                        type="submit"
+                        type="button"
+                        onClick={handleGoogleClick}
                         disabled={loading}
-                        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-semibold text-white transition-all duration-200 disabled:opacity-60"
+                        className="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-xl text-xs font-medium border transition-all cursor-pointer"
                         style={{
-                          background: 'linear-gradient(135deg, #2F6F62, #1a4f45)',
-                          boxShadow: '0 4px 16px rgba(47,111,98,0.3)',
+                          background: 'var(--cf-surface-alt)',
+                          borderColor: 'var(--cf-border)',
+                          color: 'var(--cf-text)',
                         }}
+                        onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--cf-accent)')}
+                        onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--cf-border)')}
                       >
-                        {loading ? (
-                          <span className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full inline-block" />
-                        ) : (
-                          <>
-                            {tab === 'signin' ? 'Sign In' : 'Create Account'}
-                            <ArrowRight className="w-4 h-4" />
-                          </>
-                        )}
+                        <svg className="w-4 h-4" viewBox="0 0 24 24">
+                          <path
+                            fill="#4285F4"
+                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                          />
+                          <path
+                            fill="#34A853"
+                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                          />
+                          <path
+                            fill="#FBBC05"
+                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                          />
+                          <path
+                            fill="#EA4335"
+                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                          />
+                        </svg>
+                        Continue with Google
                       </button>
 
-                      {/* Magic link option */}
-                      {tab !== 'magic' && (
-                        <p className="text-center text-xs" style={{ color: 'var(--cf-text-faint)' }}>
-                          Prefer passwordless?{' '}
-                          <button
-                            type="button"
-                            onClick={() => switchTab('magic')}
-                            className="underline transition-colors"
-                            style={{ color: 'var(--cf-accent)' }}
-                          >
-                            Send me a magic link
-                          </button>
-                        </p>
-                      )}
-                    </form>
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1 h-px" style={{ background: 'var(--cf-border)' }} />
+                        <span className="text-[11px]" style={{ color: 'var(--cf-text-faint)' }}>
+                          or email & password
+                        </span>
+                        <div className="flex-1 h-px" style={{ background: 'var(--cf-border)' }} />
+                      </div>
 
-                    {/* Magic link form */}
-                    {tab === 'magic' && (
-                      <form onSubmit={handleMagicLink} className="space-y-4">
+                      <form onSubmit={handleSignIn} className="space-y-3">
                         <div>
-                          <label htmlFor="magic-email" className="block text-xs font-medium mb-1.5"
-                            style={{ color: 'var(--cf-text-muted)' }}>
-                            Email address
+                          <label className="block text-[11px] font-medium mb-1" style={{ color: 'var(--cf-text-muted)' }}>
+                            Email Address
                           </label>
                           <div className="relative">
-                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
-                              style={{ color: 'var(--cf-text-faint)' }} />
+                            <Mail
+                              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
+                              style={{ color: 'var(--cf-text-faint)' }}
+                            />
                             <input
-                              id="magic-email"
                               type="email"
                               required
                               value={email}
-                              onChange={(e) => setEmail(e.target.value)}
-                              placeholder="you@example.com"
-                              className="w-full pl-10 pr-4 py-3 rounded-xl text-sm transition-colors"
+                              onChange={e => setEmail(e.target.value)}
+                              placeholder="name@consulting.com"
+                              className="w-full pl-9 pr-3 py-2.5 rounded-xl text-xs font-sans transition-colors"
                               style={{
                                 background: 'var(--cf-surface-alt)',
                                 border: '1px solid var(--cf-border)',
@@ -415,53 +415,325 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                           </div>
                         </div>
 
+                        <div>
+                          <div className="flex items-center justify-between mb-1">
+                            <label className="text-[11px] font-medium" style={{ color: 'var(--cf-text-muted)' }}>
+                              Password
+                            </label>
+                            <button
+                              type="button"
+                              onClick={() => handleTabChange('demo')}
+                              className="text-[11px] transition-colors"
+                              style={{ color: 'var(--cf-accent)' }}
+                            >
+                              Need test access? Use 1-Click Demo
+                            </button>
+                          </div>
+                          <div className="relative">
+                            <Lock
+                              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
+                              style={{ color: 'var(--cf-text-faint)' }}
+                            />
+                            <input
+                              type={showPassword ? 'text' : 'password'}
+                              required
+                              value={password}
+                              onChange={e => setPassword(e.target.value)}
+                              placeholder="••••••••"
+                              className="w-full pl-9 pr-10 py-2.5 rounded-xl text-xs font-sans transition-colors"
+                              style={{
+                                background: 'var(--cf-surface-alt)',
+                                border: '1px solid var(--cf-border)',
+                                color: 'var(--cf-text)',
+                                outline: 'none',
+                              }}
+                              onFocus={e => (e.currentTarget.style.borderColor = 'var(--cf-accent)')}
+                              onBlur={e => (e.currentTarget.style.borderColor = 'var(--cf-border)')}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowPassword(!showPassword)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
+                              style={{ color: 'var(--cf-text-faint)' }}
+                            >
+                              {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                            </button>
+                          </div>
+                        </div>
+
                         {error && (
-                          <p className="text-sm px-3 py-2 rounded-lg"
-                            style={{ background: 'var(--cf-caution-bg)', color: 'var(--cf-caution)' }}>
-                            {error}
-                          </p>
+                          <div
+                            className="p-3 rounded-xl text-xs flex flex-col gap-1.5"
+                            style={{ background: 'var(--cf-caution-bg)', color: 'var(--cf-caution)' }}
+                          >
+                            <p className="font-medium">{error}</p>
+                            <div className="flex gap-3 text-[11px]">
+                              <button
+                                type="button"
+                                onClick={() => handleTabChange('signup')}
+                                className="underline font-semibold"
+                              >
+                                Create this account →
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleTabChange('demo')}
+                                className="underline font-semibold"
+                              >
+                                Or try 1-Click Demo →
+                              </button>
+                            </div>
+                          </div>
                         )}
 
                         <button
                           type="submit"
                           disabled={loading}
-                          className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-semibold text-white transition-all disabled:opacity-60"
-                          style={{ background: 'linear-gradient(135deg, #2F6F62, #1a4f45)' }}
+                          className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs font-semibold text-white transition-all cursor-pointer disabled:opacity-60 shadow-md"
+                          style={{
+                            background: 'linear-gradient(135deg, #2F6F62, #1a4f45)',
+                          }}
                         >
-                          {loading
-                            ? <span className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full inline-block" />
-                            : 'Send Magic Link'
-                          }
+                          {loading ? (
+                            <span className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full inline-block" />
+                          ) : (
+                            <>
+                              <span>Sign In to Pro Suite</span>
+                              <ArrowRight className="w-3.5 h-3.5" />
+                            </>
+                          )}
                         </button>
+                      </form>
+                    </div>
+                  )}
 
-                        <p className="text-center text-xs" style={{ color: 'var(--cf-text-faint)' }}>
+                  {/* TAB 2: SIGN UP */}
+                  {tab === 'signup' && (
+                    <form onSubmit={handleSignUp} className="space-y-3">
+                      <div>
+                        <label className="block text-[11px] font-medium mb-1" style={{ color: 'var(--cf-text-muted)' }}>
+                          Full Name
+                        </label>
+                        <div className="relative">
+                          <User
+                            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
+                            style={{ color: 'var(--cf-text-faint)' }}
+                          />
+                          <input
+                            type="text"
+                            value={fullName}
+                            onChange={e => setFullName(e.target.value)}
+                            placeholder="Alex Vance"
+                            className="w-full pl-9 pr-3 py-2.5 rounded-xl text-xs font-sans transition-colors"
+                            style={{
+                              background: 'var(--cf-surface-alt)',
+                              border: '1px solid var(--cf-border)',
+                              color: 'var(--cf-text)',
+                              outline: 'none',
+                            }}
+                            onFocus={e => (e.currentTarget.style.borderColor = 'var(--cf-accent)')}
+                            onBlur={e => (e.currentTarget.style.borderColor = 'var(--cf-border)')}
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-medium mb-1" style={{ color: 'var(--cf-text-muted)' }}>
+                          Email Address
+                        </label>
+                        <div className="relative">
+                          <Mail
+                            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
+                            style={{ color: 'var(--cf-text-faint)' }}
+                          />
+                          <input
+                            type="email"
+                            required
+                            value={email}
+                            onChange={e => setEmail(e.target.value)}
+                            placeholder="name@consulting.com"
+                            className="w-full pl-9 pr-3 py-2.5 rounded-xl text-xs font-sans transition-colors"
+                            style={{
+                              background: 'var(--cf-surface-alt)',
+                              border: '1px solid var(--cf-border)',
+                              color: 'var(--cf-text)',
+                              outline: 'none',
+                            }}
+                            onFocus={e => (e.currentTarget.style.borderColor = 'var(--cf-accent)')}
+                            onBlur={e => (e.currentTarget.style.borderColor = 'var(--cf-border)')}
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-medium mb-1" style={{ color: 'var(--cf-text-muted)' }}>
+                          Create Password (at least 6 characters)
+                        </label>
+                        <div className="relative">
+                          <Lock
+                            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
+                            style={{ color: 'var(--cf-text-faint)' }}
+                          />
+                          <input
+                            type={showPassword ? 'text' : 'password'}
+                            required
+                            minLength={6}
+                            value={password}
+                            onChange={e => setPassword(e.target.value)}
+                            placeholder="••••••••"
+                            className="w-full pl-9 pr-10 py-2.5 rounded-xl text-xs font-sans transition-colors"
+                            style={{
+                              background: 'var(--cf-surface-alt)',
+                              border: '1px solid var(--cf-border)',
+                              color: 'var(--cf-text)',
+                              outline: 'none',
+                            }}
+                            onFocus={e => (e.currentTarget.style.borderColor = 'var(--cf-accent)')}
+                            onBlur={e => (e.currentTarget.style.borderColor = 'var(--cf-border)')}
+                          />
                           <button
                             type="button"
-                            onClick={() => switchTab('signin')}
-                            className="underline"
-                            style={{ color: 'var(--cf-accent)' }}
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
+                            style={{ color: 'var(--cf-text-faint)' }}
                           >
-                            ← Back to Sign In
+                            {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                           </button>
-                        </p>
-                      </form>
-                    )}
-                  </>
-                )}
-              </div>
+                        </div>
+                      </div>
 
-              {/* Footer */}
-              <div className="px-6 py-4 flex items-start gap-2 border-t"
-                style={{ borderColor: 'var(--cf-border)', background: 'var(--cf-surface-alt)' }}>
-                <ShieldCheck className="w-3.5 h-3.5 mt-0.5 shrink-0" style={{ color: 'var(--cf-accent)' }} />
-                <p className="text-xs leading-relaxed" style={{ color: 'var(--cf-text-faint)' }}>
-                  Your data is private and encrypted. We never sell your information.
-                  Your anonymous session data migrates to your account on sign in.
-                </p>
+                      {error && (
+                        <div
+                          className="p-3 rounded-xl text-xs"
+                          style={{ background: 'var(--cf-caution-bg)', color: 'var(--cf-caution)' }}
+                        >
+                          {error}
+                        </div>
+                      )}
+
+                      <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs font-semibold text-white transition-all cursor-pointer disabled:opacity-60 shadow-md"
+                        style={{
+                          background: 'linear-gradient(135deg, #2F6F62, #1a4f45)',
+                        }}
+                      >
+                        {loading ? (
+                          <span className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full inline-block" />
+                        ) : (
+                          <>
+                            <span>Create Account & Unlock Pro</span>
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </>
+                        )}
+                      </button>
+                    </form>
+                  )}
+
+                  {/* TAB 3: INSTANT 1-CLICK DEMO */}
+                  {tab === 'demo' && (
+                    <div className="space-y-3">
+                      <div
+                        className="p-3 rounded-xl text-xs border"
+                        style={{
+                          background: 'var(--cf-surface-alt)',
+                          borderColor: 'var(--cf-border)',
+                          color: 'var(--cf-text-muted)',
+                        }}
+                      >
+                        <p className="font-semibold text-[var(--cf-text)] mb-0.5">Instant Pro Access</p>
+                        <p className="text-[11px] leading-relaxed">
+                          Select a realistic freelance persona to test the website with fully unlocked features,
+                          real cash scenarios, and responsive navbar status.
+                        </p>
+                      </div>
+
+                      <div className="space-y-2">
+                        {(Object.keys(DEMO_PERSONAS) as DemoPersonaKey[]).map(key => {
+                          const persona = DEMO_PERSONAS[key];
+                          const icons = {
+                            consultant: Briefcase,
+                            freelancer: Sparkles,
+                            agency: Layers,
+                          };
+                          const IconComp = icons[key];
+
+                          return (
+                            <button
+                              key={key}
+                              type="button"
+                              disabled={loading}
+                              onClick={() => handleDemoSelect(key)}
+                              className="w-full p-3 rounded-xl border text-left transition-all flex items-center justify-between group cursor-pointer"
+                              style={{
+                                background: 'var(--cf-surface-alt)',
+                                borderColor: 'var(--cf-border)',
+                              }}
+                              onMouseEnter={e => {
+                                e.currentTarget.style.borderColor = 'var(--cf-accent)';
+                                e.currentTarget.style.background = 'var(--cf-accent-bg)';
+                              }}
+                              onMouseLeave={e => {
+                                e.currentTarget.style.borderColor = 'var(--cf-border)';
+                                e.currentTarget.style.background = 'var(--cf-surface-alt)';
+                              }}
+                            >
+                              <div className="flex items-center gap-3">
+                                <div
+                                  className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                                  style={{
+                                    background: 'linear-gradient(135deg, #2F6F62, #1a4f45)',
+                                    color: 'white',
+                                  }}
+                                >
+                                  <IconComp className="w-4 h-4" />
+                                </div>
+                                <div>
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-xs font-semibold" style={{ color: 'var(--cf-text)' }}>
+                                      {persona.name}
+                                    </span>
+                                    <span
+                                      className="text-[10px] font-mono px-1.5 py-0.2 rounded"
+                                      style={{ background: 'var(--cf-border)', color: 'var(--cf-text-muted)' }}
+                                    >
+                                      ${persona.monthlyIncome.toLocaleString()}/mo
+                                    </span>
+                                  </div>
+                                  <p className="text-[11px] truncate max-w-[240px]" style={{ color: 'var(--cf-text-faint)' }}>
+                                    {persona.role}
+                                  </p>
+                                </div>
+                              </div>
+                              <ChevronRight className="w-4 h-4 text-[var(--cf-text-faint)] group-hover:text-[var(--cf-accent)] group-hover:translate-x-0.5 transition-all" />
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+
+            {/* Footer Trust Bar */}
+            <div
+              className="px-6 py-3.5 border-t flex items-center justify-between text-[11px]"
+              style={{
+                borderColor: 'var(--cf-border)',
+                background: 'var(--cf-surface-alt)',
+                color: 'var(--cf-text-faint)',
+              }}
+            >
+              <div className="flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-[var(--cf-accent)]" />
+                <span>Zero bank logins. Private mathematical simulation.</span>
               </div>
-            </motion.div>
-          </div>
-        </>
+              <span className="font-mono text-[10px]">256-bit SSL</span>
+            </div>
+          </motion.div>
+        </motion.div>
       )}
     </AnimatePresence>
   );

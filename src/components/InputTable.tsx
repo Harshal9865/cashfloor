@@ -112,16 +112,43 @@ export const InputTable: React.FC<InputTableProps> = ({
   const totalDebits = totalTaxEscrow + totalDraw;
 
   return (
-    <section className="bg-white hairline-all overflow-hidden transition-colors relative" id="ledger-archive">
+    <section
+      className="overflow-hidden transition-colors relative rounded-2xl border"
+      style={{ background: 'var(--cf-surface)', borderColor: 'var(--cf-border)' }}
+      id="ledger-archive"
+    >
       {isLocked && (
-        <div className="absolute inset-0 z-10 bg-white/60 backdrop-blur-[2px] flex items-center justify-center">
-          <button 
-            onClick={onUnlockRequest}
-            className="bg-[#16232B] hover:bg-[#2F6F62] text-white px-6 py-3 flex items-center gap-2 text-sm font-mono uppercase tracking-widest shadow-xl transition-colors"
-          >
-            <Lock className="w-4 h-4" />
-            <span>Unlock 12-Month Ledger</span>
-          </button>
+        <div
+          className="absolute inset-0 z-20 rounded-2xl flex items-center justify-center backdrop-blur-md"
+          style={{ background: 'var(--cf-surface)', opacity: 0.95 }}
+        >
+          <div className="text-center space-y-3.5 p-8 max-w-sm mx-auto">
+            <div
+              className="w-14 h-14 rounded-2xl mx-auto flex items-center justify-center shadow-sm"
+              style={{ background: 'var(--cf-surface-alt)', border: '1px solid var(--cf-border)' }}
+            >
+              <Lock className="w-6 h-6 text-[#2F6F62]" />
+            </div>
+            <div>
+              <span className="inline-flex items-center gap-1 text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded font-bold text-emerald-600 bg-emerald-500/10 border border-emerald-500/20 mb-1">
+                PRO FEATURE
+              </span>
+              <h3 className="font-serif text-xl font-medium" style={{ color: 'var(--cf-text)' }}>
+                12-Month Double-Entry Ledger
+              </h3>
+              <p className="text-xs mt-1 leading-relaxed" style={{ color: 'var(--cf-text-muted)' }}>
+                Auditable cash schedule accounting for retainers, variable client contracts, quarterly tax escrow, and drawings.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={onUnlockRequest}
+              className="px-6 py-2.5 rounded-full text-xs font-semibold text-white transition-all cursor-pointer shadow-md hover:shadow-lg"
+              style={{ background: 'linear-gradient(135deg, #2F6F62, #1a4f45)' }}
+            >
+              Unlock 12-Month Ledger — Sign In Free
+            </button>
+          </div>
         </div>
       )}
 

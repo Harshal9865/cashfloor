@@ -17,10 +17,9 @@ import { AssumptionControls } from '@/components/AssumptionControls';
 import { InputTable } from '@/components/InputTable';
 import { CsvPasteModal } from '@/components/CsvPasteModal';
 import { PinterestCardModal } from '@/components/PinterestCardModal';
-import { AuthModal } from '@/components/auth/AuthModal';
 import { TaxDeadlineReminders } from '@/components/TaxDeadlineReminders';
-import { createClient } from '@/lib/supabase/client';
 import { loadUserLedger, saveUserLedger, SyncStatus } from '@/lib/supabase/ledgerService';
+import { useAuth } from '@/lib/auth/AuthContext';
 import { useEffect, useRef } from 'react';
 import { LegalDisclaimer } from '@/components/LegalDisclaimer';
 import { Share2, BookOpen, Download, Printer } from 'lucide-react';
@@ -61,70 +60,34 @@ export default function Home() {
   const [showPhilosophy, setShowPhilosophy] = useState(false);
   
   // Auth & Cloud Sync State
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userId, setUserId] = useState<string | undefined>();
+  const { user, isAuthenticated, openAuthModal } = useAuth();
+  const userId = user?.id;
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('offline');
   const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
   const isInitialMount = useRef(true);
 
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [authMessage, setAuthMessage] = useState<string | undefined>();
-
   // 1. Initial Load & Session Tracking
   useEffect(() => {
-    const checkSession = async () => {
+    let active = true;
+    const initData = async () => {
       try {
-        const supabase = createClient();
-        const { data: { session } } = await supabase.auth.getSession();
-        setIsAuthenticated(!!session);
-        setUserId(session?.user?.id);
-
-        if (session?.user?.id) {
-          const { payload, source } = await loadUserLedger(session.user.id);
-          if (payload.records.length > 0) {
-            setRecords(payload.records);
-            setAssumptions(payload.assumptions);
-            setCurrencySymbol(payload.currencySymbol);
-            setSyncStatus(source === 'cloud' ? 'synced' : 'offline');
-            if (payload.updatedAt) {
-              setLastSavedAt(new Date(payload.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-            }
+        const { payload, source } = await loadUserLedger(userId);
+        if (active && payload.records.length > 0) {
+          setRecords(payload.records);
+          setAssumptions(payload.assumptions);
+          setCurrencySymbol(payload.currencySymbol);
+          setSyncStatus(source === 'cloud' ? 'synced' : 'offline');
+          if (payload.updatedAt) {
+            setLastSavedAt(new Date(payload.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
           }
-        } else {
-          // Load local fallback if present
-          const { payload } = await loadUserLedger(undefined);
-          if (payload.records.length > 0) {
-            setRecords(payload.records);
-            setAssumptions(payload.assumptions);
-            setCurrencySymbol(payload.currencySymbol);
-          }
-          setSyncStatus('offline');
         }
-
-        const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-          setIsAuthenticated(!!session);
-          setUserId(session?.user?.id);
-          if (session?.user?.id) {
-            // Auto-migrate in-memory data to newly authenticated cloud account
-            setSyncStatus('saving');
-            const res = await saveUserLedger(session.user.id, records, assumptions, currencySymbol);
-            setSyncStatus(res.isCloud ? 'synced' : 'offline');
-            setLastSavedAt(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-          } else {
-            setSyncStatus('offline');
-          }
-        });
-
-        return () => {
-          authListener.subscription.unsubscribe();
-        };
       } catch (e) {
-        // Gracefully fallback to local offline mode
-        setSyncStatus('offline');
+        if (active) setSyncStatus('offline');
       }
     };
-    checkSession();
-  }, []);
+    initData();
+    return () => { active = false; };
+  }, [userId]);
 
   // 2. Debounced Cloud & Local Auto-Save
   useEffect(() => {
@@ -144,8 +107,7 @@ export default function Home() {
   }, [records, assumptions, currencySymbol, userId]);
 
   const handleUnlockRequest = (featureName: string) => {
-    setAuthMessage(`Sign in to unlock ${featureName} and access the full suite.`);
-    setIsAuthModalOpen(true);
+    openAuthModal(`Unlock ${featureName} with free Pro access.`);
   };
 
   const handleCurrencyChange = async (newSymbol: string) => {
@@ -246,8 +208,7 @@ export default function Home() {
         onLoadSample={handleLoadSample}
         onExportCsv={handleExportCsv}
         onOpenShareModal={() => setIsShareModalOpen(true)}
-        onOpenAuthModal={() => setIsAuthModalOpen(true)}
-        isAuthenticated={isAuthenticated}
+        onOpenAuthModal={() => openAuthModal()}
         syncStatus={syncStatus}
         lastSavedAt={lastSavedAt}
       />
@@ -467,12 +428,6 @@ export default function Home() {
         result={calculation}
         assumptions={assumptions}
         currencySymbol={currencySymbol}
-      />
-
-      <AuthModal 
-        isOpen={isAuthModalOpen}
-        onClose={() => setIsAuthModalOpen(false)}
-        message={authMessage}
       />
 
       {/* Safe-harbor Legal Notice */}

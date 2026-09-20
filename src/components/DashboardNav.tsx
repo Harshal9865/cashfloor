@@ -8,6 +8,7 @@ import {
   ChevronDown, LogOut, Share2, Check, Menu, X
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { useAuth } from '@/lib/auth/AuthContext';
 
 interface DashboardNavProps {
   onResetData?: () => void;
@@ -15,7 +16,6 @@ interface DashboardNavProps {
   onExportCsv?: () => void;
   onOpenShareModal?: () => void;
   onOpenAuthModal?: () => void;
-  isAuthenticated?: boolean;
   syncStatus?: 'offline' | 'saving' | 'synced' | 'error';
   lastSavedAt?: string | null;
 }
@@ -34,10 +34,29 @@ export default function DashboardNav({
   onExportCsv,
   onOpenShareModal,
   onOpenAuthModal,
-  isAuthenticated = false,
   syncStatus = 'offline',
   lastSavedAt,
 }: DashboardNavProps) {
+  const { user, signOut, openAuthModal } = useAuth();
+  const isAuthenticated = !!user;
+
+  const handleAuthTrigger = () => {
+    if (onOpenAuthModal) onOpenAuthModal();
+    else openAuthModal();
+  };
+
+  // Get initials from email or name
+  const getInitials = (nameOrEmail: string) => {
+    if (!nameOrEmail) return 'U';
+    const clean = nameOrEmail.includes('@') ? nameOrEmail.split('@')[0] : nameOrEmail;
+    const parts = clean.split(/[._\s-]+/).filter(Boolean);
+    return parts.length > 1
+      ? (parts[0][0] + parts[1][0]).toUpperCase()
+      : clean.slice(0, 2).toUpperCase();
+  };
+  const displayName = user?.name || user?.email?.split('@')[0] || 'Independent Pro';
+  const initials = getInitials(user?.name || user?.email || '');
+
   const [activeSection, setActiveSection] = useState('');
   const [avatarOpen, setAvatarOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -203,12 +222,28 @@ export default function DashboardNav({
                 <button
                   type="button"
                   onClick={() => setAvatarOpen(!avatarOpen)}
-                  className="flex items-center gap-1.5 p-1 rounded-full transition-all cursor-pointer group"
+                  className="flex items-center gap-2 pl-1.5 pr-2.5 py-1 rounded-full transition-all cursor-pointer border"
+                  style={{
+                    border: '1px solid var(--cf-border)',
+                    background: avatarOpen ? 'var(--cf-surface-alt)' : 'transparent',
+                  }}
                   title="Account"
                 >
-                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#2F6F62] to-[#0f564a] flex items-center justify-center shadow-sm group-hover:shadow-[0_0_8px_rgba(47,111,98,0.4)] transition-shadow">
-                    <User className="w-3.5 h-3.5 text-white" />
+                  <div className="relative">
+                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#2F6F62] to-[#0f564a] flex items-center justify-center shadow-sm text-white text-[11px] font-bold shrink-0">
+                      {initials}
+                    </div>
+                    <span
+                      className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-[var(--cf-surface)] bg-emerald-500"
+                      title="Online"
+                    />
                   </div>
+                  <span className="text-xs font-semibold hidden md:block max-w-[100px] truncate" style={{ color: 'var(--cf-text)' }}>
+                    {displayName}
+                  </span>
+                  <span className="hidden md:inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-mono font-bold uppercase text-emerald-600 bg-emerald-500/10 border border-emerald-500/20">
+                    PRO
+                  </span>
                   <ChevronDown className="w-3.5 h-3.5 text-[var(--cf-text-muted)] transition-transform" style={{ transform: avatarOpen ? 'rotate(180deg)' : 'none' }} />
                 </button>
 
@@ -219,30 +254,57 @@ export default function DashboardNav({
                       animate={{ opacity: 1, scale: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.95, y: -4 }}
                       transition={{ duration: 0.15 }}
-                      className="absolute right-0 top-10 w-48 rounded-xl overflow-hidden"
+                      className="absolute right-0 top-10 w-60 rounded-2xl overflow-hidden z-50"
                       style={{
                         background: 'var(--cf-surface)',
                         border: '1px solid var(--cf-border)',
-                        boxShadow: 'var(--cf-shadow-lg)',
+                        boxShadow: 'var(--cf-shadow-xl)',
                       }}
                     >
-                      <div className="px-4 py-3 border-b" style={{ borderColor: 'var(--cf-border)' }}>
-                        <p className="text-xs font-mono text-[var(--cf-text-muted)]">Signed in</p>
+                      <div className="px-4 py-3 border-b" style={{ borderColor: 'var(--cf-border)', background: 'var(--cf-surface-alt)' }}>
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#2F6F62] to-[#0f564a] flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-sm">
+                            {initials}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-1.5">
+                              <p className="text-xs font-bold truncate" style={{ color: 'var(--cf-text)' }}>{displayName}</p>
+                              <span className="text-[10px] font-mono font-bold text-emerald-600 bg-emerald-500/10 px-1 rounded">PRO</span>
+                            </div>
+                            <p className="text-[11px] truncate" style={{ color: 'var(--cf-text-faint)' }}>{user?.email}</p>
+                            <p className="text-[10px] font-mono truncate text-[#2F6F62]">{user?.role || 'Senior Independent'}</p>
+                          </div>
+                        </div>
                         {lastSavedAt && (
-                          <p className="text-[11px] text-[var(--cf-text-faint)] mt-0.5">Last saved {lastSavedAt}</p>
+                          <p className="text-[10px] mt-2 font-mono" style={{ color: 'var(--cf-text-faint)' }}>Auto-synced at {lastSavedAt}</p>
                         )}
                       </div>
-                      <div className="py-1">
+                      <div className="p-1.5 space-y-0.5">
                         <button onClick={onLoadSample}
-                          className="w-full flex items-center gap-2.5 px-4 py-2 text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors cursor-pointer">
-                          <Database className="w-3.5 h-3.5" /> Load Sample Data
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors cursor-pointer text-left">
+                          <Database className="w-3.5 h-3.5 text-[#2F6F62]" /> Load Sample Ledger
                         </button>
+                        <button onClick={() => { setAvatarOpen(false); openAuthModal('Switching to another freelance persona or account', 'demo'); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors cursor-pointer text-left">
+                          <RotateCcw className="w-3.5 h-3.5 text-amber-500" /> Switch Demo Persona
+                        </button>
+                        <Link href="/account" onClick={() => setAvatarOpen(false)}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:bg-[var(--cf-surface-alt)] transition-colors cursor-pointer">
+                          <User className="w-3.5 h-3.5" /> Account &amp; Security
+                        </Link>
                         <button onClick={onResetData}
-                          className="w-full flex items-center gap-2.5 px-4 py-2 text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-caution)] hover:bg-[var(--cf-caution-bg)] transition-colors cursor-pointer">
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-caution)] hover:bg-[var(--cf-caution-bg)] transition-colors cursor-pointer text-left">
                           <RotateCcw className="w-3.5 h-3.5" /> Reset Ledger
                         </button>
-                        <div className="border-t my-1" style={{ borderColor: 'var(--cf-border)' }} />
-                        <button className="w-full flex items-center gap-2.5 px-4 py-2 text-xs text-[var(--cf-text-muted)] hover:bg-[var(--cf-surface-alt)] transition-colors cursor-pointer">
+                      </div>
+                      <div className="p-1.5 border-t" style={{ borderColor: 'var(--cf-border)' }}>
+                        <button
+                          onClick={async () => { setAvatarOpen(false); await signOut(); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs transition-colors cursor-pointer"
+                          style={{ color: 'var(--cf-caution)' }}
+                          onMouseEnter={e => (e.currentTarget.style.background = 'var(--cf-caution-bg)')}
+                          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                        >
                           <LogOut className="w-3.5 h-3.5" /> Sign Out
                         </button>
                       </div>
@@ -253,11 +315,10 @@ export default function DashboardNav({
             ) : (
               <button
                 type="button"
-                onClick={onOpenAuthModal}
-                className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer text-white"
+                onClick={handleAuthTrigger}
+                className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold text-white transition-all cursor-pointer shadow-sm hover:shadow"
                 style={{
-                  background: 'linear-gradient(135deg, var(--cf-text) 0%, var(--cf-accent) 100%)',
-                  boxShadow: '0 2px 8px rgba(47,111,98,0.25)',
+                  background: 'linear-gradient(135deg, #2F6F62, #1a4f45)',
                 }}
               >
                 <User className="w-3.5 h-3.5" />
@@ -318,6 +379,31 @@ export default function DashboardNav({
               <div className="px-3 py-2 border-t mt-1" style={{ borderColor: 'var(--cf-border)' }}>
                 <ThemeToggle />
               </div>
+              {isAuthenticated && user ? (
+                <div className="p-3 rounded-xl border mt-2 flex items-center justify-between"
+                  style={{ background: 'var(--cf-surface)', borderColor: 'var(--cf-border)' }}>
+                  <div className="min-w-0">
+                    <p className="text-xs font-semibold truncate" style={{ color: 'var(--cf-text)' }}>{displayName}</p>
+                    <p className="text-[11px] truncate" style={{ color: 'var(--cf-text-faint)' }}>{user.email}</p>
+                  </div>
+                  <button
+                    onClick={async () => { setMobileOpen(false); await signOut(); }}
+                    className="p-1.5 rounded-lg text-xs transition-colors cursor-pointer"
+                    style={{ color: 'var(--cf-caution)' }}
+                    title="Sign Out"
+                  >
+                    <LogOut className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => { setMobileOpen(false); handleAuthTrigger(); }}
+                  className="w-full mt-2 py-2 px-3 rounded-lg text-xs font-semibold text-white flex items-center justify-center gap-1.5"
+                  style={{ background: 'linear-gradient(135deg, #2F6F62, #1a4f45)' }}
+                >
+                  <User className="w-3.5 h-3.5" /> Sign In to Pro Suite
+                </button>
+              )}
               <div className="border-t mt-2 pt-2 flex gap-2" style={{ borderColor: 'var(--cf-border)' }}>
                 <button onClick={() => { onExportCsv?.(); setMobileOpen(false); }}
                   className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs cursor-pointer border"

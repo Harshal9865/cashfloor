@@ -3,10 +3,8 @@
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { ArrowRight, ShieldCheck, TrendingUp, Zap } from 'lucide-react';
 import Link from 'next/link';
-import { useRef, useEffect, useState, lazy, Suspense } from 'react';
-
-// Lazy-load the heavy 3D canvas so the rest of the page isn't blocked
-const IncomeTerrainScene = lazy(() => import('./IncomeTerrainScene'));
+import { useRef, useEffect, useState } from 'react';
+import LivingFloorVisual from './LivingFloorVisual';
 
 /* ── Animated counter ── */
 function AnimatedNumber({ target, prefix = '', suffix = '' }: { target: number; prefix?: string; suffix?: string }) {
@@ -195,39 +193,14 @@ export default function HeroTeaser() {
           </div>
         </div>
 
-        {/* ── 3D Scene — full width below the copy ── */}
+        {/* ── Living Floor Engine Interactive Visual ── */}
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1.2, delay: 0.8 }}
-          className="relative w-full flex-1 min-h-[400px] md:min-h-[500px]"
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="relative w-full z-20"
         >
-          {/* Label above 3D scene */}
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.2, duration: 0.6 }}
-            className="absolute top-4 left-1/2 -translate-x-1/2 z-20 text-center pointer-events-none"
-          >
-            <p className="text-[11px] font-mono tracking-widest uppercase text-[#4A6070]">
-              12-month income · the glowing line is your floor
-            </p>
-          </motion.div>
-
-          <Suspense
-            fallback={
-              <div className="w-full h-full flex items-center justify-center">
-                <div className="w-6 h-6 rounded-full border-2 border-[#2F6F62] border-t-transparent animate-spin" />
-              </div>
-            }
-          >
-            <IncomeTerrainScene />
-          </Suspense>
-
-          {/* Fade out at bottom */}
-          <div className="absolute bottom-0 inset-x-0 h-24 pointer-events-none z-10"
-            style={{ background: 'linear-gradient(to bottom, transparent, var(--cf-bg))' }}
-          />
+          <LivingFloorVisual />
         </motion.div>
 
         {/* ── Social proof bar ── */}

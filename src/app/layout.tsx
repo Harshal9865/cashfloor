@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { Fraunces, IBM_Plex_Sans, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/lib/theme/ThemeContext';
+import { AuthProvider } from '@/lib/auth/AuthContext';
+import { AuthModal } from '@/components/auth/AuthModal';
 
 const fraunces = Fraunces({
   subsets: ['latin'],
@@ -123,7 +125,10 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col font-sans selection:bg-[var(--cf-accent)] selection:text-white transition-colors duration-300">
         <ThemeProvider>
-          {children}
+          <AuthProvider>
+            <AuthModal />
+            {children}
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>
