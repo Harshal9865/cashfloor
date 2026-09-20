@@ -24,7 +24,7 @@ import { useEffect, useRef } from 'react';
 import { RealDataWizardModal } from '@/components/RealDataWizardModal';
 import { DailyPaymentLog } from '@/components/DailyPaymentLog';
 import { LegalDisclaimer } from '@/components/LegalDisclaimer';
-import { Share2, BookOpen, Download, Printer, Sparkles, ShieldCheck, HelpCircle } from 'lucide-react';
+import { Share2, BookOpen, Download, Printer, Sparkles, ShieldCheck, HelpCircle, AlertTriangle, Upload } from 'lucide-react';
 
 // ... (keep REALISTIC_SAMPLE_RECORDS)
 const REALISTIC_SAMPLE_RECORDS: MonthlyRecord[] = [
@@ -239,73 +239,86 @@ export default function Home() {
       {/* 3. Main Canvas */}
       <div className="flex-1 max-w-7xl mx-auto w-full px-4 md:px-8 py-8 space-y-6">
         {/* ── Real Data Launchpad & Sample Status Banner ── */}
-        <div 
-          className="rounded-3xl border p-4 sm:p-5 shadow-sm transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
-          style={{
-            background: isViewingSample ? 'var(--cf-surface)' : 'var(--cf-surface-alt)',
-            borderColor: isViewingSample ? 'rgba(201,138,62,0.3)' : 'rgba(47,111,98,0.3)',
+        <motion.div
+          initial={false}
+          animate={{
+            boxShadow: isViewingSample
+              ? ['0 0 0px rgba(245,158,11,0)', '0 0 15px rgba(245,158,11,0.2)', '0 0 0px rgba(245,158,11,0)']
+              : '0 1px 2px rgba(0,0,0,0.05)',
           }}
+          transition={{ duration: 3, repeat: Infinity }}
+          className={`rounded-3xl border p-5 sm:p-6 shadow-sm transition-all flex flex-col md:flex-row md:items-center justify-between gap-5 relative overflow-hidden ${
+            isViewingSample ? 'bg-amber-500/5 border-amber-500/30' : 'bg-[var(--cf-surface-alt)] border-[var(--cf-border)]'
+          }`}
         >
-          <div className="flex items-start sm:items-center gap-3.5">
+          {isViewingSample && (
+            <div className="absolute top-0 left-0 w-1 h-full bg-amber-500 rounded-l-3xl" />
+          )}
+
+          <div className="flex items-start sm:items-center gap-4 relative z-10">
             <div 
-              className="w-9 h-9 rounded-2xl flex items-center justify-center shrink-0 border"
+              className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 border"
               style={{
-                background: isViewingSample ? 'var(--cf-warm-bg)' : 'var(--cf-accent-bg)',
-                borderColor: isViewingSample ? 'rgba(201,138,62,0.3)' : 'rgba(47,111,98,0.3)',
-                color: isViewingSample ? 'var(--cf-warm)' : 'var(--cf-accent)',
+                background: isViewingSample ? 'rgba(245, 158, 11, 0.15)' : 'var(--cf-accent-bg)',
+                borderColor: isViewingSample ? 'rgba(245, 158, 11, 0.2)' : 'rgba(47,111,98,0.3)',
+                color: isViewingSample ? '#f59e0b' : 'var(--cf-accent)',
               }}
             >
-              {isViewingSample ? <Sparkles className="w-4 h-4" /> : <ShieldCheck className="w-4 h-4" />}
+              {isViewingSample ? <AlertTriangle className="w-5 h-5" /> : <ShieldCheck className="w-5 h-5" />}
             </div>
 
             <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-mono font-bold uppercase tracking-wider text-[var(--cf-text)]">
-                  {isViewingSample ? 'Sample Demonstration Mode Active' : 'Personal Financial Ledger Active'}
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-sm font-serif font-bold tracking-tight text-[var(--cf-text)]">
+                  {isViewingSample ? 'Calibration Required' : 'Ledger Calibrated'}
                 </span>
                 <span 
                   className="text-[10px] font-mono px-2 py-0.5 rounded-full font-semibold border"
                   style={{
-                    background: isViewingSample ? 'var(--cf-warm-bg)' : 'var(--cf-accent-bg)',
-                    borderColor: isViewingSample ? 'rgba(201,138,62,0.3)' : 'rgba(47,111,98,0.3)',
-                    color: isViewingSample ? 'var(--cf-warm)' : 'var(--cf-accent)',
+                    background: isViewingSample ? 'rgba(245, 158, 11, 0.1)' : 'var(--cf-accent-bg)',
+                    borderColor: isViewingSample ? 'rgba(245, 158, 11, 0.2)' : 'rgba(47,111,98,0.3)',
+                    color: isViewingSample ? '#f59e0b' : 'var(--cf-accent)',
                   }}
                 >
-                  {isViewingSample ? 'Alex Vance Demo ($3,200 Floor)' : 'Real Numbers Active'}
+                  {isViewingSample ? 'Simulation Mode' : 'Real Numbers Active'}
                 </span>
               </div>
-              <p className="text-xs text-[var(--cf-text-muted)] mt-0.5">
+              <p className="text-xs text-[var(--cf-text-muted)] max-w-xl leading-relaxed">
                 {isViewingSample
-                  ? 'Showing simulated freelance financials. Step into your own numbers to calculate your true survival floor.'
-                  : `Your real numbers are driving all 6 stress test models. Current floor: ${currencySymbol}${calculation.floorIncome.toLocaleString()}/mo.`}
+                  ? 'Your survival floor is currently simulating with sample data. To get your true financial runway, we need to calibrate your real numbers.'
+                  : `Your real numbers are driving all 6 stress test models. Your guaranteed baseline income is locked at ${currencySymbol}${calculation.floorIncome.toLocaleString()}/mo.`}
               </p>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 self-end md:self-auto">
+          <div className="flex flex-wrap items-center gap-2 self-end md:self-auto relative z-10">
             <button
               type="button"
               onClick={() => setIsWizardOpen(true)}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-white transition-all shadow-sm cursor-pointer hover:opacity-95"
-              style={{ background: 'linear-gradient(135deg, #2F6F62 0%, #1a4f45 100%)' }}
+              className={`inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-white transition-all shadow-md cursor-pointer hover:opacity-95 hover:scale-105`}
+              style={{ background: isViewingSample ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' : 'linear-gradient(135deg, #2F6F62 0%, #1a4f45 100%)' }}
             >
               <Sparkles className="w-3.5 h-3.5" />
-              <span>{isViewingSample ? 'Enter My Real Numbers' : 'Edit My Numbers'}</span>
+              <span>{isViewingSample ? 'Calibrate My Runway' : 'Update Numbers'}</span>
             </button>
 
-            <button
-              type="button"
-              onClick={() => setIsPasteModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-mono border transition-all cursor-pointer"
-              style={{
-                background: 'var(--cf-surface)',
-                borderColor: 'var(--cf-border)',
-                color: 'var(--cf-text)',
-              }}
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span>Import CSV</span>
-            </button>
+            {isViewingSample && (
+              <button
+                type="button"
+                onClick={() => setIsPasteModalOpen(true)}
+                className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-mono border transition-all cursor-pointer"
+                style={{
+                  color: 'var(--cf-text)',
+                  background: 'var(--cf-surface)',
+                  borderColor: 'var(--cf-border)',
+                }}
+                onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--cf-text-muted)')}
+                onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--cf-border)')}
+              >
+                <Upload className="w-3.5 h-3.5" />
+                <span>Import CSV</span>
+              </button>
+            )}
 
             {isViewingSample ? (
               <button
@@ -327,7 +340,7 @@ export default function Home() {
               </button>
             )}
           </div>
-        </div>
+        </motion.div>
 
         {/* Hero Runway */}
         <section id="runway" className="dash-card p-6 md:p-8">

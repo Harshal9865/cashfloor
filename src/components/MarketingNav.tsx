@@ -23,7 +23,6 @@ const navLinks = [
   { label: 'How It Works', href: '/#how-it-works' },
   { label: 'Features', href: '/#features' },
   { label: 'Integrations', href: '/integrations' },
-  { label: 'Subscription', href: '/subscription' },
   { label: 'Calculators', href: '/dashboard' },
   { label: 'Philosophy', href: '/blog/the-20th-percentile-math' },
 ];
@@ -139,19 +138,6 @@ export default function MarketingNav() {
 
         {/* Right side actions */}
         <div className="flex items-center gap-3">
-          <Link
-            href="/subscription"
-            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono border transition-all hover:border-[var(--cf-accent)]"
-            style={{
-              color: 'var(--cf-accent)',
-              borderColor: 'rgba(47,111,98,0.3)',
-              background: 'var(--cf-accent-bg)',
-            }}
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span className="font-semibold">Pricing</span>
-          </Link>
-
           <ThemeToggle className="hidden sm:flex" />
 
           {isAuthenticated && user ? (

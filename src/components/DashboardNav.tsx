@@ -61,8 +61,15 @@ export default function DashboardNav({
   const [activeSection, setActiveSection] = useState('');
   const [avatarOpen, setAvatarOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const avatarRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   // Close avatar dropdown on outside click
   useEffect(() => {
@@ -113,14 +120,18 @@ export default function DashboardNav({
   return (
     <>
       <header
-        className="w-full sticky top-0 z-40 transition-all duration-300"
-        style={{
-          background: 'var(--cf-nav-bg)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          borderBottom: '1px solid var(--cf-nav-border)',
-          boxShadow: 'var(--cf-shadow-sm)',
-        }}
+        className={`w-full sticky top-0 z-40 transition-all duration-300 ${
+          scrolled ? 'backdrop-blur-xl border-b' : 'bg-transparent'
+        }`}
+        style={
+          scrolled
+            ? {
+                background: 'var(--cf-nav-bg)',
+                borderColor: 'var(--cf-nav-border)',
+                boxShadow: 'var(--cf-shadow-sm)',
+              }
+            : {}
+        }
       >
         <div className="max-w-7xl mx-auto px-4 md:px-8 h-14 flex items-center justify-between gap-4">
 
@@ -187,70 +198,48 @@ export default function DashboardNav({
               <span>{syncLabel}</span>
             </Link>
 
-            {/* Subscription Link / Icon */}
-            <Link
-              href="/subscription"
-              title="View Plans & Subscription"
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono transition-all border group"
-              style={{
-                color: 'var(--cf-accent)',
-                borderColor: 'rgba(47,111,98,0.3)',
-                background: 'var(--cf-accent-bg)',
-              }}
-            >
-              <Sparkles className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
-              <span className="font-semibold">Subscription</span>
-            </Link>
-
-            {/* Export */}
-            <button
-              type="button"
-              onClick={onExportCsv}
-              title="Export CSV"
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer border"
-              style={{
-                color: 'var(--cf-text-muted)',
-                borderColor: 'var(--cf-border)',
-                background: 'transparent',
-              }}
-              onMouseEnter={e => {
-                (e.currentTarget as HTMLButtonElement).style.color = 'var(--cf-text)';
-                (e.currentTarget as HTMLButtonElement).style.background = 'var(--cf-surface)';
-              }}
-              onMouseLeave={e => {
-                (e.currentTarget as HTMLButtonElement).style.color = 'var(--cf-text-muted)';
-                (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
-              }}
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span>Export</span>
-            </button>
-
-            {/* Share */}
-            <button
-              type="button"
-              onClick={onOpenShareModal}
-              title="Share"
-              className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer border"
-              style={{
-                color: 'var(--cf-text-muted)',
-                borderColor: 'var(--cf-border)',
-                background: 'transparent',
-              }}
-              onMouseEnter={e => {
-                (e.currentTarget as HTMLButtonElement).style.color = 'var(--cf-accent)';
-                (e.currentTarget as HTMLButtonElement).style.background = 'var(--cf-accent-bg)';
-              }}
-              onMouseLeave={e => {
-                (e.currentTarget as HTMLButtonElement).style.color = 'var(--cf-text-muted)';
-                (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
-              }}
-            >
-              <Share2 className="w-3.5 h-3.5" />
-              <span>Share</span>
-            </button>
-
-            <ThemeToggle className="hidden sm:flex" />
+            {/* Unauthenticated: Export / Share in main nav */}
+            {!isAuthenticated && (
+              <>
+                <button
+                  type="button"
+                  onClick={onExportCsv}
+                  title="Export CSV"
+                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer"
+                  style={{ color: 'var(--cf-text-muted)' }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLButtonElement).style.color = 'var(--cf-text)';
+                    (e.currentTarget as HTMLButtonElement).style.background = 'var(--cf-surface)';
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLButtonElement).style.color = 'var(--cf-text-muted)';
+                    (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
+                  }}
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Export</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={onOpenShareModal}
+                  title="Share"
+                  className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer"
+                  style={{ color: 'var(--cf-text-muted)' }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLButtonElement).style.color = 'var(--cf-accent)';
+                    (e.currentTarget as HTMLButtonElement).style.background = 'var(--cf-accent-bg)';
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLButtonElement).style.color = 'var(--cf-text-muted)';
+                    (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
+                  }}
+                >
+                  <Share2 className="w-3.5 h-3.5" />
+                  <span>Share</span>
+                </button>
+                <ThemeToggle className="hidden sm:flex" />
+              </>
+            )}
 
             {/* Auth / Avatar */}
             {isAuthenticated ? (
@@ -325,9 +314,28 @@ export default function DashboardNav({
                           <RotateCcw className="w-3.5 h-3.5 text-amber-500" /> Switch Demo Persona
                         </button>
                         <Link href="/account" onClick={() => setAvatarOpen(false)}
-                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:bg-[var(--cf-surface-alt)] transition-colors cursor-pointer">
-                          <User className="w-3.5 h-3.5" /> Account &amp; Security
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors cursor-pointer">
+                          <User className="w-3.5 h-3.5 text-[#2F6F62]" /> Account &amp; Security
                         </Link>
+                        
+                        <div className="my-1 border-t" style={{ borderColor: 'var(--cf-border)' }}></div>
+
+                        <button onClick={() => { onExportCsv?.(); setAvatarOpen(false); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors cursor-pointer text-left">
+                          <Download className="w-3.5 h-3.5" /> Export Data to CSV
+                        </button>
+                        <button onClick={() => { onOpenShareModal?.(); setAvatarOpen(false); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors cursor-pointer text-left">
+                          <Share2 className="w-3.5 h-3.5" /> Share Report
+                        </button>
+                        <div className="flex items-center justify-between px-3 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors cursor-pointer">
+                          <div className="flex items-center gap-2.5">
+                            <span className="w-3.5 h-3.5 flex items-center justify-center">🌓</span> Theme
+                          </div>
+                          <ThemeToggle />
+                        </div>
+
+                        <div className="my-1 border-t" style={{ borderColor: 'var(--cf-border)' }}></div>
                         <button onClick={onResetData}
                           className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-caution)] hover:bg-[var(--cf-caution-bg)] transition-colors cursor-pointer text-left">
                           <RotateCcw className="w-3.5 h-3.5" /> Reset Ledger
