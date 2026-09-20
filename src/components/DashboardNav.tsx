@@ -72,9 +72,9 @@ export default function DashboardNav({
   }, []);
 
   const syncColor =
-    syncStatus === 'synced' ? '#2F6F62' :
-    syncStatus === 'saving' ? '#C98A3E' :
-    syncStatus === 'error' ? '#B4573F' : '#5C6D77';
+    syncStatus === 'synced' ? 'var(--cf-accent)' :
+    syncStatus === 'saving' ? 'var(--cf-warm)' :
+    syncStatus === 'error' ? 'var(--cf-caution)' : 'var(--cf-text-faint)';
 
   const syncLabel =
     syncStatus === 'synced' ? 'Synced' :
@@ -83,14 +83,16 @@ export default function DashboardNav({
 
   return (
     <>
-      <header className="w-full sticky top-0 z-40 transition-all"
+      <header
+        className="w-full sticky top-0 z-40 transition-all duration-300"
         style={{
-          background: 'rgba(241,244,242,0.92)',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
-          borderBottom: '1px solid rgba(22,35,43,0.08)',
-          boxShadow: '0 1px 12px rgba(22,35,43,0.06)',
-        }}>
+          background: 'var(--cf-nav-bg)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderBottom: '1px solid var(--cf-nav-border)',
+          boxShadow: 'var(--cf-shadow-sm)',
+        }}
+      >
         <div className="max-w-7xl mx-auto px-4 md:px-8 h-14 flex items-center justify-between gap-4">
 
           {/* ── Logo ── */}
@@ -98,13 +100,14 @@ export default function DashboardNav({
             <div className="relative w-7 h-7 bg-gradient-to-br from-[#16232B] to-[#2F6F62] rounded-lg flex items-center justify-center shadow-sm group-hover:shadow-[0_0_12px_rgba(47,111,98,0.4)] transition-shadow">
               <span className="text-white font-serif text-sm font-bold">C</span>
             </div>
-            <span className="font-serif text-base text-[#16232B] tracking-tight group-hover:text-[#2F6F62] transition-colors hidden sm:block">
+            <span className="font-serif text-base text-[var(--cf-text)] tracking-tight group-hover:text-[var(--cf-accent)] transition-colors hidden sm:block">
               CashFloor
             </span>
           </Link>
 
           {/* ── Center Tab Nav (desktop) ── */}
-          <nav className="hidden lg:flex items-center gap-0.5 bg-[#E8EDE9]/60 rounded-xl p-1 border border-[rgba(22,35,43,0.08)]">
+          <nav className="hidden lg:flex items-center gap-0.5 rounded-xl p-1 border"
+            style={{ background: 'var(--cf-surface)', borderColor: 'var(--cf-border)' }}>
             {NAV_SECTIONS.map((s) => {
               const isActive = activeSection === s.href.slice(1);
               return (
@@ -112,13 +115,13 @@ export default function DashboardNav({
                   key={s.label}
                   href={s.href}
                   className="relative px-4 py-1.5 rounded-lg text-xs font-medium transition-colors duration-200"
-                  style={{ color: isActive ? '#16232B' : '#5C6D77' }}
+                  style={{ color: isActive ? 'var(--cf-text)' : 'var(--cf-text-muted)' }}
                 >
                   {isActive && (
                     <motion.div
                       layoutId="nav-pill"
                       className="absolute inset-0 rounded-lg"
-                      style={{ background: 'white', boxShadow: '0 1px 4px rgba(22,35,43,0.12)' }}
+                      style={{ background: 'var(--cf-surface-alt)', boxShadow: 'var(--cf-shadow-sm)' }}
                       transition={{ type: 'spring', stiffness: 400, damping: 35 }}
                     />
                   )}
@@ -133,7 +136,7 @@ export default function DashboardNav({
             {/* Sync status dot (compact) */}
             {isAuthenticated && (
               <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono"
-                style={{ background: `${syncColor}12`, border: `1px solid ${syncColor}30`, color: syncColor }}>
+                style={{ background: 'var(--cf-surface)', border: '1px solid var(--cf-border)', color: syncColor }}>
                 {syncStatus === 'saving'
                   ? <RefreshCw className="w-3 h-3 animate-spin" />
                   : syncStatus === 'synced'
@@ -149,7 +152,20 @@ export default function DashboardNav({
               type="button"
               onClick={onExportCsv}
               title="Export CSV"
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono text-[#5C6D77] hover:text-[#16232B] hover:bg-[#E8EDE9] transition-all cursor-pointer border border-transparent hover:border-[rgba(22,35,43,0.1)]"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer border"
+              style={{
+                color: 'var(--cf-text-muted)',
+                borderColor: 'var(--cf-border)',
+                background: 'transparent',
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLButtonElement).style.color = 'var(--cf-text)';
+                (e.currentTarget as HTMLButtonElement).style.background = 'var(--cf-surface)';
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLButtonElement).style.color = 'var(--cf-text-muted)';
+                (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
+              }}
             >
               <Download className="w-3.5 h-3.5" />
               <span>Export</span>
@@ -160,7 +176,20 @@ export default function DashboardNav({
               type="button"
               onClick={onOpenShareModal}
               title="Share"
-              className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono text-[#5C6D77] hover:text-[#2F6F62] hover:bg-[#E6F0EE] transition-all cursor-pointer border border-transparent hover:border-[rgba(47,111,98,0.2)]"
+              className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer border"
+              style={{
+                color: 'var(--cf-text-muted)',
+                borderColor: 'var(--cf-border)',
+                background: 'transparent',
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLButtonElement).style.color = 'var(--cf-accent)';
+                (e.currentTarget as HTMLButtonElement).style.background = 'var(--cf-accent-bg)';
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLButtonElement).style.color = 'var(--cf-text-muted)';
+                (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
+              }}
             >
               <Share2 className="w-3.5 h-3.5" />
               <span>Share</span>
@@ -180,7 +209,7 @@ export default function DashboardNav({
                   <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#2F6F62] to-[#0f564a] flex items-center justify-center shadow-sm group-hover:shadow-[0_0_8px_rgba(47,111,98,0.4)] transition-shadow">
                     <User className="w-3.5 h-3.5 text-white" />
                   </div>
-                  <ChevronDown className="w-3.5 h-3.5 text-[#5C6D77] transition-transform" style={{ transform: avatarOpen ? 'rotate(180deg)' : 'none' }} />
+                  <ChevronDown className="w-3.5 h-3.5 text-[var(--cf-text-muted)] transition-transform" style={{ transform: avatarOpen ? 'rotate(180deg)' : 'none' }} />
                 </button>
 
                 <AnimatePresence>
@@ -192,26 +221,28 @@ export default function DashboardNav({
                       transition={{ duration: 0.15 }}
                       className="absolute right-0 top-10 w-48 rounded-xl overflow-hidden"
                       style={{
-                        background: 'white',
-                        border: '1px solid rgba(22,35,43,0.1)',
-                        boxShadow: '0 8px 32px rgba(22,35,43,0.12)',
+                        background: 'var(--cf-surface)',
+                        border: '1px solid var(--cf-border)',
+                        boxShadow: 'var(--cf-shadow-lg)',
                       }}
                     >
-                      <div className="px-4 py-3 border-b border-[rgba(22,35,43,0.08)]">
-                        <p className="text-xs font-mono text-[#5C6D77]">Signed in</p>
+                      <div className="px-4 py-3 border-b" style={{ borderColor: 'var(--cf-border)' }}>
+                        <p className="text-xs font-mono text-[var(--cf-text-muted)]">Signed in</p>
                         {lastSavedAt && (
-                          <p className="text-[11px] text-[#8E9EA7] mt-0.5">Last saved {lastSavedAt}</p>
+                          <p className="text-[11px] text-[var(--cf-text-faint)] mt-0.5">Last saved {lastSavedAt}</p>
                         )}
                       </div>
                       <div className="py-1">
-                        <button onClick={onLoadSample} className="w-full flex items-center gap-2.5 px-4 py-2 text-xs text-[#5C6D77] hover:bg-[#F1F4F2] hover:text-[#16232B] transition-colors cursor-pointer">
+                        <button onClick={onLoadSample}
+                          className="w-full flex items-center gap-2.5 px-4 py-2 text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors cursor-pointer">
                           <Database className="w-3.5 h-3.5" /> Load Sample Data
                         </button>
-                        <button onClick={onResetData} className="w-full flex items-center gap-2.5 px-4 py-2 text-xs text-[#5C6D77] hover:bg-[#FBEFEA] hover:text-[#B4573F] transition-colors cursor-pointer">
+                        <button onClick={onResetData}
+                          className="w-full flex items-center gap-2.5 px-4 py-2 text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-caution)] hover:bg-[var(--cf-caution-bg)] transition-colors cursor-pointer">
                           <RotateCcw className="w-3.5 h-3.5" /> Reset Ledger
                         </button>
-                        <div className="border-t border-[rgba(22,35,43,0.08)] my-1" />
-                        <button className="w-full flex items-center gap-2.5 px-4 py-2 text-xs text-[#5C6D77] hover:bg-[#F1F4F2] transition-colors cursor-pointer">
+                        <div className="border-t my-1" style={{ borderColor: 'var(--cf-border)' }} />
+                        <button className="w-full flex items-center gap-2.5 px-4 py-2 text-xs text-[var(--cf-text-muted)] hover:bg-[var(--cf-surface-alt)] transition-colors cursor-pointer">
                           <LogOut className="w-3.5 h-3.5" /> Sign Out
                         </button>
                       </div>
@@ -223,10 +254,9 @@ export default function DashboardNav({
               <button
                 type="button"
                 onClick={onOpenAuthModal}
-                className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer"
+                className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer text-white"
                 style={{
-                  background: 'linear-gradient(135deg, #16232B, #2F6F62)',
-                  color: 'white',
+                  background: 'linear-gradient(135deg, var(--cf-text) 0%, var(--cf-accent) 100%)',
                   boxShadow: '0 2px 8px rgba(47,111,98,0.25)',
                 }}
               >
@@ -239,7 +269,10 @@ export default function DashboardNav({
             <button
               type="button"
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="lg:hidden p-1.5 rounded-lg text-[#5C6D77] hover:bg-[#E8EDE9] transition-colors cursor-pointer"
+              className="lg:hidden p-1.5 rounded-lg transition-colors cursor-pointer"
+              style={{ color: 'var(--cf-text-muted)', background: 'transparent' }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'var(--cf-surface)')}
+              onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
             >
               {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
             </button>
@@ -257,9 +290,9 @@ export default function DashboardNav({
             transition={{ duration: 0.2 }}
             className="lg:hidden sticky top-14 z-30 overflow-hidden"
             style={{
-              background: 'rgba(241,244,242,0.96)',
+              background: 'var(--cf-nav-bg)',
               backdropFilter: 'blur(12px)',
-              borderBottom: '1px solid rgba(22,35,43,0.08)',
+              borderBottom: '1px solid var(--cf-nav-border)',
             }}
           >
             <div className="px-4 py-3 flex flex-col gap-1">
@@ -268,21 +301,32 @@ export default function DashboardNav({
                   key={s.label}
                   href={s.href}
                   onClick={() => setMobileOpen(false)}
-                  className="px-3 py-2 rounded-lg text-sm text-[#5C6D77] hover:text-[#16232B] hover:bg-white transition-colors"
+                  className="px-3 py-2 rounded-lg text-sm transition-colors"
+                  style={{ color: 'var(--cf-text-muted)' }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLAnchorElement).style.color = 'var(--cf-text)';
+                    (e.currentTarget as HTMLAnchorElement).style.background = 'var(--cf-surface)';
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLAnchorElement).style.color = 'var(--cf-text-muted)';
+                    (e.currentTarget as HTMLAnchorElement).style.background = 'transparent';
+                  }}
                 >
                   {s.label}
                 </a>
               ))}
-              <div className="px-3 py-2 border-t border-[rgba(22,35,43,0.08)] mt-1">
+              <div className="px-3 py-2 border-t mt-1" style={{ borderColor: 'var(--cf-border)' }}>
                 <ThemeToggle />
               </div>
-              <div className="border-t border-[rgba(22,35,43,0.08)] mt-2 pt-2 flex gap-2">
+              <div className="border-t mt-2 pt-2 flex gap-2" style={{ borderColor: 'var(--cf-border)' }}>
                 <button onClick={() => { onExportCsv?.(); setMobileOpen(false); }}
-                  className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs text-[#5C6D77] bg-white border border-[rgba(22,35,43,0.1)] cursor-pointer">
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs cursor-pointer border"
+                  style={{ color: 'var(--cf-text-muted)', borderColor: 'var(--cf-border)', background: 'var(--cf-surface)' }}>
                   <Download className="w-3.5 h-3.5" /> Export
                 </button>
                 <button onClick={() => { onLoadSample?.(); setMobileOpen(false); }}
-                  className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs text-[#5C6D77] bg-white border border-[rgba(22,35,43,0.1)] cursor-pointer">
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs cursor-pointer border"
+                  style={{ color: 'var(--cf-text-muted)', borderColor: 'var(--cf-border)', background: 'var(--cf-surface)' }}>
                   <Database className="w-3.5 h-3.5" /> Sample
                 </button>
               </div>

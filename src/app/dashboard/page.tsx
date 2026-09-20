@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { MonthlyRecord, CalculatorAssumptions } from '@/lib/calculator/types';
 import { computeFullLedger } from '@/lib/calculator/engine';
 import { exportLedgerToCsv } from '@/lib/export/csvExport';
@@ -238,7 +239,7 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col">
+    <main className="min-h-screen flex flex-col bg-[var(--cf-bg)] text-[var(--cf-text)] transition-colors duration-300">
       {/* 1. Clean Dashboard Navigation Bar */}
       <DashboardNav
         onResetData={handleResetData}
@@ -370,7 +371,10 @@ export default function Home() {
           <button
             type="button"
             onClick={() => setShowPhilosophy(!showPhilosophy)}
-            className="text-xs text-[#5C6D77] hover:text-[#2F6F62] flex items-center gap-1.5 transition-colors cursor-pointer"
+            className="text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+            style={{ color: 'var(--cf-text-muted)' }}
+            onMouseEnter={e => (e.currentTarget.style.color = 'var(--cf-accent)')}
+            onMouseLeave={e => (e.currentTarget.style.color = 'var(--cf-text-muted)')}
           >
             <BookOpen className="w-4 h-4 text-[#2F6F62]" />
             <span className="font-medium">The 20th Percentile Income Floor Philosophy</span>
@@ -380,25 +384,28 @@ export default function Home() {
             <button
               type="button"
               onClick={handleExportCsv}
-              className="flex-1 sm:flex-initial justify-center flex items-center gap-1.5 text-xs text-[#16232B] border border-[#16232B]/20 hover:border-[#2F6F62] bg-white px-3 py-2 transition-colors cursor-pointer font-mono whitespace-nowrap"
+              className="flex-1 sm:flex-initial justify-center flex items-center gap-1.5 text-xs px-3 py-2 rounded-lg transition-colors cursor-pointer font-mono whitespace-nowrap border"
+              style={{ color: 'var(--cf-text-muted)', borderColor: 'var(--cf-border)', background: 'var(--cf-surface)' }}
             >
-              <Download className="w-3.5 h-3.5 text-[#2F6F62]" />
+              <Download className="w-3.5 h-3.5" style={{ color: 'var(--cf-accent)' }} />
               <span>Export CSV</span>
             </button>
 
             <button
               type="button"
               onClick={handlePrintPdf}
-              className="flex-1 sm:flex-initial justify-center flex items-center gap-1.5 text-xs text-[#16232B] border border-[#16232B]/20 hover:border-[#2F6F62] bg-white px-3 py-2 transition-colors cursor-pointer font-mono whitespace-nowrap"
+              className="flex-1 sm:flex-initial justify-center flex items-center gap-1.5 text-xs px-3 py-2 rounded-lg transition-colors cursor-pointer font-mono whitespace-nowrap border"
+              style={{ color: 'var(--cf-text-muted)', borderColor: 'var(--cf-border)', background: 'var(--cf-surface)' }}
             >
-              <Printer className="w-3.5 h-3.5 text-[#5C6D77]" />
+              <Printer className="w-3.5 h-3.5" style={{ color: 'var(--cf-text-faint)' }} />
               <span>Print / PDF</span>
             </button>
 
             <button
               type="button"
               onClick={() => setIsShareModalOpen(true)}
-              className="flex-1 sm:flex-initial justify-center flex items-center gap-1.5 text-xs text-white bg-[#2F6F62] hover:bg-[#0f564a] px-3.5 py-2 transition-colors font-mono cursor-pointer whitespace-nowrap"
+              className="flex-1 sm:flex-initial justify-center flex items-center gap-1.5 text-xs text-white px-3.5 py-2 rounded-lg transition-colors font-mono cursor-pointer whitespace-nowrap"
+              style={{ background: 'linear-gradient(135deg, #2F6F62, #1a4f45)', boxShadow: '0 2px 8px rgba(47,111,98,0.3)' }}
             >
               <Share2 className="w-3.5 h-3.5" />
               <span>Pinterest Card</span>
@@ -408,17 +415,23 @@ export default function Home() {
 
         {/* Expandable Philosophy Drawer */}
         {showPhilosophy && (
-          <div className="hairline-all p-6 bg-white space-y-3 font-sans text-xs text-[#5C6D77] leading-relaxed">
-            <h3 className="font-serif text-base text-[#16232B] font-semibold">
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="rounded-xl p-6 space-y-3 font-sans text-xs leading-relaxed border"
+            style={{ background: 'var(--cf-surface)', borderColor: 'var(--cf-border)', color: 'var(--cf-text-muted)' }}
+          >
+            <h3 className="font-serif text-base font-semibold" style={{ color: 'var(--cf-text)' }}>
               The Mathematical Reason Freelancers Go Broke on Average Income
             </h3>
             <p>
               When revenue swings between dry periods ($1,600) and windfall quarters ($6,000), averaging income creates a lethal mathematical illusion. If you budget or set your lifestyle to your <em>average</em> income, you will inevitably overspend during lean cycles, exhausting cash reserves and accumulating high-interest tax or credit debt.
             </p>
             <p>
-              By computing the <strong>20th percentile income floor</strong>, Calm Ledger isolates the empirical baseline that was met or exceeded in 80% of all operating history. Budgeting for baseline personal living costs at this floor guarantees that lean months cause zero financial panic. Every dollar earned above the floor during peak quarters automatically cascades through our double-entry allocation protocol into statutory tax escrow and your safety buffer. Once your buffer is fully funded, excess capital becomes a safe, guilt-free dividend.
+              By computing the <strong>20th percentile income floor</strong>, CashFloor isolates the empirical baseline that was met or exceeded in 80% of all operating history. Budgeting for baseline personal living costs at this floor guarantees that lean months cause zero financial panic. Every dollar earned above the floor during peak quarters automatically cascades through our double-entry allocation protocol into statutory tax escrow and your safety buffer.
             </p>
-          </div>
+          </motion.div>
         )}
       </div>
 
