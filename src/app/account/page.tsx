@@ -24,14 +24,16 @@ import {
   Clock,
   Layers,
   Check,
-  Sliders
+  Sliders,
+  Bell,
+  Settings
 } from 'lucide-react';
 import DashboardNav from '@/components/DashboardNav';
 import { useAuth, DEMO_PERSONAS, DemoPersonaKey } from '@/lib/auth/AuthContext';
 
 export default function AccountPage() {
   const { user, isAuthenticated, isPro, signOut, openAuthModal, signInWithDemo } = useAuth();
-  const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'billing' | 'data'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'billing' | 'preferences' | 'notifications' | 'data'>('profile');
   const [purgeSuccess, setPurgeSuccess] = useState(false);
   const [exportSuccess, setExportSuccess] = useState(false);
 
@@ -178,37 +180,45 @@ export default function AccountPage() {
               )}
             </div>
           </div>
-
-          {/* ── Sub-Navigation Tabs ── */}
-          <div className="flex items-center gap-2 mt-8 pt-6 border-t border-[var(--cf-border-soft)] overflow-x-auto">
-            {[
-              { id: 'profile', label: 'Identity & Personas', icon: User },
-              { id: 'security', label: 'Security & Sessions', icon: Lock },
-              { id: 'billing', label: 'Subscription & Billing', icon: Sparkles },
-              { id: 'data', label: 'Data Sovereignty & Vault', icon: Database },
-            ].map(tab => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setActiveTab(tab.id as any)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-mono transition-all cursor-pointer whitespace-nowrap border"
-                  style={{
-                    background: isActive ? 'var(--cf-surface-alt)' : 'transparent',
-                    borderColor: isActive ? 'var(--cf-accent)' : 'transparent',
-                    color: isActive ? 'var(--cf-text)' : 'var(--cf-text-muted)',
-                    fontWeight: isActive ? 600 : 400,
-                  }}
-                >
-                  <Icon className="w-3.5 h-3.5" style={{ color: isActive ? 'var(--cf-accent)' : 'inherit' }} />
-                  <span>{tab.label}</span>
-                </button>
-              );
-            })}
-          </div>
         </div>
+
+        {/* ── SIDEBAR + PANE LAYOUT ── */}
+        <div className="flex flex-col md:flex-row gap-8 mt-8 pt-6 border-t border-[var(--cf-border-soft)]">
+            
+            {/* Sidebar Sub-Navigation */}
+            <aside className="w-full md:w-64 shrink-0 flex flex-row md:flex-col gap-1 overflow-x-auto md:overflow-visible pb-2 md:pb-0">
+              {[
+                { id: 'profile', label: 'Identity & Personas', icon: User },
+                { id: 'security', label: 'Security & Sessions', icon: Lock },
+                { id: 'billing', label: 'Subscription & Billing', icon: Sparkles },
+                { id: 'preferences', label: 'Preferences', icon: Settings },
+                { id: 'notifications', label: 'Notifications', icon: Bell },
+                { id: 'data', label: 'Data Sovereignty & Vault', icon: Database },
+              ].map(tab => {
+                const Icon = tab.icon;
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setActiveTab(tab.id as any)}
+                    className="flex items-center gap-2.5 px-4 py-3 md:py-2.5 rounded-xl text-xs font-mono transition-all cursor-pointer whitespace-nowrap border text-left"
+                    style={{
+                      background: isActive ? 'var(--cf-surface-alt)' : 'transparent',
+                      borderColor: isActive ? 'var(--cf-accent)' : 'transparent',
+                      color: isActive ? 'var(--cf-text)' : 'var(--cf-text-muted)',
+                      fontWeight: isActive ? 600 : 400,
+                    }}
+                  >
+                    <Icon className="w-4 h-4 shrink-0" style={{ color: isActive ? 'var(--cf-accent)' : 'inherit' }} />
+                    <span>{tab.label}</span>
+                  </button>
+                );
+              })}
+            </aside>
+
+            {/* Main Pane Content */}
+            <div className="flex-1 min-w-0 pb-24">
 
         {/* ── Tab Content ── */}
         <AnimatePresence mode="wait">
@@ -459,7 +469,99 @@ export default function AccountPage() {
             </motion.div>
           )}
 
-          {/* TAB 4: DATA SOVEREIGNTY & VAULT */}
+          {/* TAB 4: PREFERENCES (New) */}
+          {activeTab === 'preferences' && (
+            <motion.div
+              key="preferences"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              className="space-y-6"
+            >
+              <div 
+                className="p-6 sm:p-8 rounded-3xl border space-y-6"
+                style={{ background: 'var(--cf-surface)', borderColor: 'var(--cf-border)' }}
+              >
+                <div>
+                  <h2 className="text-base font-serif font-bold text-[var(--cf-text)]">
+                    Workspace Preferences
+                  </h2>
+                  <p className="text-xs text-[var(--cf-text-muted)] mt-0.5">
+                    Customize your financial dashboard
+                  </p>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-4 rounded-xl border border-[var(--cf-border-soft)]">
+                    <div>
+                      <span className="font-semibold text-xs text-[var(--cf-text)]">Base Currency</span>
+                      <p className="text-[11px] text-[var(--cf-text-muted)]">Default currency for new ledgers</p>
+                    </div>
+                    <select className="bg-[var(--cf-surface-alt)] border border-[var(--cf-border)] text-xs rounded-lg px-2 py-1 outline-none">
+                      <option>USD ($)</option>
+                      <option>EUR (€)</option>
+                      <option>GBP (£)</option>
+                    </select>
+                  </div>
+                  <div className="flex items-center justify-between p-4 rounded-xl border border-[var(--cf-border-soft)]">
+                    <div>
+                      <span className="font-semibold text-xs text-[var(--cf-text)]">Fiscal Year Start</span>
+                      <p className="text-[11px] text-[var(--cf-text-muted)]">Align tax reminders with your jurisdiction</p>
+                    </div>
+                    <select className="bg-[var(--cf-surface-alt)] border border-[var(--cf-border)] text-xs rounded-lg px-2 py-1 outline-none">
+                      <option>January</option>
+                      <option>April (UK)</option>
+                      <option>July (AU)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* TAB 5: NOTIFICATIONS (New) */}
+          {activeTab === 'notifications' && (
+            <motion.div
+              key="notifications"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              className="space-y-6"
+            >
+              <div 
+                className="p-6 sm:p-8 rounded-3xl border space-y-6"
+                style={{ background: 'var(--cf-surface)', borderColor: 'var(--cf-border)' }}
+              >
+                <div>
+                  <h2 className="text-base font-serif font-bold text-[var(--cf-text)]">
+                    Alerts &amp; Notifications
+                  </h2>
+                  <p className="text-xs text-[var(--cf-text-muted)] mt-0.5">
+                    Get warned before you hit a cash flow crisis
+                  </p>
+                </div>
+
+                <div className="space-y-4">
+                  <label className="flex items-center justify-between p-4 rounded-xl border border-[var(--cf-border-soft)] cursor-pointer hover:bg-[var(--cf-surface-alt)] transition-colors">
+                    <div>
+                      <span className="font-semibold text-xs text-[var(--cf-text)]">Runway Warning</span>
+                      <p className="text-[11px] text-[var(--cf-text-muted)]">Alert me if runway drops below 3 months</p>
+                    </div>
+                    <input type="checkbox" defaultChecked className="accent-[var(--cf-accent)] w-4 h-4" />
+                  </label>
+                  <label className="flex items-center justify-between p-4 rounded-xl border border-[var(--cf-border-soft)] cursor-pointer hover:bg-[var(--cf-surface-alt)] transition-colors">
+                    <div>
+                      <span className="font-semibold text-xs text-[var(--cf-text)]">Tax Deadlines</span>
+                      <p className="text-[11px] text-[var(--cf-text-muted)]">14-day warning for estimated tax payments</p>
+                    </div>
+                    <input type="checkbox" defaultChecked className="accent-[var(--cf-accent)] w-4 h-4" />
+                  </label>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* TAB 6: DATA SOVEREIGNTY & VAULT */}
           {activeTab === 'data' && (
             <motion.div
               key="data"
@@ -570,7 +672,8 @@ export default function AccountPage() {
           )}
 
         </AnimatePresence>
-
+        </div> {/* Close Main Pane */}
+        </div> {/* Close Sidebar Layout */}
       </main>
     </div>
   );

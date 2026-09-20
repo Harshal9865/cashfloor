@@ -119,25 +119,20 @@ export default function DashboardNav({
 
   return (
     <>
+      <div className="h-20 shrink-0 w-full" /> {/* Spacer for fixed nav */}
       <header
-        className={`w-full sticky top-0 z-40 transition-all duration-300 ${
-          scrolled ? 'border-b' : 'bg-transparent'
-        }`}
-        style={
-          scrolled
-            ? {
-                background: 'var(--cf-nav-bg)',
-                backdropFilter: 'blur(20px)',
-                WebkitBackdropFilter: 'blur(20px)',
-                borderColor: 'var(--cf-nav-border)',
-                boxShadow: 'var(--cf-shadow-sm)',
-              }
-            : {
-                background: 'transparent',
-              }
-        }
+        className={`fixed top-4 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none transition-all duration-500`}
       >
-        <div className="max-w-7xl mx-auto px-4 md:px-8 h-14 flex items-center justify-between gap-4">
+        <div
+          className="pointer-events-auto flex items-center justify-between w-full max-w-4xl px-3 h-12 rounded-2xl border transition-shadow duration-300"
+          style={{
+            background: 'var(--cf-nav-bg)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            borderColor: 'var(--cf-nav-border)',
+            boxShadow: scrolled ? 'var(--cf-shadow-md)' : 'var(--cf-shadow-sm)',
+          }}
+        >
 
           {/* ── Logo ── */}
           <Link href="/" className="flex items-center gap-2.5 group shrink-0">

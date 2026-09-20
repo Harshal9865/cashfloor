@@ -4,6 +4,7 @@ import './globals.css';
 import { ThemeProvider } from '@/lib/theme/ThemeContext';
 import { AuthProvider } from '@/lib/auth/AuthContext';
 import { AuthModal } from '@/components/auth/AuthModal';
+import { WorkspaceLoader } from '@/components/WorkspaceLoader';
 
 const fraunces = Fraunces({
   subsets: ['latin'],
@@ -127,6 +128,7 @@ export default function RootLayout({
         <ThemeProvider>
           <AuthProvider>
             <AuthModal />
+            <WorkspaceLoader />
             {children}
           </AuthProvider>
         </ThemeProvider>

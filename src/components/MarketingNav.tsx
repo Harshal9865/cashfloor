@@ -123,8 +123,8 @@ export default function MarketingNav() {
                 }}
                 onMouseEnter={(e) => {
                   if (!isActive) {
-                    e.currentTarget.style.color = 'var(--cf-text)';
-                    e.currentTarget.style.background = 'var(--cf-surface-alt)';
+                    e.currentTarget.style.color = 'var(--cf-accent)';
+                    e.currentTarget.style.background = 'var(--cf-accent-bg)';
                   }
                 }}
                 onMouseLeave={(e) => {

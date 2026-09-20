@@ -342,7 +342,7 @@ export default function Home() {
           </div>
         </motion.div>
 
-        {/* Hero Runway */}
+        {/* Hero Runway (Command Center) */}
         <section id="runway" className="dash-card p-6 md:p-8">
           <HeroRunway
             runwayMonths={calculation.runwayMonths}
@@ -359,95 +359,94 @@ export default function Home() {
           />
         </section>
 
-        <TaxDeadlineReminders />
+        {/* BENTO BOX GRID */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          {/* LEFT COLUMN: Charts & Ledgers (2/3 width) */}
+          <div className="lg:col-span-2 space-y-6">
+            
+            {/* Timeline Chart */}
+            <section id="cash-flow" className="dash-card p-6">
+              <CashFlowChart
+                records={records}
+                floorIncome={calculation.floorIncome}
+                avgExpenses={calculation.avgMonthlyExpenses}
+                currentSavings={calculation.currentSavings}
+                bufferTarget={calculation.bufferTarget}
+                taxReservePct={assumptions.taxReservePct}
+                currencySymbol={currencySymbol}
+              />
+            </section>
 
-        {/* Capital Partitioning */}
-        <section id="partitions" className="dash-card p-6 md:p-8">
-          <LedgerRows
-            result={calculation}
-            assumptions={assumptions}
-            currencySymbol={currencySymbol}
-          />
-        </section>
+            {/* Daily Payment Feed & Cash Stream */}
+            <section id="daily-log" className="dash-card p-6">
+              <DailyPaymentLog currencySymbol={currencySymbol} />
+            </section>
 
-        {/* Timeline Chart */}
-        <section id="cash-flow" className="dash-card p-6 md:p-8">
-          <CashFlowChart
-            records={records}
-            floorIncome={calculation.floorIncome}
-            avgExpenses={calculation.avgMonthlyExpenses}
-            currentSavings={calculation.currentSavings}
-            bufferTarget={calculation.bufferTarget}
-            taxReservePct={assumptions.taxReservePct}
-            currencySymbol={currencySymbol}
-          />
-        </section>
+            {/* Capital Partitioning */}
+            <section id="partitions" className="dash-card p-6">
+              <LedgerRows
+                result={calculation}
+                assumptions={assumptions}
+                currencySymbol={currencySymbol}
+              />
+            </section>
 
-        {/* Daily Payment Feed & Cash Stream */}
-        <section id="daily-log" className="dash-card p-6 md:p-8">
-          <DailyPaymentLog currencySymbol={currencySymbol} />
-        </section>
+            {/* Ledger Archive */}
+            <section id="ledger-archive" className="dash-card p-6">
+              <InputTable
+                records={records}
+                onChange={setRecords}
+                onOpenPasteModal={() => setIsPasteModalOpen(true)}
+                taxReservePct={assumptions.taxReservePct}
+                sustainablePaycheck={calculation.sustainablePaycheck}
+                initialSavings={calculation.currentSavings}
+                floorIncome={calculation.floorIncome}
+                currencySymbol={currencySymbol}
+                isLocked={!isAuthenticated}
+                onUnlockRequest={() => handleUnlockRequest('12-Month Ledger')}
+              />
+            </section>
+          </div>
 
-        {/* Waterfall */}
-        <section className="dash-card p-6 md:p-8">
-          <CashFlowWaterfall
-            steps={calculation.waterfallSteps}
-            currencySymbol={currencySymbol}
-          />
-        </section>
+          {/* RIGHT COLUMN: Controls & Risk (1/3 width, sticky) */}
+          <div className="space-y-6 lg:sticky lg:top-24 self-start">
+            
+            <TaxDeadlineReminders />
 
-        {/* Stress Testing */}
-        <section className="dash-card p-6 md:p-8">
-          <ScenarioSimulator
-            assumptions={assumptions}
-            onChange={setAssumptions}
-            windfallAllocation={calculation.windfallAllocation}
-            currencySymbol={currencySymbol}
-            scenarioImpactDescription={calculation.scenarioImpactDescription}
-            isLocked={!isAuthenticated}
-            onUnlockRequest={() => handleUnlockRequest('Advanced Stress Testing')}
-          />
-        </section>
+            {/* Levers */}
+            <section id="assumptions" className="dash-card p-5">
+              <AssumptionControls
+                assumptions={assumptions}
+                onChange={setAssumptions}
+                currencySymbol={currencySymbol}
+                onCurrencyChange={handleCurrencyChange}
+                floorIncome={calculation.floorIncome}
+                sensitivityDaysPer150={calculation.sensitivityDaysPer150}
+                onRevertDefaults={handleRevertDefaults}
+              />
+            </section>
 
-        {/* Levers */}
-        <section id="assumptions" className="dash-card p-6 md:p-8">
-          <AssumptionControls
-            assumptions={assumptions}
-            onChange={setAssumptions}
-            currencySymbol={currencySymbol}
-            onCurrencyChange={handleCurrencyChange}
-            floorIncome={calculation.floorIncome}
-            sensitivityDaysPer150={calculation.sensitivityDaysPer150}
-            onRevertDefaults={handleRevertDefaults}
-          />
-        </section>
+            {/* Risk Radar */}
+            <section className="dash-card p-5">
+              <RiskVolatilityRadar
+                volatility={calculation.volatility}
+                clientConcentrations={calculation.clientConcentrations}
+                currencySymbol={currencySymbol}
+                isLocked={!isAuthenticated}
+                onUnlockRequest={() => handleUnlockRequest('Client Concentration Radar')}
+              />
+            </section>
 
-        {/* Risk Radar */}
-        <section className="dash-card p-6 md:p-8">
-          <RiskVolatilityRadar
-            volatility={calculation.volatility}
-            clientConcentrations={calculation.clientConcentrations}
-            currencySymbol={currencySymbol}
-            isLocked={!isAuthenticated}
-            onUnlockRequest={() => handleUnlockRequest('Client Concentration Radar')}
-          />
-        </section>
-
-        {/* Ledger Table */}
-        <section id="ledger-archive" className="dash-card p-6 md:p-8">
-          <InputTable
-            records={records}
-            onChange={setRecords}
-            onOpenPasteModal={() => setIsPasteModalOpen(true)}
-            taxReservePct={assumptions.taxReservePct}
-            sustainablePaycheck={calculation.sustainablePaycheck}
-            initialSavings={calculation.currentSavings}
-            floorIncome={calculation.floorIncome}
-            currencySymbol={currencySymbol}
-            isLocked={!isAuthenticated}
-            onUnlockRequest={() => handleUnlockRequest('12-Month Ledger')}
-          />
-        </section>
+            {/* Waterfall */}
+            <section className="dash-card p-5">
+              <CashFlowWaterfall
+                steps={calculation.waterfallSteps}
+                currencySymbol={currencySymbol}
+              />
+            </section>
+          </div>
+        </div>
 
         {/* Philosophy Drawer & Action Bar */}
         <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 hairline-t">
