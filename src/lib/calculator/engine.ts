@@ -1,0 +1,395 @@
+import {
+  CalculatorAssumptions,
+  CalculationResult,
+  MonthlyRecord,
+  VolatilityMetrics,
+  ClientConcentration,
+  WindfallAllocation,
+  WaterfallStep,
+} from './types';
+
+/**
+ * Computes the conservative income floor at a specified percentile (default: 20th percentile).
+ */
+export function incomeFloor(incomes: number[], percentile: number = 20): number {
+  if (!incomes || incomes.length === 0) return 0;
+
+  const valid = incomes
+    .filter((n) => typeof n === 'number' && !isNaN(n) && isFinite(n))
+    .map((n) => Math.max(0, n));
+
+  if (valid.length === 0) return 0;
+
+  const sorted = [...valid].sort((a, b) => a - b);
+  const index = Math.ceil((percentile / 100) * sorted.length) - 1;
+  return sorted[Math.max(0, index)];
+}
+
+/**
+ * Calculates safety buffer target based on average monthly expenses and target months.
+ */
+export function calculateBufferTarget(
+  avgMonthlyExpenses: number,
+  bufferMonthsMultiplier: number = 3.5
+): number {
+  if (avgMonthlyExpenses <= 0 || bufferMonthsMultiplier <= 0) return 0;
+  return Math.round(avgMonthlyExpenses * bufferMonthsMultiplier);
+}
+
+/**
+ * Calculates runway months at $0 new income.
+ */
+export function calculateRunway(
+  currentSavings: number,
+  avgMonthlyExpenses: number
+): { runwayMonths: number; isInfiniteRunway: boolean } {
+  const savings = Math.max(0, currentSavings);
+
+  if (avgMonthlyExpenses <= 0) {
+    if (savings > 0) {
+      return { runwayMonths: 999, isInfiniteRunway: true };
+    }
+    return { runwayMonths: 0, isInfiniteRunway: false };
+  }
+
+  const raw = savings / avgMonthlyExpenses;
+  const rounded = Math.round(raw * 10) / 10;
+  return {
+    runwayMonths: rounded,
+    isInfiniteRunway: false,
+  };
+}
+
+/**
+ * Computes volatility metrics including standard deviation and coefficient of variation (CV).
+ */
+export function calculateVolatility(incomes: number[]): VolatilityMetrics {
+  const valid = (incomes || []).filter((n) => typeof n === 'number' && !isNaN(n) && isFinite(n));
+  if (valid.length === 0) {
+    return {
+      standardDeviation: 0,
+      meanIncome: 0,
+      coefficientOfVariation: 0,
+      volatilityTier: 'calm',
+      minMonth: 0,
+      maxMonth: 0,
+      peakToTroughRatio: 1,
+    };
+  }
+
+  const mean = valid.reduce((a, b) => a + b, 0) / valid.length;
+  const variance = valid.reduce((acc, curr) => acc + Math.pow(curr - mean, 2), 0) / valid.length;
+  const standardDeviation = Math.round(Math.sqrt(variance));
+  const cv = mean > 0 ? Number((standardDeviation / mean).toFixed(2)) : 0;
+
+  let volatilityTier: 'calm' | 'moderate' | 'volatile' = 'moderate';
+  if (cv < 0.25) {
+    volatilityTier = 'calm';
+  } else if (cv > 0.45) {
+    volatilityTier = 'volatile';
+  }
+
+  const minMonth = Math.min(...valid);
+  const maxMonth = Math.max(...valid);
+  const peakToTroughRatio = minMonth > 0 ? Number((maxMonth / minMonth).toFixed(1)) : maxMonth > 0 ? 99 : 1;
+
+  return {
+    standardDeviation,
+    meanIncome: Math.round(mean),
+    coefficientOfVariation: cv,
+    volatilityTier,
+    minMonth,
+    maxMonth,
+    peakToTroughRatio,
+  };
+}
+
+/**
+ * Computes client concentration risk (Herfindahl-Hirschman index inspired).
+ */
+export function calculateClientConcentrations(records: MonthlyRecord[]): ClientConcentration[] {
+  const tagTotals: Record<string, number> = {};
+  let totalIncome = 0;
+
+  records.forEach((r) => {
+    const tag = r.clientTag || 'Primary Client';
+    tagTotals[tag] = (tagTotals[tag] || 0) + r.income;
+    totalIncome += r.income;
+  });
+
+  if (totalIncome === 0) return [];
+
+  return Object.entries(tagTotals)
+    .map(([tag, amount]) => {
+      const pct = Math.round((amount / totalIncome) * 100);
+      return {
+        tag,
+        totalIncome: amount,
+        percentageOfTotal: pct,
+        isHighRisk: pct >= 45, // >45% concentration signals single-point-of-failure
+      };
+    })
+    .sort((a, b) => b.totalIncome - a.totalIncome);
+}
+
+/**
+ * Computes the Windfall Allocation Waterfall.
+ * How a freelancer should mathematically allocate an unexpected bonus or high invoice.
+ */
+export function calculateWindfallWaterfall(
+  windfallAmount: number,
+  taxReservePct: number,
+  bufferGap: number
+): WindfallAllocation {
+  const amount = Math.max(0, windfallAmount);
+  const tax = Math.round(amount * taxReservePct);
+  const postTax = Math.max(0, amount - tax);
+  const bufferAllocation = Math.min(bufferGap, postTax);
+  const bonusPaycheck = Math.max(0, postTax - bufferAllocation);
+
+  return {
+    windfallAmount: amount,
+    taxAllocation: tax,
+    bufferAllocation,
+    bonusPaycheckAllocation: bonusPaycheck,
+  };
+}
+
+/**
+ * Full deterministic calculation of the Calm Ledger metrics with scenario analysis and waterfall.
+ */
+export function computeFullLedger(
+  records: MonthlyRecord[],
+  assumptions: CalculatorAssumptions
+): CalculationResult {
+  const rawIncomes = records.map((r) => Math.max(0, Number(r.income) || 0));
+  const expenses = records.map((r) => Math.max(0, Number(r.expenses) || 0));
+
+  // Handle Scenario Adjustments
+  let scenarioAdjustedIncomes = [...rawIncomes];
+  let scenarioImpactDescription = 'Normal baseline: 20th percentile calculated across 12 active months.';
+
+  const scenario = assumptions.scenario || 'base';
+
+  if (scenario === 'conservative') {
+    // Pure floor only scenario
+    const baseFloor = incomeFloor(rawIncomes, assumptions.percentile ?? 20);
+    scenarioAdjustedIncomes = scenarioAdjustedIncomes.map(() => baseFloor);
+    scenarioImpactDescription = 'Conservative (Floor Only): Zero pipeline reliance, strictly guaranteed survival floor.';
+  } else if (scenario === 'client_loss') {
+    const dropPct = assumptions.clientLossPercentage ?? 0.30;
+    scenarioAdjustedIncomes = scenarioAdjustedIncomes.map((inc) => Math.round(inc * (1 - dropPct)));
+    scenarioImpactDescription = `Stress Test: Simulating a ${Math.round(dropPct * 100)}% revenue contract loss shock.`;
+  } else if (scenario === 'dry_spell') {
+    // Zero out the last 3 months
+    scenarioAdjustedIncomes = scenarioAdjustedIncomes.map((inc, i) => (i >= scenarioAdjustedIncomes.length - 3 ? 0 : inc));
+    scenarioImpactDescription = 'Severe Dry Spell: Simulating 3 consecutive months of zero client revenue.';
+  } else if (scenario === 'windfall') {
+    const windfall = assumptions.windfallAmount ?? 10000;
+    scenarioImpactDescription = `Windfall: Simulating an immediate $${windfall.toLocaleString()} project payment.`;
+  } else if (scenario === 'late_invoice') {
+    scenarioAdjustedIncomes = scenarioAdjustedIncomes.map((inc, i) => (i < 2 ? 0 : inc));
+    scenarioImpactDescription = 'Invoice Aging Shock: Simulating a sudden 60-day freeze on all receivables.';
+  }
+
+  const totalAnnualIncome = scenarioAdjustedIncomes.reduce((acc, curr) => acc + curr, 0);
+  const totalAnnualExpenses = expenses.reduce((acc, curr) => acc + curr, 0);
+
+  const count = records.length || 1;
+  const avgMonthlyIncome = Math.round(totalAnnualIncome / count);
+  const avgMonthlyExpenses = Math.round(totalAnnualExpenses / count);
+
+  const floor = incomeFloor(scenarioAdjustedIncomes, assumptions.percentile ?? 20);
+  const taxReservePct = Math.min(1, Math.max(0, assumptions.taxReservePct ?? 0.25));
+  const taxReserve = Math.round(floor * taxReservePct);
+
+  const bufferMultiplier = assumptions.bufferMonthsMultiplier ?? 3.5;
+  const bufferTarget = calculateBufferTarget(
+    avgMonthlyExpenses,
+    bufferMultiplier
+  );
+
+  let currentSavings = Math.max(0, assumptions.currentSavings || 0);
+
+  // If windfall scenario, inject net post-tax windfall into savings
+  let windfallAllocation: WindfallAllocation | undefined;
+  if (scenario === 'windfall' && assumptions.windfallAmount) {
+    const gapBeforeWindfall = Math.max(0, bufferTarget - currentSavings);
+    windfallAllocation = calculateWindfallWaterfall(assumptions.windfallAmount, taxReservePct, gapBeforeWindfall);
+    currentSavings += windfallAllocation.bufferAllocation;
+  }
+
+  const bufferGap = Math.max(0, bufferTarget - currentSavings);
+  const isBufferComplete = bufferTarget > 0 && bufferGap === 0;
+  const bufferFundingPercentage = bufferTarget > 0 ? Math.min(100, Math.round((currentSavings / bufferTarget) * 100)) : 100;
+
+  const netFloor = Math.max(0, floor - taxReserve);
+
+  let monthlyBufferContribution = 0;
+  if (bufferGap > 0) {
+    const surplusAtFloor = Math.max(0, netFloor - avgMonthlyExpenses);
+    const potentialAllocation = surplusAtFloor > 0 
+      ? surplusAtFloor 
+      : Math.min(bufferGap, Math.round(netFloor * 0.15));
+    monthlyBufferContribution = Math.min(bufferGap, potentialAllocation);
+  }
+
+  const sustainablePaycheck = Math.max(0, netFloor - monthlyBufferContribution);
+  const { runwayMonths, isInfiniteRunway } = calculateRunway(currentSavings, avgMonthlyExpenses);
+
+  const monthlyFloorSurplusDeficit = netFloor - avgMonthlyExpenses;
+  const hasDeficitAtFloor = monthlyFloorSurplusDeficit < 0;
+
+  const monthsToBufferTarget = monthlyBufferContribution > 0 ? Math.ceil(bufferGap / monthlyBufferContribution) : bufferGap === 0 ? 0 : 99;
+
+  // Real-time zero-income calendar exhaustion date
+  let exhaustionDate = 'Indefinite';
+  if (!isInfiniteRunway && runwayMonths > 0) {
+    const now = new Date();
+    const daysRemaining = Math.round(runwayMonths * 30.417);
+    const exhaustion = new Date(now.getTime() + daysRemaining * 24 * 60 * 60 * 1000);
+    exhaustionDate = exhaustion.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  } else if (runwayMonths === 0) {
+    exhaustionDate = 'Immediate';
+  }
+
+  const dailyBurnVelocity = avgMonthlyExpenses > 0 ? Math.round((avgMonthlyExpenses / 30.417) * 100) / 100 : 0;
+  const surplusMargin = currentSavings - bufferTarget;
+  const sensitivityDaysPer150 = dailyBurnVelocity > 0 ? Math.round(150 / dailyBurnVelocity) : 0;
+
+  // Stitch 5 Capital Partitioning & Reserve Pillars
+  const pillarBreakdown = [
+    {
+      id: 'floor',
+      name: 'Income Floor',
+      objective: 'Absolute baseline survival overhead & essential personal commitments.',
+      monthlyQuota: avgMonthlyExpenses,
+      formula: 'Fixed Cost Ceiling',
+      fundedBalance: Math.min(avgMonthlyExpenses, floor),
+      solvencyStatus: floor >= avgMonthlyExpenses ? '100% Protected' : 'Deficit Warning',
+      solvencyType: floor >= avgMonthlyExpenses ? ('protected' as const) : ('warning' as const),
+      indicatorColor: '#16232B',
+    },
+    {
+      id: 'salary',
+      name: 'Sustainable Paycheck',
+      objective: 'Regular predictable transfer to personal checking on the 1st & 15th.',
+      monthlyQuota: sustainablePaycheck,
+      formula: `${Math.round(((sustainablePaycheck) / (floor || 1)) * 100)}% of Base Floor`,
+      fundedBalance: sustainablePaycheck,
+      solvencyStatus: sustainablePaycheck > 0 ? 'Automated Bi-Weekly' : '0% Draw Capacity',
+      solvencyType: 'automated' as const,
+      indicatorColor: '#2F6F62',
+    },
+    {
+      id: 'tax',
+      name: 'Tax Reserve Vault',
+      objective: 'Mandatory statutory withholding escrow (Federal + State + Self-Employment).',
+      monthlyQuota: taxReserve,
+      formula: `${Math.round(taxReservePct * 100)}% Gross Inflow (Auto Escrow)`,
+      fundedBalance: Math.round(taxReserve * Math.min(Math.max(1, runwayMonths), 3)),
+      solvencyStatus: 'Q3 Safe Harbor OK',
+      solvencyType: 'safe' as const,
+      indicatorColor: '#875205',
+    },
+    {
+      id: 'buffer',
+      name: 'Buffer Threshold',
+      objective: `Targeted ${bufferMultiplier}-month minimum calm reserve fund before growth reinvestment.`,
+      monthlyQuota: bufferTarget,
+      formula: `${bufferMultiplier} × $${avgMonthlyExpenses.toLocaleString()}/mo`,
+      fundedBalance: Math.min(currentSavings, bufferTarget),
+      solvencyStatus: currentSavings >= bufferTarget ? 'Fully Funded' : `${bufferFundingPercentage}% Funded`,
+      solvencyType: currentSavings >= bufferTarget ? ('funded' as const) : ('warning' as const),
+      indicatorColor: '#6f7976',
+    },
+    {
+      id: 'liquid',
+      name: 'Total Liquid Working Cash',
+      objective: 'Verified aggregated balance across business checking & treasury accounts.',
+      monthlyQuota: currentSavings,
+      formula: 'Total Liquid Capital',
+      fundedBalance: currentSavings,
+      solvencyStatus: surplusMargin >= 0 ? `+$${surplusMargin.toLocaleString()} Surplus` : `-$${Math.abs(surplusMargin).toLocaleString()} Deficit`,
+      solvencyType: surplusMargin >= 0 ? ('surplus' as const) : ('warning' as const),
+      indicatorColor: '#0f564a',
+    },
+  ];
+
+  // Real-time Waterfall Breakdown Steps
+  const waterfallSteps: WaterfallStep[] = [
+    {
+      label: 'Gross Income Floor',
+      amount: floor,
+      runningTotal: floor,
+      type: 'inflow',
+      color: '#2F6F62',
+    },
+    {
+      label: `Tax Reserve (${Math.round(taxReservePct * 100)}%)`,
+      amount: -taxReserve,
+      runningTotal: floor - taxReserve,
+      type: 'deduction',
+      color: '#875205',
+    },
+    {
+      label: 'Average Overhead Expenses',
+      amount: -Math.min(floor - taxReserve, avgMonthlyExpenses),
+      runningTotal: Math.max(0, floor - taxReserve - avgMonthlyExpenses),
+      type: 'deduction',
+      color: '#B4573F',
+    },
+    {
+      label: 'Safety Buffer Contribution',
+      amount: -monthlyBufferContribution,
+      runningTotal: sustainablePaycheck,
+      type: 'allocation',
+      color: '#C98A3E',
+    },
+    {
+      label: 'Net Sustainable Paycheck',
+      amount: sustainablePaycheck,
+      runningTotal: sustainablePaycheck,
+      type: 'net',
+      color: '#2F6F62',
+    },
+  ];
+
+  const volatility = calculateVolatility(rawIncomes);
+  const clientConcentrations = calculateClientConcentrations(records);
+
+  return {
+    floorIncome: floor,
+    taxReserve,
+    bufferTarget,
+    currentSavings,
+    bufferGap,
+    monthlyBufferContribution,
+    sustainablePaycheck,
+    avgMonthlyIncome,
+    avgMonthlyExpenses,
+    totalAnnualIncome,
+    totalAnnualExpenses,
+    runwayMonths,
+    isInfiniteRunway,
+    isBufferComplete,
+    hasDeficitAtFloor,
+    monthlyFloorSurplusDeficit,
+    monthsToBufferTarget,
+    bufferFundingPercentage,
+    exhaustionDate,
+    dailyBurnVelocity,
+    surplusMargin,
+    sensitivityDaysPer150,
+    pillarBreakdown,
+    volatility,
+    clientConcentrations,
+    windfallAllocation,
+    waterfallSteps,
+    scenarioImpactDescription,
+  };
+}
