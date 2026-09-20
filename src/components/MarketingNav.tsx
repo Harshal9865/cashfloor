@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, X, Menu } from 'lucide-react';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const navLinks = [
   { label: 'How It Works', href: '#how-it-works' },
@@ -74,6 +75,8 @@ export default function MarketingNav() {
               <ArrowRight className="relative w-3.5 h-3.5 text-[#3DE8C8] group-hover:translate-x-0.5 transition-transform" />
             </Link>
 
+            <ThemeToggle className="hidden sm:flex" />
+
             <button
               type="button"
               onClick={() => setMobileOpen(!mobileOpen)}
@@ -110,6 +113,9 @@ export default function MarketingNav() {
                   {link.label}
                 </motion.a>
               ))}
+              <div className="px-4 py-2">
+                <ThemeToggle />
+              </div>
               <Link
                 href="/dashboard"
                 onClick={() => setMobileOpen(false)}

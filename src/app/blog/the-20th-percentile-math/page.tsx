@@ -11,6 +11,7 @@ import {
   FileSpreadsheet,
   CheckCircle2
 } from 'lucide-react';
+import DashboardNav from '@/components/DashboardNav';
 
 export const metadata: Metadata = {
   title: 'The 20th Percentile Rule: Why Averages Kill Freelance Businesses',
@@ -68,38 +69,20 @@ export default function BlogPostPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F1F4F2] text-[#16232B]">
+    <div className="min-h-screen transition-colors duration-300 bg-[var(--cf-bg)] text-[var(--cf-text)]">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdArticle) }}
       />
 
-      {/* Editorial Header */}
-      <header className="border-b border-[#16232B]/15 bg-white/70 backdrop-blur-sm sticky top-0 z-20">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
-          <Link
-            href="/"
-            className="flex items-center space-x-2 text-xs font-mono text-[#5C6D77] hover:text-[#16232B] transition-colors"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Return to CashFloor</span>
-          </Link>
-
-          <Link
-            href="/dashboard"
-            className="bg-[#2F6F62] hover:bg-[#16232B] text-white px-3.5 py-1.5 text-xs font-mono uppercase tracking-wider transition-colors"
-          >
-            Launch Calculator
-          </Link>
-        </div>
-      </header>
+      <DashboardNav />
 
       {/* Main Editorial Body */}
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-12 md:py-16">
         {/* Article Meta */}
         <div className="space-y-4 mb-8">
-          <div className="flex flex-wrap items-center gap-3 text-xs font-mono text-[#5C6D77]">
-            <span className="bg-[#2F6F62]/10 text-[#2F6F62] px-2.5 py-1 border border-[#2F6F62]/20 font-semibold uppercase tracking-wider">
+          <div className="flex flex-wrap items-center gap-3 text-xs font-mono text-[var(--cf-text-muted)]">
+            <span className="bg-[var(--cf-accent-bg)] text-[var(--cf-accent-bright)] px-2.5 py-1 border border-[var(--cf-accent)]/20 font-semibold uppercase tracking-wider">
               Fintech Research Note #04
             </span>
             <div className="flex items-center space-x-1">
@@ -113,17 +96,17 @@ export default function BlogPostPage() {
             </div>
           </div>
 
-          <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[#16232B] leading-[1.15]">
+          <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[var(--cf-text)] leading-[1.15]">
             The 20th Percentile Rule: Why Averages Kill Freelance Businesses
           </h1>
 
-          <p className="text-lg text-[#5C6D77] leading-relaxed font-serif italic border-l-2 border-[#2F6F62] pl-4">
+          <p className="text-lg text-[var(--cf-text-muted)] leading-relaxed font-serif italic border-l-2 border-[var(--cf-accent)] pl-4">
             If your financial safety margin is calibrated to your average monthly earnings, you are quietly operating on borrowed time. Here is the mathematical defense.
           </p>
         </div>
 
         {/* Lead Content */}
-        <article className="prose prose-slate max-w-none space-y-6 text-[#16232B] leading-relaxed text-base">
+        <article className="prose prose-slate max-w-none space-y-6 text-[var(--cf-text)] leading-relaxed text-base">
           <p>
             Every veteran independent consultant remembers the month the averages failed them. 
             On paper, the business was thriving: trailing twelve-month revenue was $115,000, 
@@ -135,17 +118,17 @@ export default function BlogPostPage() {
             Then November happened:
           </p>
 
-          <ul className="list-none pl-0 space-y-3 font-mono text-xs bg-white border border-[#16232B]/10 p-5">
+          <ul className="list-none pl-0 space-y-3 font-mono text-xs bg-[var(--cf-surface)] border border-[var(--cf-border)] p-5">
             <li className="flex items-start space-x-2">
-              <span className="text-[#B4573F] font-bold">01.</span>
+              <span className="text-[var(--cf-caution)] font-bold">01.</span>
               <span><strong>Client A</strong> delayed Net-30 invoice sign-off for 44 days due to enterprise corporate holiday budget freezes.</span>
             </li>
             <li className="flex items-start space-x-2">
-              <span className="text-[#B4573F] font-bold">02.</span>
+              <span className="text-[var(--cf-caution)] font-bold">02.</span>
               <span><strong>Client B</strong> unexpectedly churned after an internal re-org eliminated their marketing contractor budget.</span>
             </li>
             <li className="flex items-start space-x-2">
-              <span className="text-[#B4573F] font-bold">03.</span>
+              <span className="text-[var(--cf-caution)] font-bold">03.</span>
               <span><strong>Q4 Estimated Taxes</strong> arrived simultaneously on January 15th: $4,800 due to federal and state revenue departments.</span>
             </li>
           </ul>
@@ -156,18 +139,18 @@ export default function BlogPostPage() {
           </p>
 
           {/* Callout Box */}
-          <div className="bg-[#16232B] text-[#F1F4F2] p-6 border-l-4 border-[#C18C5D] my-8">
-            <div className="flex items-center space-x-2 text-[#C18C5D] font-mono text-xs uppercase tracking-widest mb-2">
+          <div className="bg-[var(--cf-surface-alt)] text-[var(--cf-text)] p-6 border-l-4 border-[var(--cf-warm)] my-8">
+            <div className="flex items-center space-x-2 text-[var(--cf-warm)] font-mono text-xs uppercase tracking-widest mb-2">
               <ShieldCheck className="w-4 h-4" />
               <span>Core Axiom</span>
             </div>
-            <p className="font-serif text-lg italic text-[#F1F4F2]/90 leading-snug">
+            <p className="font-serif text-lg italic leading-snug">
               &quot;Never calculate your survival margin against your mean performance. 
               The financial markets do not reward optimism in solvency; they reward resilience against the 20th percentile trough.&quot;
             </p>
           </div>
 
-          <h2 className="font-serif text-2xl font-bold text-[#16232B] pt-6 border-t border-[#16232B]/10">
+          <h2 className="font-serif text-2xl font-bold text-[var(--cf-text)] pt-6 border-t border-[var(--cf-hairline)]">
             What Is the 20th Percentile (P20) Cash Floor?
           </h2>
 
@@ -178,89 +161,89 @@ export default function BlogPostPage() {
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-6">
-            <div className="p-4 bg-white border border-[#16232B]/10">
-              <div className="font-mono text-xs text-[#2F6F62] uppercase tracking-wider font-semibold mb-1">Factor 01</div>
-              <h4 className="font-serif font-bold text-sm text-[#16232B]">Payment Velocity Lag</h4>
-              <p className="text-xs text-[#5C6D77] mt-1.5 leading-normal">
+            <div className="p-4 bg-[var(--cf-surface)] border border-[var(--cf-border)]">
+              <div className="font-mono text-xs text-[var(--cf-accent-bright)] uppercase tracking-wider font-semibold mb-1">Factor 01</div>
+              <h4 className="font-serif font-bold text-sm text-[var(--cf-text)]">Payment Velocity Lag</h4>
+              <p className="text-xs text-[var(--cf-text-muted)] mt-1.5 leading-normal">
                 Receivables are delayed by an average of 18 to 32 days beyond stated Net terms.
               </p>
             </div>
 
-            <div className="p-4 bg-white border border-[#16232B]/10">
-              <div className="font-mono text-xs text-[#B4573F] uppercase tracking-wider font-semibold mb-1">Factor 02</div>
-              <h4 className="font-serif font-bold text-sm text-[#16232B]">Project Gaps</h4>
-              <p className="text-xs text-[#5C6D77] mt-1.5 leading-normal">
+            <div className="p-4 bg-[var(--cf-surface)] border border-[var(--cf-border)]">
+              <div className="font-mono text-xs text-[var(--cf-caution)] uppercase tracking-wider font-semibold mb-1">Factor 02</div>
+              <h4 className="font-serif font-bold text-sm text-[var(--cf-text)]">Project Gaps</h4>
+              <p className="text-xs text-[var(--cf-text-muted)] mt-1.5 leading-normal">
                 The seasonal dead zone between Thanksgiving and mid-January when project kickoffs stall.
               </p>
             </div>
 
-            <div className="p-4 bg-white border border-[#16232B]/10">
-              <div className="font-mono text-xs text-[#875205] uppercase tracking-wider font-semibold mb-1">Factor 03</div>
-              <h4 className="font-serif font-bold text-sm text-[#16232B]">Quarterly Tax Drag</h4>
-              <p className="text-xs text-[#5C6D77] mt-1.5 leading-normal">
+            <div className="p-4 bg-[var(--cf-surface)] border border-[var(--cf-border)]">
+              <div className="font-mono text-xs text-[var(--cf-warm)] uppercase tracking-wider font-semibold mb-1">Factor 03</div>
+              <h4 className="font-serif font-bold text-sm text-[var(--cf-text)]">Quarterly Tax Drag</h4>
+              <p className="text-xs text-[var(--cf-text-muted)] mt-1.5 leading-normal">
                 Self-employment (15.3%) plus income taxes biting precisely when liquidity is low.
               </p>
             </div>
           </div>
 
           {/* Interactive Widget Embedded Right in the Editorial */}
-          <h2 className="font-serif text-2xl font-bold text-[#16232B] pt-4">
+          <h2 className="font-serif text-2xl font-bold text-[var(--cf-text)] pt-4">
             Stress-Test Your Own Runway Below
           </h2>
-          <p className="text-sm text-[#5C6D77]">
+          <p className="text-sm text-[var(--cf-text-muted)]">
             Drag the sliders to see how payment delays and client churn depress your realistic runway compared to naive arithmetic.
           </p>
 
           <InteractiveRunwayP20Widget />
 
-          <h2 className="font-serif text-2xl font-bold text-[#16232B] pt-4 border-t border-[#16232B]/10">
+          <h2 className="font-serif text-2xl font-bold text-[var(--cf-text)] pt-4 border-t border-[var(--cf-hairline)]">
             The 4 Rules for Implementing Calm Solvency
           </h2>
 
           <div className="space-y-4 my-6">
-            <div className="flex items-start space-x-3 p-4 bg-white border border-[#16232B]/10">
-              <CheckCircle2 className="w-5 h-5 text-[#2F6F62] shrink-0 mt-0.5" />
+            <div className="flex items-start space-x-3 p-4 bg-[var(--cf-surface)] border border-[var(--cf-border)]">
+              <CheckCircle2 className="w-5 h-5 text-[var(--cf-accent)] shrink-0 mt-0.5" />
               <div>
-                <h4 className="font-serif font-semibold text-base text-[#16232B]">
+                <h4 className="font-serif font-semibold text-base text-[var(--cf-text)]">
                   1. Maintain a Dedicated Tax Escrow Sub-Account
                 </h4>
-                <p className="text-xs text-[#5C6D77] mt-1 leading-relaxed">
+                <p className="text-xs text-[var(--cf-text-muted)] mt-1 leading-relaxed">
                   Every time an invoice is paid into your operating checking account, immediately skim 25% to 30% into a secondary high-yield savings account labeled &quot;Tax Escrow&quot;. Treat that money as if it already belongs to the state.
                 </p>
               </div>
             </div>
 
-            <div className="flex items-start space-x-3 p-4 bg-white border border-[#16232B]/10">
-              <CheckCircle2 className="w-5 h-5 text-[#2F6F62] shrink-0 mt-0.5" />
+            <div className="flex items-start space-x-3 p-4 bg-[var(--cf-surface)] border border-[var(--cf-border)]">
+              <CheckCircle2 className="w-5 h-5 text-[var(--cf-accent)] shrink-0 mt-0.5" />
               <div>
-                <h4 className="font-serif font-semibold text-base text-[#16232B]">
+                <h4 className="font-serif font-semibold text-base text-[var(--cf-text)]">
                   2. Budget Base Living Expenses to the P20 Floor, Not the Peak
                 </h4>
-                <p className="text-xs text-[#5C6D77] mt-1 leading-relaxed">
+                <p className="text-xs text-[var(--cf-text-muted)] mt-1 leading-relaxed">
                   Fixed personal and business obligations (rent, insurance, software, baseline nutrition) must never exceed your P20 floor. When windfall months happen, direct 80% to replenishing your 6-month buffer.
                 </p>
               </div>
             </div>
 
-            <div className="flex items-start space-x-3 p-4 bg-white border border-[#16232B]/10">
-              <CheckCircle2 className="w-5 h-5 text-[#2F6F62] shrink-0 mt-0.5" />
+            <div className="flex items-start space-x-3 p-4 bg-[var(--cf-surface)] border border-[var(--cf-border)]">
+              <CheckCircle2 className="w-5 h-5 text-[var(--cf-accent)] shrink-0 mt-0.5" />
               <div>
-                <h4 className="font-serif font-semibold text-base text-[#16232B]">
+                <h4 className="font-serif font-semibold text-base text-[var(--cf-text)]">
                   3. Enforce 50% Upfront Retainers
                 </h4>
-                <p className="text-xs text-[#5C6D77] mt-1 leading-relaxed">
+                <p className="text-xs text-[var(--cf-text-muted)] mt-1 leading-relaxed">
                   Never finance client corporate operations out of your pocket. Billing 50% deposit upfront shifts liquidity risk back to the capitalized institution and guarantees cash inflows before work commences.
                 </p>
               </div>
             </div>
 
-            <div className="flex items-start space-x-3 p-4 bg-white border border-[#16232B]/10">
-              <CheckCircle2 className="w-5 h-5 text-[#2F6F62] shrink-0 mt-0.5" />
+            <div className="flex items-start space-x-3 p-4 bg-[var(--cf-surface)] border border-[var(--cf-border)]">
+              <CheckCircle2 className="w-5 h-5 text-[var(--cf-accent)] shrink-0 mt-0.5" />
               <div>
-                <h4 className="font-serif font-semibold text-base text-[#16232B]">
+                <h4 className="font-serif font-semibold text-base text-[var(--cf-text)]">
                   4. Review Your Double-Entry Ledger Monthly
                 </h4>
-                <p className="text-xs text-[#5C6D77] mt-1 leading-relaxed">
+                <p className="text-xs text-[var(--cf-text-muted)] mt-1 leading-relaxed">
                   Use CashFloor to run scenario simulations each month. If your P20 runway dips below 3.0 months, trigger immediate business conservation protocols before an emergency strikes.
                 </p>
               </div>
@@ -268,27 +251,21 @@ export default function BlogPostPage() {
           </div>
 
           {/* Bottom CTA Banner */}
-          <div className="my-12 p-8 bg-[#16232B] text-[#F1F4F2] text-center border border-[#16232B]/20 shadow-md">
-            <h3 className="font-serif text-2xl font-bold text-[#F1F4F2]">
+          <div className="my-12 p-8 bg-[var(--cf-surface-alt)] border border-[var(--cf-border)] shadow-md text-center rounded-xl">
+            <h3 className="font-serif text-2xl font-bold text-[var(--cf-text)]">
               Ready to Model Your Complete Runway?
             </h3>
-            <p className="text-xs text-[#F1F4F2]/70 max-w-lg mx-auto mt-2 mb-6 leading-relaxed font-sans">
+            <p className="text-xs text-[var(--cf-text-muted)] max-w-lg mx-auto mt-2 mb-6 leading-relaxed font-sans">
               Enter your income streams, ongoing fixed retainers, and expenses into CashFloor. 
               No bank logins or surveillance required — 100% private, client-side financial clarity.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-3">
               <Link
                 href="/dashboard"
-                className="bg-[#2F6F62] hover:bg-[#3d8c7c] text-white px-6 py-3 font-mono text-xs uppercase tracking-widest font-semibold transition-colors inline-flex items-center justify-center space-x-2"
+                className="bg-[var(--cf-accent)] hover:bg-[var(--cf-accent-bright)] text-white px-6 py-3 font-mono text-xs uppercase tracking-widest font-semibold transition-colors inline-flex items-center justify-center space-x-2 rounded-lg"
               >
                 <FileSpreadsheet className="w-4 h-4" />
                 <span>Open CashFloor Workspace</span>
-              </Link>
-              <Link
-                href="/"
-                className="border border-[#F1F4F2]/30 hover:border-white text-[#F1F4F2] px-6 py-3 font-mono text-xs uppercase tracking-widest transition-colors inline-flex items-center justify-center"
-              >
-                Learn More
               </Link>
             </div>
           </div>
@@ -296,12 +273,12 @@ export default function BlogPostPage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-[#16232B]/15 bg-white py-8 text-center text-xs font-mono text-[#5C6D77]">
+      <footer className="border-t border-[var(--cf-border)] bg-[var(--cf-bg-deep)] py-8 text-center text-xs font-mono text-[var(--cf-text-muted)]">
         <div className="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p>© {new Date().getFullYear()} CashFloor. Mathematical conservatism for independent professionals.</p>
           <div className="flex items-center space-x-4">
-            <Link href="/privacy" className="hover:text-[#16232B] transition-colors">Privacy Policy</Link>
-            <Link href="/terms" className="hover:text-[#16232B] transition-colors">Terms of Service</Link>
+            <Link href="/privacy" className="hover:text-[var(--cf-text)] transition-colors">Privacy Policy</Link>
+            <Link href="/terms" className="hover:text-[var(--cf-text)] transition-colors">Terms of Service</Link>
           </div>
         </div>
       </footer>

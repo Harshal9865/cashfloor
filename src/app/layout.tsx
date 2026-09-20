@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Fraunces, IBM_Plex_Sans, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
+import { ThemeProvider } from '@/lib/theme/ThemeContext';
 
 const fraunces = Fraunces({
   subsets: ['latin'],
@@ -104,12 +105,26 @@ export default function RootLayout({
     >
       <head>
         <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                const stored = localStorage.getItem('cf-theme');
+                const system = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const resolved = stored ?? (system ? 'dark' : 'dark');
+                document.documentElement.setAttribute('data-theme', resolved);
+              } catch (e) {}
+            `,
+          }}
+        />
+        <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="min-h-full flex flex-col bg-[#F1F4F2] text-[#16232B] font-sans selection:bg-[#2F6F62] selection:text-white">
-        {children}
+      <body className="min-h-full flex flex-col font-sans selection:bg-[var(--cf-accent)] selection:text-white transition-colors duration-300">
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

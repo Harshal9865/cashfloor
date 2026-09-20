@@ -238,7 +238,7 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col bg-[#F1F4F2] text-[#16232B] selection:bg-[#2F6F62] selection:text-white">
+    <main className="min-h-screen flex flex-col">
       {/* 1. Clean Dashboard Navigation Bar */}
       <DashboardNav
         onResetData={handleResetData}
@@ -423,16 +423,16 @@ export default function Home() {
       </div>
 
       {/* Footer */}
-      <footer className="w-full bg-[#E8EDE9] py-6 px-4 md:px-8 mt-4" style={{ borderTop: '1px solid rgba(22,35,43,0.08)' }}>
+      <footer className="w-full py-6 px-4 md:px-8 mt-4" style={{ backgroundColor: 'var(--cf-bg-deep)', borderTop: '1px solid var(--cf-border)' }}>
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3">
           <div className="flex items-center gap-2">
             <div className="w-5 h-5 bg-gradient-to-br from-[#16232B] to-[#2F6F62] rounded flex items-center justify-center">
               <span className="text-white font-serif text-[10px] font-bold">C</span>
             </div>
-            <span className="font-serif text-[#16232B] text-sm font-semibold">CashFloor</span>
-            <span className="text-[#8E9EA7] text-xs">· Freelance Runway Calculator</span>
+            <span className="font-serif text-[var(--cf-text)] text-sm font-semibold">CashFloor</span>
+            <span className="text-[var(--cf-text-faint)] text-xs">· Freelance Runway Calculator</span>
           </div>
-          <div className="flex items-center gap-4 text-[11px] font-mono text-[#8E9EA7]">
+          <div className="flex items-center gap-4 text-[11px] font-mono text-[var(--cf-text-faint)]">
             <button type="button" onClick={handleExportCsv} className="hover:text-[#2F6F62] transition-colors cursor-pointer">Export CSV</button>
             <button type="button" onClick={() => setIsShareModalOpen(true)} className="hover:text-[#2F6F62] transition-colors cursor-pointer">Share Card</button>
             <a href="/blog/the-20th-percentile-math" className="hover:text-[#2F6F62] transition-colors">Guide</a>

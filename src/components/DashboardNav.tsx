@@ -7,6 +7,7 @@ import {
   Download, Database, RotateCcw, Cloud, User, RefreshCw,
   ChevronDown, LogOut, Share2, Check, Menu, X
 } from 'lucide-react';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 interface DashboardNavProps {
   onResetData?: () => void;
@@ -165,6 +166,8 @@ export default function DashboardNav({
               <span>Share</span>
             </button>
 
+            <ThemeToggle className="hidden sm:flex" />
+
             {/* Auth / Avatar */}
             {isAuthenticated ? (
               <div ref={avatarRef} className="relative">
@@ -270,6 +273,9 @@ export default function DashboardNav({
                   {s.label}
                 </a>
               ))}
+              <div className="px-3 py-2 border-t border-[rgba(22,35,43,0.08)] mt-1">
+                <ThemeToggle />
+              </div>
               <div className="border-t border-[rgba(22,35,43,0.08)] mt-2 pt-2 flex gap-2">
                 <button onClick={() => { onExportCsv?.(); setMobileOpen(false); }}
                   className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs text-[#5C6D77] bg-white border border-[rgba(22,35,43,0.1)] cursor-pointer">
