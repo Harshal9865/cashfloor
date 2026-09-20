@@ -121,16 +121,20 @@ export default function DashboardNav({
     <>
       <header
         className={`w-full sticky top-0 z-40 transition-all duration-300 ${
-          scrolled ? 'backdrop-blur-xl border-b' : 'bg-transparent'
+          scrolled ? 'border-b' : 'bg-transparent'
         }`}
         style={
           scrolled
             ? {
                 background: 'var(--cf-nav-bg)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
                 borderColor: 'var(--cf-nav-border)',
                 boxShadow: 'var(--cf-shadow-sm)',
               }
-            : {}
+            : {
+                background: 'transparent',
+              }
         }
       >
         <div className="max-w-7xl mx-auto px-4 md:px-8 h-14 flex items-center justify-between gap-4">

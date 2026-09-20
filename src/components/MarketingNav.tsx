@@ -73,17 +73,21 @@ export default function MarketingNav() {
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
       className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
         scrolled
-          ? 'backdrop-blur-md border-b'
+          ? 'border-b'
           : 'bg-transparent'
       }`}
       style={
         scrolled
           ? {
               background: 'var(--cf-nav-bg)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
               borderColor: 'var(--cf-border)',
               boxShadow: 'var(--cf-shadow-md)',
             }
-          : {}
+          : {
+              background: 'transparent',
+            }
       }
     >
       <div className="max-w-7xl mx-auto px-4 md:px-8 h-16 flex items-center justify-between">

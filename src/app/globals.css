@@ -43,7 +43,7 @@
   --cf-shadow-lg:   0 8px 32px rgba(22,35,43,0.12), 0 24px 64px rgba(22,35,43,0.08);
 
   /* Nav */
-  --cf-nav-bg:      rgba(241,244,242,0.92);
+  --cf-nav-bg:      rgba(241,244,242,0.70);
   --cf-nav-border:  rgba(22,35,43,0.08);
 
   /* Hairlines */
@@ -89,7 +89,7 @@
   --cf-shadow-lg:   0 8px 40px rgba(0,0,0,0.5), 0 32px 80px rgba(0,0,0,0.4);
 
   /* Nav */
-  --cf-nav-bg:      rgba(8,12,16,0.88);
+  --cf-nav-bg:      rgba(8,12,16,0.70);
   --cf-nav-border:  rgba(255,255,255,0.06);
 
   /* Hairlines */
