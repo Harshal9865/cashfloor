@@ -69,7 +69,7 @@ export default function HeroTeaser() {
               <div className="w-3 h-3 rounded-full bg-[#2F6F62]/70" />
             </div>
             <div className="text-[10px] uppercase tracking-widest text-[#5C6D77] font-[var(--font-mono)]">
-              Calm Ledger Live Simulation
+              CashFloor Live Simulation
             </div>
           </div>
 

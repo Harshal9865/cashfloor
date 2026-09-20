@@ -49,16 +49,16 @@ export const InteractiveRunwayP20Widget: React.FC = () => {
 
   const handleCopyCitation = () => {
     navigator.clipboard.writeText(
-      `"The 20th-Percentile Rule: Always calibrate your freelance financial runway to the 20th percentile cash flow floor ($${stats.p20Floor}/mo), not your average invoice volume ($${monthlyRevenue}/mo)." — Calm Ledger (https://calmledger.com/blog/the-20th-percentile-math)`
+      `"The 20th-Percentile Rule: Always calibrate your freelance financial runway to the 20th percentile cash flow floor ($${stats.p20Floor}/mo), not your average invoice volume ($${monthlyRevenue}/mo)." — CashFloor (https://cashfloor.app/blog/the-20th-percentile-math)`
     );
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
   };
 
   const pinterestShareUrl = `https://www.pinterest.com/pin/create/button/?url=${encodeURIComponent(
-    'https://calmledger.com/blog/the-20th-percentile-math'
+    'https://cashfloor.app/blog/the-20th-percentile-math'
   )}&media=${encodeURIComponent(
-    'https://calmledger.com/pinterest-pin.png'
+    'https://cashfloor.app/pinterest-pin.png'
   )}&description=${encodeURIComponent(
     'The 20th Percentile Rule for Freelancers: Why averages kill independent businesses and how to calculate your true cash floor.'
   )}`;

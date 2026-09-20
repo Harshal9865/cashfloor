@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     description:
       'Discover why smart independent consultants calculate runway using the 20th percentile cash floor rather than mean monthly billing.',
     type: 'article',
-    url: 'https://calmledger.com/blog/the-20th-percentile-math',
+    url: 'https://cashfloor.app/blog/the-20th-percentile-math',
     images: [
       {
         url: '/pinterest-pin.png',
@@ -45,22 +45,22 @@ export default function BlogPostPage() {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
     headline: 'The 20th Percentile Rule: Why Averages Kill Freelance Businesses',
-    image: ['https://calmledger.com/pinterest-pin.png'],
+    image: ['https://cashfloor.app/pinterest-pin.png'],
     datePublished: '2026-09-20T08:00:00+00:00',
     dateModified: '2026-09-20T08:00:00+00:00',
     author: [
       {
         '@type': 'Organization',
-        name: 'Calm Ledger Financial Research',
-        url: 'https://calmledger.com',
+        name: 'CashFloor Financial Research',
+        url: 'https://cashfloor.app',
       },
     ],
     publisher: {
       '@type': 'Organization',
-      name: 'Calm Ledger',
+      name: 'CashFloor',
       logo: {
         '@type': 'ImageObject',
-        url: 'https://calmledger.com/favicon.ico',
+        url: 'https://cashfloor.app/favicon.ico',
       },
     },
     description:
@@ -82,7 +82,7 @@ export default function BlogPostPage() {
             className="flex items-center space-x-2 text-xs font-mono text-[#5C6D77] hover:text-[#16232B] transition-colors"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Return to Calm Ledger</span>
+            <span>Return to CashFloor</span>
           </Link>
 
           <Link
@@ -261,7 +261,7 @@ export default function BlogPostPage() {
                   4. Review Your Double-Entry Ledger Monthly
                 </h4>
                 <p className="text-xs text-[#5C6D77] mt-1 leading-relaxed">
-                  Use Calm Ledger to run scenario simulations each month. If your P20 runway dips below 3.0 months, trigger immediate business conservation protocols before an emergency strikes.
+                  Use CashFloor to run scenario simulations each month. If your P20 runway dips below 3.0 months, trigger immediate business conservation protocols before an emergency strikes.
                 </p>
               </div>
             </div>
@@ -273,7 +273,7 @@ export default function BlogPostPage() {
               Ready to Model Your Complete Runway?
             </h3>
             <p className="text-xs text-[#F1F4F2]/70 max-w-lg mx-auto mt-2 mb-6 leading-relaxed font-sans">
-              Enter your income streams, ongoing fixed retainers, and expenses into Calm Ledger. 
+              Enter your income streams, ongoing fixed retainers, and expenses into CashFloor. 
               No bank logins or surveillance required — 100% private, client-side financial clarity.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-3">
@@ -282,7 +282,7 @@ export default function BlogPostPage() {
                 className="bg-[#2F6F62] hover:bg-[#3d8c7c] text-white px-6 py-3 font-mono text-xs uppercase tracking-widest font-semibold transition-colors inline-flex items-center justify-center space-x-2"
               >
                 <FileSpreadsheet className="w-4 h-4" />
-                <span>Open Calm Ledger Workspace</span>
+                <span>Open CashFloor Workspace</span>
               </Link>
               <Link
                 href="/"
@@ -298,7 +298,7 @@ export default function BlogPostPage() {
       {/* Footer */}
       <footer className="border-t border-[#16232B]/15 bg-white py-8 text-center text-xs font-mono text-[#5C6D77]">
         <div className="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p>© {new Date().getFullYear()} Calm Ledger. Mathematical conservatism for independent professionals.</p>
+          <p>© {new Date().getFullYear()} CashFloor. Mathematical conservatism for independent professionals.</p>
           <div className="flex items-center space-x-4">
             <Link href="/privacy" className="hover:text-[#16232B] transition-colors">Privacy Policy</Link>
             <Link href="/terms" className="hover:text-[#16232B] transition-colors">Terms of Service</Link>

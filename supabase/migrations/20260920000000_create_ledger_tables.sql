@@ -45,23 +45,28 @@ alter table public.ledger_records enable row level security;
 alter table public.ledger_assumptions enable row level security;
 
 -- 5. Strict RLS Policies for 'ledgers'
+drop policy if exists "Users can view their own ledgers" on public.ledgers;
 create policy "Users can view their own ledgers"
   on public.ledgers for select
   using (auth.uid() = user_id);
 
+drop policy if exists "Users can insert their own ledgers" on public.ledgers;
 create policy "Users can insert their own ledgers"
   on public.ledgers for insert
   with check (auth.uid() = user_id);
 
+drop policy if exists "Users can update their own ledgers" on public.ledgers;
 create policy "Users can update their own ledgers"
   on public.ledgers for update
   using (auth.uid() = user_id);
 
+drop policy if exists "Users can delete their own ledgers" on public.ledgers;
 create policy "Users can delete their own ledgers"
   on public.ledgers for delete
   using (auth.uid() = user_id);
 
 -- 6. Strict RLS Policies for 'ledger_records' (via ledger ownership)
+drop policy if exists "Users can view their own ledger records" on public.ledger_records;
 create policy "Users can view their own ledger records"
   on public.ledger_records for select
   using (
@@ -72,6 +77,7 @@ create policy "Users can view their own ledger records"
     )
   );
 
+drop policy if exists "Users can insert their own ledger records" on public.ledger_records;
 create policy "Users can insert their own ledger records"
   on public.ledger_records for insert
   with check (
@@ -82,6 +88,7 @@ create policy "Users can insert their own ledger records"
     )
   );
 
+drop policy if exists "Users can update their own ledger records" on public.ledger_records;
 create policy "Users can update their own ledger records"
   on public.ledger_records for update
   using (
@@ -92,6 +99,7 @@ create policy "Users can update their own ledger records"
     )
   );
 
+drop policy if exists "Users can delete their own ledger records" on public.ledger_records;
 create policy "Users can delete their own ledger records"
   on public.ledger_records for delete
   using (
@@ -103,6 +111,7 @@ create policy "Users can delete their own ledger records"
   );
 
 -- 7. Strict RLS Policies for 'ledger_assumptions'
+drop policy if exists "Users can view their own ledger assumptions" on public.ledger_assumptions;
 create policy "Users can view their own ledger assumptions"
   on public.ledger_assumptions for select
   using (
@@ -113,6 +122,7 @@ create policy "Users can view their own ledger assumptions"
     )
   );
 
+drop policy if exists "Users can insert their own ledger assumptions" on public.ledger_assumptions;
 create policy "Users can insert their own ledger assumptions"
   on public.ledger_assumptions for insert
   with check (
@@ -123,6 +133,7 @@ create policy "Users can insert their own ledger assumptions"
     )
   );
 
+drop policy if exists "Users can update their own ledger assumptions" on public.ledger_assumptions;
 create policy "Users can update their own ledger assumptions"
   on public.ledger_assumptions for update
   using (
@@ -133,7 +144,18 @@ create policy "Users can update their own ledger assumptions"
     )
   );
 
+drop policy if exists "Users can delete their own ledger assumptions" on public.ledger_assumptions;
+create policy "Users can delete their own ledger assumptions"
+  on public.ledger_assumptions for delete
+  using (
+    exists (
+      select 1 from public.ledgers
+      where public.ledgers.id = public.ledger_assumptions.ledger_id
+      and public.ledgers.user_id = auth.uid()
+    )
+  );
+
 -- 8. Indexes for High Performance Queries
-create index if exists idx_ledgers_user_id on public.ledgers(user_id);
-create index if exists idx_ledger_records_ledger_id on public.ledger_records(ledger_id, sort_order);
-create index if exists idx_ledger_assumptions_ledger_id on public.ledger_assumptions(ledger_id);
+create index if not exists idx_ledgers_user_id on public.ledgers(user_id);
+create index if not exists idx_ledger_records_ledger_id on public.ledger_records(ledger_id, sort_order);
+create index if not exists idx_ledger_assumptions_ledger_id on public.ledger_assumptions(ledger_id);

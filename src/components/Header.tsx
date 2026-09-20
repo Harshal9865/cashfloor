@@ -38,7 +38,7 @@ export default function Header({
             </div>
             <div className="flex flex-col">
               <span className="font-serif text-xl tracking-tight text-[#16232B] font-normal leading-tight group-hover:text-[#2F6F62] transition-colors">
-                Calm Ledger
+                CashFloor
               </span>
               <span className="text-[10px] font-mono tracking-widest text-[#5C6D77] uppercase hidden sm:inline">
                 Runway &amp; Income Equilibrium

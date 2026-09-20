@@ -3,7 +3,7 @@ import HeroTeaser from '@/components/marketing/HeroTeaser';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Calm Ledger | The Freelancer\'s Edge',
+  title: 'CashFloor | The Freelancer\'s Edge',
   description: 'A professional ledger for irregular income. Calculate your conservative survival floor and stress-test your cash flow.',
 };
 
@@ -47,7 +47,7 @@ export default function MarketingPage() {
       <footer className="border-t border-[rgba(22,35,43,0.12)] py-12 text-center text-[#5C6D77] text-sm">
         <div className="max-w-5xl mx-auto px-4">
           <p className="mb-4 text-xs max-w-2xl mx-auto">
-            <strong>Disclaimer:</strong> Calm Ledger is an educational simulation tool designed to model hypothetical cash flow scenarios for freelancers. It does not provide financial, tax, or legal advice.
+            <strong>Disclaimer:</strong> CashFloor is an educational simulation tool designed to model hypothetical cash flow scenarios for freelancers. It does not provide financial, tax, or legal advice.
           </p>
           <div className="flex flex-wrap justify-center gap-6 text-xs">
             <a href="/blog/the-20th-percentile-math" className="text-[#2F6F62] hover:underline font-semibold transition-colors">The 20th Percentile Rule (Guide)</a>
@@ -55,7 +55,7 @@ export default function MarketingPage() {
             <a href="/terms" className="hover:text-[#16232B] transition-colors">Terms of Service</a>
           </div>
           <p className="mt-6 opacity-60">
-            &copy; {new Date().getFullYear()} Calm Ledger. All rights reserved.
+            &copy; {new Date().getFullYear()} CashFloor. All rights reserved.
           </p>
         </div>
       </footer>

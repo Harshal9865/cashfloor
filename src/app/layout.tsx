@@ -23,10 +23,10 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://calmledger.com'),
+  metadataBase: new URL('https://cashfloor.app'),
   title: {
-    default: 'Calm Ledger — Irregular Income & Cash Runway Calculator',
-    template: '%s | Calm Ledger',
+    default: 'CashFloor — Irregular Income & Cash Runway Calculator',
+    template: '%s | CashFloor',
   },
   description:
     'A quiet, mathematically conservative runway and income floor calculator for freelancers, consultants, and independent contractors. Stress-test delayed invoices and tax obligations without bank logins.',
@@ -34,31 +34,32 @@ export const metadata: Metadata = {
     'freelance runway calculator',
     'irregular income calculator',
     'consultant cash flow simulator',
-    '20th percentile cash flow',
+    '20th percentile cash floor',
+    'cash floor calculator',
     'quarterly estimated taxes freelancer',
     'independent contractor financial planning',
   ],
-  authors: [{ name: 'Calm Ledger Team' }],
+  authors: [{ name: 'CashFloor Team' }],
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://calmledger.com',
-    title: 'Calm Ledger — 20th Percentile Freelance Runway Simulator',
+    url: 'https://cashfloor.app',
+    title: 'CashFloor — 20th Percentile Freelance Runway Simulator',
     description:
       'Stop relying on optimistic averages. Model worst-case payment delays, client churn, and quarterly tax drag with zero bank surveillance.',
-    siteName: 'Calm Ledger',
+    siteName: 'CashFloor',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Calm Ledger Conservative Cash Flow Dashboard Preview',
+        alt: 'CashFloor Conservative Cash Flow Dashboard Preview',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Calm Ledger — 20th Percentile Freelance Runway Simulator',
+    title: 'CashFloor — 20th Percentile Freelance Runway Simulator',
     description:
       'Conservative runway and cash flow stress testing for independent consultants and freelancers.',
     images: ['/og-image.png'],
@@ -72,7 +73,7 @@ export const metadata: Metadata = {
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'SoftwareApplication',
-  name: 'Calm Ledger',
+  name: 'CashFloor',
   operatingSystem: 'Any web browser',
   applicationCategory: 'FinanceApplication',
   offers: {
