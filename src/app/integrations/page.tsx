@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   CreditCard,
   Building2,
@@ -110,13 +110,21 @@ export default function IntegrationsPage() {
 
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [syncingId, setSyncingId] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  const toggleConnect = (id: string) => {
+  const toggleConnect = (id: string, name: string) => {
     setSyncingId(id);
     setTimeout(() => {
-      setConnectedState(prev => ({ ...prev, [id]: !prev[id] }));
+      setConnectedState(prev => {
+        const isNowConnected = !prev[id];
+        if (isNowConnected) {
+          setToastMessage(`Successfully connected to ${name}!`);
+          setTimeout(() => setToastMessage(null), 3000);
+        }
+        return { ...prev, [id]: isNowConnected };
+      });
       setSyncingId(null);
-    }, 600);
+    }, 1200);
   };
 
   const filtered = activeCategory === 'all' 
@@ -143,6 +151,21 @@ export default function IntegrationsPage() {
             Ecosystem Integrations &amp; Payment Feeds
           </span>
         </div>
+
+        {/* Global Toast Notification */}
+        <AnimatePresence>
+          {toastMessage && (
+            <motion.div
+              initial={{ opacity: 0, y: -20, x: '-50%' }}
+              animate={{ opacity: 1, y: 0, x: '-50%' }}
+              exit={{ opacity: 0, y: -20, x: '-50%' }}
+              className="fixed top-24 left-1/2 z-50 flex items-center gap-3 px-6 py-3 rounded-full bg-[var(--cf-surface)] border border-[var(--cf-accent)] shadow-[0_8px_32px_var(--cf-accent-glow)] text-[var(--cf-text)] font-semibold text-sm"
+            >
+              <Check className="w-5 h-5 text-[var(--cf-accent)]" />
+              {toastMessage}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Hero Header */}
         <div className="text-center max-w-3xl mx-auto space-y-4">
@@ -191,15 +214,25 @@ export default function IntegrationsPage() {
             const isSyncing = syncingId === tool.id;
 
             return (
-              <div
+              <motion.div
                 key={tool.id}
-                className="rounded-3xl border p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 shadow-sm hover:shadow-md"
+                whileHover={{ y: -4, scale: 1.01 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                className="rounded-3xl border p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 relative overflow-hidden"
                 style={{
                   background: 'var(--cf-surface)',
                   borderColor: isConnected ? 'var(--cf-accent)' : 'var(--cf-border)',
+                  boxShadow: isConnected 
+                    ? '0 0 0 1px var(--cf-accent), 0 8px 32px var(--cf-accent-glow)' 
+                    : 'var(--cf-shadow-sm)',
                 }}
               >
-                <div>
+                {/* Glowing Background Overlay when connected */}
+                {isConnected && (
+                  <div className="absolute inset-0 bg-gradient-to-br from-[var(--cf-accent-glow)] to-transparent pointer-events-none opacity-20" />
+                )}
+
+                <div className="relative z-10">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
                       <div 
@@ -248,7 +281,7 @@ export default function IntegrationsPage() {
 
                   <button
                     type="button"
-                    onClick={() => toggleConnect(tool.id)}
+                    onClick={() => toggleConnect(tool.id, tool.name)}
                     disabled={isSyncing}
                     className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-mono font-semibold transition-all cursor-pointer border ${
                       isConnected
@@ -276,7 +309,7 @@ export default function IntegrationsPage() {
                     )}
                   </button>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
         </div>

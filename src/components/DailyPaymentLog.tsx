@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useMemo, useEffect } from 'react';
+import { motion, AnimatePresence, useSpring, useTransform, useMotionValue } from 'framer-motion';
 import {
   Calendar,
   Plus,
@@ -30,6 +30,21 @@ export interface DailyTransaction {
   amount: number; // positive for inflow, negative for expense
   clientOrVendor: string;
   status: 'cleared' | 'pending' | 'scheduled';
+}
+
+function AnimatedCounter({ value, prefix = '' }: { value: number; prefix?: string }) {
+  const motionValue = useMotionValue(0);
+  const springValue = useSpring(motionValue, { stiffness: 60, damping: 20, duration: 800 });
+
+  useEffect(() => {
+    motionValue.set(value);
+  }, [value, motionValue]);
+
+  const display = useTransform(springValue, (current) => 
+    `${prefix}${Math.round(current).toLocaleString()}`
+  );
+
+  return <motion.span>{display}</motion.span>;
 }
 
 const INITIAL_DAILY_TRANSACTIONS: DailyTransaction[] = [
@@ -249,7 +264,7 @@ export function DailyPaymentLog({
             <ArrowUpRight className="w-4 h-4 text-emerald-500" />
           </div>
           <div className="text-2xl font-serif font-bold text-emerald-600 mt-1">
-            +{currencySymbol}{totalInflow.toLocaleString()}
+            <AnimatedCounter value={totalInflow} prefix={`+${currencySymbol}`} />
           </div>
           <span className="text-[10px] font-mono text-[var(--cf-text-muted)] mt-0.5 block">
             Across {transactions.filter(t => t.amount > 0).length} client payments
@@ -263,7 +278,7 @@ export function DailyPaymentLog({
             <ArrowDownRight className="w-4 h-4 text-rose-500" />
           </div>
           <div className="text-2xl font-serif font-bold text-[var(--cf-caution)] mt-1">
-            -{currencySymbol}{totalOutflow.toLocaleString()}
+            <AnimatedCounter value={totalOutflow} prefix={`-${currencySymbol}`} />
           </div>
           <span className="text-[10px] font-mono text-[var(--cf-text-muted)] mt-0.5 block">
             Rent, software &amp; tax escrow transfers
@@ -277,7 +292,7 @@ export function DailyPaymentLog({
             <Sparkles className="w-4 h-4 text-[var(--cf-accent)]" />
           </div>
           <div className={`text-2xl font-serif font-bold mt-1 ${netDailyCash >= 0 ? 'text-[var(--cf-accent)]' : 'text-rose-500'}`}>
-            {netDailyCash >= 0 ? '+' : ''}{currencySymbol}{netDailyCash.toLocaleString()}
+            <AnimatedCounter value={netDailyCash} prefix={netDailyCash >= 0 ? `+${currencySymbol}` : currencySymbol} />
           </div>
           <span className="text-[10px] font-mono text-[var(--cf-text-muted)] mt-0.5 block">
             Directly reinforcing your liquid runway
@@ -297,7 +312,7 @@ export function DailyPaymentLog({
             </span>
           </div>
           <span className="text-[11px] font-mono text-[var(--cf-accent)] font-semibold">
-            ${totalInflow.toLocaleString()} Inflows Routed
+            <AnimatedCounter value={totalInflow} prefix={`$`} /> Inflows Routed
           </span>
         </div>
 
@@ -316,9 +331,10 @@ export function DailyPaymentLog({
             <span className="text-[10px] font-mono text-[var(--cf-text-faint)] block">
               2. Operating Buffer (40%)
             </span>
-            <span className="text-sm font-serif font-bold text-[var(--cf-accent)] mt-0.5 block">
-              ${bufferPartition.toLocaleString()} Buffered
-            </span>
+            <div className="text-sm font-serif font-bold text-[var(--cf-accent)] mt-0.5 flex items-center gap-1">
+              <AnimatedCounter value={bufferPartition} prefix={currencySymbol} />
+              <span>Buffered</span>
+            </div>
             <span className="text-[9px] text-[var(--cf-text-muted)]">Cushions 60-day invoice delays</span>
           </div>
 
@@ -384,43 +400,52 @@ export function DailyPaymentLog({
             </tr>
           </thead>
           <tbody className="divide-y divide-[var(--cf-border-soft)]">
-            {filteredTransactions.map(tx => {
-              const isInflow = tx.amount > 0;
-
-              return (
-                <tr key={tx.id} className="hover:bg-[var(--cf-surface-alt)]/60 transition-colors">
-                  <td className="py-3 px-4 font-semibold text-[var(--cf-text)]">
-                    Day {tx.dayNumber}
-                  </td>
-                  <td className="py-3 px-4 text-[var(--cf-text)] font-sans font-medium">
-                    {tx.title}
-                  </td>
-                  <td className="py-3 px-4 text-[var(--cf-text-muted)]">
-                    {tx.clientOrVendor}
-                  </td>
-                  <td className="py-3 px-4">
-                    <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-[var(--cf-surface-alt)] border border-[var(--cf-border-soft)] text-[var(--cf-text-muted)]">
-                      {tx.category.replace('_', ' ')}
-                    </span>
-                  </td>
-                  <td className="py-3 px-4 text-right font-bold font-mono">
-                    <span className={isInflow ? 'text-emerald-500' : 'text-rose-500'}>
-                      {isInflow ? '+' : '-'}{currencySymbol}{Math.abs(tx.amount).toLocaleString()}
-                    </span>
-                  </td>
-                  <td className="py-3 px-4 text-center">
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteTransaction(tx.id)}
-                      className="p-1 rounded text-[var(--cf-text-faint)] hover:text-rose-500 transition-colors cursor-pointer"
-                      title="Delete entry"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
+            <AnimatePresence>
+              {filteredTransactions.map(tx => {
+                const isInflow = tx.amount > 0;
+  
+                return (
+                  <motion.tr 
+                    key={tx.id}
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.3 }}
+                    className="hover:bg-[var(--cf-surface-alt)]/60 transition-colors"
+                  >
+                    <td className="py-3 px-4 font-semibold text-[var(--cf-text)]">
+                      Day {tx.dayNumber}
+                    </td>
+                    <td className="py-3 px-4 text-[var(--cf-text)] font-sans font-medium">
+                      {tx.title}
+                    </td>
+                    <td className="py-3 px-4 text-[var(--cf-text-muted)]">
+                      {tx.clientOrVendor}
+                    </td>
+                    <td className="py-3 px-4">
+                      <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-[var(--cf-surface-alt)] border border-[var(--cf-border-soft)] text-[var(--cf-text-muted)]">
+                        {tx.category.replace('_', ' ')}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-right font-bold font-mono">
+                      <span className={isInflow ? 'text-emerald-500' : 'text-rose-500'}>
+                        {isInflow ? '+' : '-'}{currencySymbol}{Math.abs(tx.amount).toLocaleString()}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-center">
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteTransaction(tx.id)}
+                        className="p-1 rounded text-[var(--cf-text-faint)] hover:text-rose-500 transition-colors cursor-pointer"
+                        title="Delete entry"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </td>
+                  </motion.tr>
+                );
+              })}
+            </AnimatePresence>
           </tbody>
         </table>
       </div>

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowRight,
@@ -42,6 +43,7 @@ export default function MarketingNav() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [avatarOpen, setAvatarOpen] = useState(false);
   const avatarRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
 
   const { user, isAuthenticated, loading, openAuthModal, signOut } = useAuth();
 
@@ -101,24 +103,38 @@ export default function MarketingNav() {
 
         {/* Desktop Navigation Links */}
         <nav className="hidden md:flex items-center gap-1">
-          {navLinks.map((link) => (
-            <Link
-              key={link.label}
-              href={link.href}
-              className="px-3.5 py-1.5 text-xs font-medium transition-colors duration-200 rounded-lg"
-              style={{ color: 'var(--cf-text-muted)' }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = 'var(--cf-text)';
-                e.currentTarget.style.background = 'var(--cf-surface-alt)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = 'var(--cf-text-muted)';
-                e.currentTarget.style.background = 'transparent';
-              }}
-            >
-              {link.label}
-            </Link>
-          ))}
+          {navLinks.map((link) => {
+            const isHash = link.href.includes('#');
+            const isActive = !isHash && pathname === link.href;
+
+            return (
+              <Link
+                key={link.label}
+                href={link.href}
+                className={`px-3.5 py-1.5 text-xs font-medium transition-colors duration-200 rounded-lg ${
+                  isActive ? 'font-bold' : ''
+                }`}
+                style={{
+                  color: isActive ? 'var(--cf-accent)' : 'var(--cf-text-muted)',
+                  background: isActive ? 'var(--cf-accent-bg)' : 'transparent',
+                }}
+                onMouseEnter={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.color = 'var(--cf-text)';
+                    e.currentTarget.style.background = 'var(--cf-surface-alt)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.color = 'var(--cf-text-muted)';
+                    e.currentTarget.style.background = 'transparent';
+                  }
+                }}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </nav>
 
         {/* Right side actions */}

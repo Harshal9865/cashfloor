@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Download, Database, RotateCcw, Cloud, User, RefreshCw,
@@ -61,6 +62,7 @@ export default function DashboardNav({
   const [avatarOpen, setAvatarOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const avatarRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
 
   // Close avatar dropdown on outside click
   useEffect(() => {
@@ -75,6 +77,11 @@ export default function DashboardNav({
 
   // Active section detection
   useEffect(() => {
+    if (pathname !== '/dashboard') {
+      setActiveSection('');
+      return;
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -84,11 +91,14 @@ export default function DashboardNav({
       { threshold: 0.3 }
     );
     NAV_SECTIONS.forEach(({ href }) => {
-      const el = document.querySelector(href);
-      if (el) observer.observe(el);
+      if (href.includes('#')) {
+        const id = href.split('#')[1];
+        const el = document.getElementById(id);
+        if (el) observer.observe(el);
+      }
     });
     return () => observer.disconnect();
-  }, []);
+  }, [pathname]);
 
   const syncColor =
     syncStatus === 'synced' ? 'var(--cf-accent)' :
@@ -128,9 +138,13 @@ export default function DashboardNav({
           <nav className="hidden lg:flex items-center gap-0.5 rounded-xl p-1 border"
             style={{ background: 'var(--cf-surface)', borderColor: 'var(--cf-border)' }}>
             {NAV_SECTIONS.map((s) => {
-              const isActive = activeSection === s.href.slice(1);
+              const isHash = s.href.includes('#');
+              const isActiveHash = isHash && activeSection === s.href.split('#')[1] && pathname === '/dashboard';
+              const isActivePath = !isHash && pathname === s.href;
+              const isActive = isActiveHash || isActivePath;
+
               return (
-                <a
+                <Link
                   key={s.label}
                   href={s.href}
                   className="relative px-4 py-1.5 rounded-lg text-xs font-medium transition-colors duration-200"
@@ -145,7 +159,7 @@ export default function DashboardNav({
                     />
                   )}
                   <span className="relative">{s.label}</span>
-                </a>
+                </Link>
               );
             })}
           </nav>
