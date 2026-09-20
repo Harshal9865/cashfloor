@@ -21,8 +21,9 @@ import { TaxDeadlineReminders } from '@/components/TaxDeadlineReminders';
 import { loadUserLedger, saveUserLedger, SyncStatus } from '@/lib/supabase/ledgerService';
 import { useAuth } from '@/lib/auth/AuthContext';
 import { useEffect, useRef } from 'react';
+import { RealDataWizardModal } from '@/components/RealDataWizardModal';
 import { LegalDisclaimer } from '@/components/LegalDisclaimer';
-import { Share2, BookOpen, Download, Printer } from 'lucide-react';
+import { Share2, BookOpen, Download, Printer, Sparkles, ShieldCheck, HelpCircle } from 'lucide-react';
 
 // ... (keep REALISTIC_SAMPLE_RECORDS)
 const REALISTIC_SAMPLE_RECORDS: MonthlyRecord[] = [
@@ -57,7 +58,18 @@ export default function Home() {
 
   const [isPasteModalOpen, setIsPasteModalOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [isWizardOpen, setIsWizardOpen] = useState(false);
   const [showPhilosophy, setShowPhilosophy] = useState(false);
+
+  const isViewingSample = useMemo(() => {
+    if (records.length !== REALISTIC_SAMPLE_RECORDS.length) return false;
+    return records.every((r, i) => r.income === REALISTIC_SAMPLE_RECORDS[i].income && r.expenses === REALISTIC_SAMPLE_RECORDS[i].expenses);
+  }, [records]);
+
+  const handleApplyWizardData = (newRecords: MonthlyRecord[], newAssumptions: Partial<CalculatorAssumptions>) => {
+    setRecords(newRecords);
+    setAssumptions(prev => ({ ...prev, ...newAssumptions }));
+  };
   
   // Auth & Cloud Sync State
   const { user, isAuthenticated, openAuthModal } = useAuth();
@@ -225,6 +237,97 @@ export default function Home() {
 
       {/* 3. Main Canvas */}
       <div className="flex-1 max-w-7xl mx-auto w-full px-4 md:px-8 py-8 space-y-6">
+        {/* ── Real Data Launchpad & Sample Status Banner ── */}
+        <div 
+          className="rounded-3xl border p-4 sm:p-5 shadow-sm transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
+          style={{
+            background: isViewingSample ? 'var(--cf-surface)' : 'var(--cf-surface-alt)',
+            borderColor: isViewingSample ? 'rgba(201,138,62,0.3)' : 'rgba(47,111,98,0.3)',
+          }}
+        >
+          <div className="flex items-start sm:items-center gap-3.5">
+            <div 
+              className="w-9 h-9 rounded-2xl flex items-center justify-center shrink-0 border"
+              style={{
+                background: isViewingSample ? 'var(--cf-warm-bg)' : 'var(--cf-accent-bg)',
+                borderColor: isViewingSample ? 'rgba(201,138,62,0.3)' : 'rgba(47,111,98,0.3)',
+                color: isViewingSample ? 'var(--cf-warm)' : 'var(--cf-accent)',
+              }}
+            >
+              {isViewingSample ? <Sparkles className="w-4 h-4" /> : <ShieldCheck className="w-4 h-4" />}
+            </div>
+
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-mono font-bold uppercase tracking-wider text-[var(--cf-text)]">
+                  {isViewingSample ? 'Sample Demonstration Mode Active' : 'Personal Financial Ledger Active'}
+                </span>
+                <span 
+                  className="text-[10px] font-mono px-2 py-0.5 rounded-full font-semibold border"
+                  style={{
+                    background: isViewingSample ? 'var(--cf-warm-bg)' : 'var(--cf-accent-bg)',
+                    borderColor: isViewingSample ? 'rgba(201,138,62,0.3)' : 'rgba(47,111,98,0.3)',
+                    color: isViewingSample ? 'var(--cf-warm)' : 'var(--cf-accent)',
+                  }}
+                >
+                  {isViewingSample ? 'Alex Vance Demo ($3,200 Floor)' : 'Real Numbers Active'}
+                </span>
+              </div>
+              <p className="text-xs text-[var(--cf-text-muted)] mt-0.5">
+                {isViewingSample
+                  ? 'Showing simulated freelance financials. Step into your own numbers to calculate your true survival floor.'
+                  : `Your real numbers are driving all 6 stress test models. Current floor: ${currencySymbol}${calculation.floorIncome.toLocaleString()}/mo.`}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 self-end md:self-auto">
+            <button
+              type="button"
+              onClick={() => setIsWizardOpen(true)}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-white transition-all shadow-sm cursor-pointer hover:opacity-95"
+              style={{ background: 'linear-gradient(135deg, #2F6F62 0%, #1a4f45 100%)' }}
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>{isViewingSample ? 'Enter My Real Numbers' : 'Edit My Numbers'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIsPasteModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-mono border transition-all cursor-pointer"
+              style={{
+                background: 'var(--cf-surface)',
+                borderColor: 'var(--cf-border)',
+                color: 'var(--cf-text)',
+              }}
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Import CSV</span>
+            </button>
+
+            {isViewingSample ? (
+              <button
+                type="button"
+                onClick={handleResetData}
+                className="px-3 py-2 rounded-xl text-xs font-mono text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] transition-colors cursor-pointer"
+                title="Clear sample rows to start from zero"
+              >
+                Clear to Blank
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleLoadSample}
+                className="px-3 py-2 rounded-xl text-xs font-mono text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] transition-colors cursor-pointer"
+                title="Restore Alex Vance sample data"
+              >
+                Load Sample
+              </button>
+            )}
+          </div>
+        </div>
+
         {/* Hero Runway */}
         <section id="runway" className="dash-card p-6 md:p-8">
           <HeroRunway
@@ -428,6 +531,14 @@ export default function Home() {
         result={calculation}
         assumptions={assumptions}
         currencySymbol={currencySymbol}
+      />
+
+      <RealDataWizardModal
+        isOpen={isWizardOpen}
+        onClose={() => setIsWizardOpen(false)}
+        onApplyRealData={handleApplyWizardData}
+        currencySymbol={currencySymbol}
+        onOpenCsvModal={() => setIsPasteModalOpen(true)}
       />
 
       {/* Safe-harbor Legal Notice */}

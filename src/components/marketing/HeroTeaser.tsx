@@ -76,11 +76,14 @@ export default function HeroTeaser() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full mb-6 overflow-hidden relative"
-              style={{ background: 'rgba(47,111,98,0.12)', border: '1px solid rgba(47,111,98,0.3)' }}
+              className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full mb-6 overflow-hidden relative border"
+              style={{ 
+                background: 'var(--cf-accent-bg)', 
+                borderColor: 'var(--cf-border)' 
+              }}
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-[#3DE8C8] animate-pulse" />
-              <span className="text-xs font-mono tracking-widest text-[#3DE8C8] uppercase">
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--cf-accent)] dark:bg-[#3DE8C8] animate-pulse" />
+              <span className="text-xs font-mono tracking-widest text-[var(--cf-accent)] dark:text-[#3DE8C8] font-semibold uppercase">
                 The Freelancer&apos;s Financial Floor
               </span>
             </motion.div>

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Download, Database, RotateCcw, Cloud, User, RefreshCw,
-  ChevronDown, LogOut, Share2, Check, Menu, X
+  ChevronDown, LogOut, Share2, Check, Menu, X, Shield, Sparkles
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/lib/auth/AuthContext';
@@ -93,12 +93,12 @@ export default function DashboardNav({
   const syncColor =
     syncStatus === 'synced' ? 'var(--cf-accent)' :
     syncStatus === 'saving' ? 'var(--cf-warm)' :
-    syncStatus === 'error' ? 'var(--cf-caution)' : 'var(--cf-text-faint)';
+    syncStatus === 'error' ? 'var(--cf-caution)' : 'var(--cf-accent)';
 
   const syncLabel =
-    syncStatus === 'synced' ? 'Synced' :
+    syncStatus === 'synced' ? 'Cloud Synced' :
     syncStatus === 'saving' ? 'Saving...' :
-    syncStatus === 'error' ? 'Error' : 'Offline';
+    syncStatus === 'error' ? 'Sync Error' : 'Private Vault';
 
   return (
     <>
@@ -152,19 +152,41 @@ export default function DashboardNav({
 
           {/* ── Right actions ── */}
           <div className="flex items-center gap-2">
-            {/* Sync status dot (compact) */}
-            {isAuthenticated && (
-              <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono"
-                style={{ background: 'var(--cf-surface)', border: '1px solid var(--cf-border)', color: syncColor }}>
-                {syncStatus === 'saving'
-                  ? <RefreshCw className="w-3 h-3 animate-spin" />
-                  : syncStatus === 'synced'
-                  ? <Check className="w-3 h-3" />
-                  : <Cloud className="w-3 h-3" />
-                }
-                <span>{syncLabel}</span>
-              </div>
-            )}
+            {/* Sync / Vault Status pill */}
+            <Link
+              href="/account"
+              title={
+                syncStatus === 'synced'
+                  ? 'All financial models backed up to encrypted cloud'
+                  : 'Zero Bank Surveillance: Operating in 100% Private Local-First Vault'
+              }
+              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono border transition-all hover:border-[var(--cf-accent)]"
+              style={{ background: 'var(--cf-surface)', borderColor: 'var(--cf-border)', color: syncColor }}
+            >
+              {syncStatus === 'saving' ? (
+                <RefreshCw className="w-3 h-3 animate-spin" />
+              ) : syncStatus === 'synced' ? (
+                <Check className="w-3 h-3" />
+              ) : (
+                <Shield className="w-3 h-3 text-[var(--cf-accent)]" />
+              )}
+              <span>{syncLabel}</span>
+            </Link>
+
+            {/* Subscription Link / Icon */}
+            <Link
+              href="/subscription"
+              title="View Plans & Subscription"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono transition-all border group"
+              style={{
+                color: 'var(--cf-accent)',
+                borderColor: 'rgba(47,111,98,0.3)',
+                background: 'var(--cf-accent-bg)',
+              }}
+            >
+              <Sparkles className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+              <span className="font-semibold">Subscription</span>
+            </Link>
 
             {/* Export */}
             <button
