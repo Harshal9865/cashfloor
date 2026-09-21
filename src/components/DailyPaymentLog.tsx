@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { motion, AnimatePresence, useSpring, useTransform, useMotionValue } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Calendar,
   Plus,
@@ -9,15 +9,9 @@ import {
   ArrowDownRight,
   Shield,
   Sparkles,
-  Lock,
   Search,
-  Filter,
   Trash2,
-  CheckCircle2,
   DollarSign,
-  Tag,
-  Building2,
-  CreditCard,
   X
 } from 'lucide-react';
 
@@ -33,18 +27,34 @@ export interface DailyTransaction {
 }
 
 function AnimatedCounter({ value, prefix = '' }: { value: number; prefix?: string }) {
-  const motionValue = useMotionValue(0);
-  const springValue = useSpring(motionValue, { stiffness: 60, damping: 20, duration: 800 });
+  const [display, setDisplay] = useState(value);
 
   useEffect(() => {
-    motionValue.set(value);
-  }, [value, motionValue]);
+    let start = display;
+    const end = value;
+    if (start === end) return;
 
-  const display = useTransform(springValue, (current) => 
-    `${prefix}${Math.round(current).toLocaleString()}`
-  );
+    const duration = 600;
+    const startTime = performance.now();
+    let frameId: number;
 
-  return <motion.span>{display}</motion.span>;
+    const tick = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(1, elapsed / duration);
+      const ease = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+      const current = Math.round(start + (end - start) * ease);
+      setDisplay(current);
+
+      if (progress < 1) {
+        frameId = requestAnimationFrame(tick);
+      }
+    };
+
+    frameId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frameId);
+  }, [value]);
+
+  return <span>{prefix}{display.toLocaleString()}</span>;
 }
 
 const INITIAL_DAILY_TRANSACTIONS: DailyTransaction[] = [
@@ -588,3 +598,5 @@ export function DailyPaymentLog({
     </div>
   );
 }
+
+export default DailyPaymentLog;

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   ComposedChart, Bar, Line, Area, XAxis, YAxis, CartesianGrid,
   Tooltip, ReferenceLine, ResponsiveContainer, Legend, Cell,
@@ -183,6 +183,11 @@ export const CashFlowChart: React.FC<CashFlowChartProps> = ({
 }) => {
   const [viewMode, setViewMode] = useState<'12_months' | '30_days' | '90_drought'>(initialViewMode);
   const [activeIdx, setActiveIdx] = useState<number | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   if (!records || records.length === 0) return null;
 
@@ -356,47 +361,55 @@ export const CashFlowChart: React.FC<CashFlowChartProps> = ({
 
       {/* ── Dynamic Chart Rendering ── */}
       <div style={{ width: '100%', height: 320 }}>
-        <ResponsiveContainer width="100%" height="100%">
-          {viewMode === '12_months' ? (
-            <ComposedChart data={monthlyData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--cf-border)" vertical={false} />
-              <XAxis dataKey="label" tick={{ fill: 'var(--cf-text-muted)', fontSize: 11, fontFamily: 'var(--font-mono)' }} axisLine={{ stroke: 'var(--cf-border)' }} tickLine={false} />
-              <YAxis yAxisId="left" tick={{ fill: 'var(--cf-text-muted)', fontSize: 10, fontFamily: 'var(--font-mono)' }} tickFormatter={(v) => `${currencySymbol}${v >= 1000 ? `${Math.round(v / 1000)}k` : v}`} axisLine={false} tickLine={false} width={40} />
-              <YAxis yAxisId="right" orientation="right" tick={{ fill: 'var(--cf-text-faint)', fontSize: 10, fontFamily: 'var(--font-mono)' }} tickFormatter={(v) => `${currencySymbol}${Math.round(v / 1000)}k`} axisLine={false} tickLine={false} width={45} />
-              <Tooltip content={<CustomMonthlyTooltip currencySymbol={currencySymbol} floorIncome={floorIncome} bufferTarget={bufferTarget} />} />
-              <ReferenceLine yAxisId="left" y={floorIncome} stroke="var(--cf-accent)" strokeDasharray="4 3" strokeWidth={1.5} label={{ value: `Floor ${fmt(floorIncome)}`, fill: 'var(--cf-accent)', fontSize: 10, fontFamily: 'var(--font-mono)', position: 'insideTopLeft' }} />
-              <Bar yAxisId="left" dataKey="income" radius={[4, 4, 0, 0]} maxBarSize={28}>
-                {monthlyData.map((entry, idx) => (
-                  <Cell key={`bar-${idx}`} fill={entry.isLean ? 'var(--cf-warm)' : 'var(--cf-accent)'} opacity={0.88} />
-                ))}
-              </Bar>
-              <Bar yAxisId="left" dataKey="expenses" fill="var(--cf-caution)" opacity={0.35} radius={[3, 3, 0, 0]} maxBarSize={16} />
-              <Line yAxisId="right" type="monotone" dataKey="balance" stroke="var(--cf-accent)" strokeWidth={2.5} dot={{ r: 3, fill: 'var(--cf-surface)', stroke: 'var(--cf-accent)', strokeWidth: 2 }} activeDot={{ r: 5, fill: 'var(--cf-accent)' }} />
-            </ComposedChart>
-          ) : viewMode === '30_days' ? (
-            <ComposedChart data={dailyData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--cf-border)" vertical={false} />
-              <XAxis dataKey="label" tick={{ fill: 'var(--cf-text-muted)', fontSize: 10, fontFamily: 'var(--font-mono)' }} interval={2} axisLine={{ stroke: 'var(--cf-border)' }} tickLine={false} />
-              <YAxis yAxisId="left" tick={{ fill: 'var(--cf-text-muted)', fontSize: 10, fontFamily: 'var(--font-mono)' }} tickFormatter={(v) => `${currencySymbol}${v >= 1000 ? `${(v / 1000).toFixed(1)}k` : v}`} axisLine={false} tickLine={false} width={42} />
-              <YAxis yAxisId="right" orientation="right" tick={{ fill: 'var(--cf-text-faint)', fontSize: 10, fontFamily: 'var(--font-mono)' }} tickFormatter={(v) => `${currencySymbol}${Math.round(v / 1000)}k`} axisLine={false} tickLine={false} width={45} />
-              <Tooltip content={<CustomDailyTooltip currencySymbol={currencySymbol} dailyFloor={dailyFloor} />} />
-              <ReferenceLine yAxisId="left" y={dailyFloor} stroke="var(--cf-accent)" strokeDasharray="3 3" strokeWidth={1.5} label={{ value: `Floor ${fmt(dailyFloor)}/d`, fill: 'var(--cf-accent)', fontSize: 9, fontFamily: 'var(--font-mono)', position: 'insideTopLeft' }} />
-              <Bar yAxisId="left" dataKey="inflow" fill="#3DE8C8" radius={[3, 3, 0, 0]} maxBarSize={14} />
-              <Bar yAxisId="left" dataKey="outflow" fill="var(--cf-caution)" opacity={0.4} radius={[2, 2, 0, 0]} maxBarSize={10} />
-              <Line yAxisId="right" type="monotone" dataKey="balance" stroke="var(--cf-accent)" strokeWidth={2} dot={false} activeDot={{ r: 4, fill: 'var(--cf-accent)' }} />
-            </ComposedChart>
-          ) : (
-            <ComposedChart data={droughtData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--cf-border)" vertical={false} />
-              <XAxis dataKey="label" tick={{ fill: 'var(--cf-text-muted)', fontSize: 10, fontFamily: 'var(--font-mono)' }} axisLine={{ stroke: 'var(--cf-border)' }} tickLine={false} />
-              <YAxis yAxisId="right" orientation="right" tick={{ fill: 'var(--cf-text-faint)', fontSize: 10, fontFamily: 'var(--font-mono)' }} tickFormatter={(v) => `${currencySymbol}${Math.round(v / 1000)}k`} axisLine={false} tickLine={false} width={45} />
-              <Tooltip formatter={(v: any) => [`${currencySymbol}${Number(v).toLocaleString()}`, 'Remaining Cash']} />
-              <ReferenceLine yAxisId="right" y={0} stroke="var(--cf-caution)" strokeWidth={2} label={{ value: 'Exhaustion Line ($0)', fill: 'var(--cf-caution)', fontSize: 10, fontFamily: 'var(--font-mono)' }} />
-              <Area yAxisId="right" type="monotone" dataKey="balance" stroke="var(--cf-caution)" fill="rgba(180,87,63,0.15)" strokeWidth={2} />
-            </ComposedChart>
-          )}
-        </ResponsiveContainer>
+        {mounted ? (
+          <ResponsiveContainer width="100%" height="100%">
+            {viewMode === '12_months' ? (
+              <ComposedChart data={monthlyData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--cf-border)" vertical={false} />
+                <XAxis dataKey="label" tick={{ fill: 'var(--cf-text-muted)', fontSize: 11, fontFamily: 'var(--font-mono)' }} axisLine={{ stroke: 'var(--cf-border)' }} tickLine={false} />
+                <YAxis yAxisId="left" tick={{ fill: 'var(--cf-text-muted)', fontSize: 10, fontFamily: 'var(--font-mono)' }} tickFormatter={(v) => `${currencySymbol}${v >= 1000 ? `${Math.round(v / 1000)}k` : v}`} axisLine={false} tickLine={false} width={40} />
+                <YAxis yAxisId="right" orientation="right" tick={{ fill: 'var(--cf-text-faint)', fontSize: 10, fontFamily: 'var(--font-mono)' }} tickFormatter={(v) => `${currencySymbol}${Math.round(v / 1000)}k`} axisLine={false} tickLine={false} width={45} />
+                <Tooltip content={<CustomMonthlyTooltip currencySymbol={currencySymbol} floorIncome={floorIncome} bufferTarget={bufferTarget} />} />
+                <ReferenceLine yAxisId="left" y={floorIncome} stroke="var(--cf-accent)" strokeDasharray="4 3" strokeWidth={1.5} label={{ value: `Floor ${fmt(floorIncome)}`, fill: 'var(--cf-accent)', fontSize: 10, fontFamily: 'var(--font-mono)', position: 'insideTopLeft' }} />
+                <Bar yAxisId="left" dataKey="income" radius={[4, 4, 0, 0]} maxBarSize={28}>
+                  {monthlyData.map((entry, idx) => (
+                    <Cell key={`bar-${idx}`} fill={entry.isLean ? 'var(--cf-warm)' : 'var(--cf-accent)'} opacity={0.88} />
+                  ))}
+                </Bar>
+                <Bar yAxisId="left" dataKey="expenses" fill="var(--cf-caution)" opacity={0.35} radius={[3, 3, 0, 0]} maxBarSize={16} />
+                <Line yAxisId="right" type="monotone" dataKey="balance" stroke="var(--cf-accent)" strokeWidth={2.5} dot={{ r: 3, fill: 'var(--cf-surface)', stroke: 'var(--cf-accent)', strokeWidth: 2 }} activeDot={{ r: 5, fill: 'var(--cf-accent)' }} />
+              </ComposedChart>
+            ) : viewMode === '30_days' ? (
+              <ComposedChart data={dailyData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--cf-border)" vertical={false} />
+                <XAxis dataKey="label" tick={{ fill: 'var(--cf-text-muted)', fontSize: 10, fontFamily: 'var(--font-mono)' }} interval={2} axisLine={{ stroke: 'var(--cf-border)' }} tickLine={false} />
+                <YAxis yAxisId="left" tick={{ fill: 'var(--cf-text-muted)', fontSize: 10, fontFamily: 'var(--font-mono)' }} tickFormatter={(v) => `${currencySymbol}${v >= 1000 ? `${(v / 1000).toFixed(1)}k` : v}`} axisLine={false} tickLine={false} width={42} />
+                <YAxis yAxisId="right" orientation="right" tick={{ fill: 'var(--cf-text-faint)', fontSize: 10, fontFamily: 'var(--font-mono)' }} tickFormatter={(v) => `${currencySymbol}${Math.round(v / 1000)}k`} axisLine={false} tickLine={false} width={45} />
+                <Tooltip content={<CustomDailyTooltip currencySymbol={currencySymbol} dailyFloor={dailyFloor} />} />
+                <ReferenceLine yAxisId="left" y={dailyFloor} stroke="var(--cf-accent)" strokeDasharray="3 3" strokeWidth={1.5} label={{ value: `Floor ${fmt(dailyFloor)}/d`, fill: 'var(--cf-accent)', fontSize: 9, fontFamily: 'var(--font-mono)', position: 'insideTopLeft' }} />
+                <Bar yAxisId="left" dataKey="inflow" fill="#3DE8C8" radius={[3, 3, 0, 0]} maxBarSize={14} />
+                <Bar yAxisId="left" dataKey="outflow" fill="var(--cf-caution)" opacity={0.4} radius={[2, 2, 0, 0]} maxBarSize={10} />
+                <Line yAxisId="right" type="monotone" dataKey="balance" stroke="var(--cf-accent)" strokeWidth={2} dot={false} activeDot={{ r: 4, fill: 'var(--cf-accent)' }} />
+              </ComposedChart>
+            ) : (
+              <ComposedChart data={droughtData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--cf-border)" vertical={false} />
+                <XAxis dataKey="label" tick={{ fill: 'var(--cf-text-muted)', fontSize: 10, fontFamily: 'var(--font-mono)' }} axisLine={{ stroke: 'var(--cf-border)' }} tickLine={false} />
+                <YAxis yAxisId="right" orientation="right" tick={{ fill: 'var(--cf-text-faint)', fontSize: 10, fontFamily: 'var(--font-mono)' }} tickFormatter={(v) => `${currencySymbol}${Math.round(v / 1000)}k`} axisLine={false} tickLine={false} width={45} />
+                <Tooltip formatter={(v: any) => [`${currencySymbol}${Number(v).toLocaleString()}`, 'Remaining Cash']} />
+                <ReferenceLine yAxisId="right" y={0} stroke="var(--cf-caution)" strokeWidth={2} label={{ value: 'Exhaustion Line ($0)', fill: 'var(--cf-caution)', fontSize: 10, fontFamily: 'var(--font-mono)' }} />
+                <Area yAxisId="right" type="monotone" dataKey="balance" stroke="var(--cf-caution)" fill="rgba(180,87,63,0.15)" strokeWidth={2} />
+              </ComposedChart>
+            )}
+          </ResponsiveContainer>
+        ) : (
+          <div className="w-full h-full rounded-2xl bg-[var(--cf-surface-alt)]/40 animate-pulse flex items-center justify-center text-xs font-mono text-[var(--cf-text-muted)]">
+            <span>Synchronizing Solvency Trajectory...</span>
+          </div>
+        )}
       </div>
     </section>
   );
 };
+
+export default CashFlowChart;

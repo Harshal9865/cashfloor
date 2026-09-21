@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import {
   Calendar,
@@ -9,19 +10,25 @@ import {
   Sparkles,
   Zap,
   DollarSign,
-  Shield,
-  Layers,
-  ArrowRight,
-  TrendingUp,
-  Download,
   Clock,
   Activity
 } from 'lucide-react';
 import DashboardNav from '@/components/DashboardNav';
 import Footer from '@/components/marketing/Footer';
-import { CashFlowChart } from '@/components/CashFlowChart';
-import { DailyPaymentLog, DailyTransaction } from '@/components/DailyPaymentLog';
+import DailyPaymentLog, { DailyTransaction } from '@/components/DailyPaymentLog';
 import { MonthlyRecord } from '@/lib/calculator/types';
+
+const CashFlowChart = dynamic(
+  () => import('@/components/CashFlowChart'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-[320px] rounded-2xl bg-[var(--cf-surface-alt)]/40 animate-pulse flex items-center justify-center text-xs font-mono text-[var(--cf-text-muted)]">
+        Synchronizing Solvency Stream...
+      </div>
+    ),
+  }
+);
 
 const SAMPLE_MONTHS: MonthlyRecord[] = [
   { id: '1', month: 'Jul', income: 4050, expenses: 2100, clientTag: 'Acme Retainer' },
