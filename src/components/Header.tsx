@@ -4,6 +4,7 @@ import React from 'react';
 import { SlidersHorizontal, RotateCcw, Database, Download, Share2, ArrowRight, Cloud, User, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth/AuthContext';
+import CashFloorLogo from '@/components/CashFloorLogo';
 
 interface HeaderProps {
   isMarketingPage?: boolean;
@@ -35,19 +36,7 @@ export default function Header({
       <div className="max-w-7xl mx-auto px-4 md:px-12 flex justify-between items-center w-full h-16">
         {/* Brand Identity Anchor */}
         <div className="flex items-center space-x-6">
-          <Link href="/" className="flex items-center space-x-3 group">
-            <div className="w-8 h-8 bg-[#16232B] flex items-center justify-center text-[#F1F4F2] font-serif text-lg font-bold group-hover:bg-[#2F6F62] transition-colors">
-              C
-            </div>
-            <div className="flex flex-col">
-              <span className="font-serif text-xl tracking-tight text-[#16232B] font-normal leading-tight group-hover:text-[#2F6F62] transition-colors">
-                CashFloor
-              </span>
-              <span className="text-[10px] font-mono tracking-widest text-[#5C6D77] uppercase hidden sm:inline">
-                Runway &amp; Income Equilibrium
-              </span>
-            </div>
-          </Link>
+          <CashFloorLogo size="md" showTagline={true} />
 
           {/* Global Ecosystem Navigation Links (Desktop) */}
           {!isMarketingPage && (

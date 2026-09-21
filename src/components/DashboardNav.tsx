@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/lib/auth/AuthContext';
+import CashFloorLogo from '@/components/CashFloorLogo';
 
 interface DashboardNavProps {
   onResetData?: () => void;
@@ -148,14 +149,7 @@ export default function DashboardNav({
             </button>
 
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2.5 group shrink-0">
-              <div className="relative w-7 h-7 bg-gradient-to-br from-[#16232B] to-[#2F6F62] rounded-lg flex items-center justify-center shadow-sm group-hover:shadow-[0_0_12px_rgba(47,111,98,0.4)] transition-shadow">
-                <span className="text-white font-serif text-sm font-bold">C</span>
-              </div>
-              <span className="font-serif text-base text-[var(--cf-text)] tracking-tight group-hover:text-[var(--cf-accent)] transition-colors hidden sm:block">
-                CashFloor
-              </span>
-            </Link>
+            <CashFloorLogo size="sm" />
           </div>
 
           {/* ── Center Tab Nav (desktop) ── */}

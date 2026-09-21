@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/client';
 import { Camera, Save, LogOut, Loader2, ArrowLeft, Shield, DollarSign, Percent } from 'lucide-react';
 import Link from 'next/link';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import CashFloorLogo from '@/components/CashFloorLogo';
 
 export default function AccountPage() {
   const { user, signOut, refreshProfile, updateProfileData } = useAuth();
@@ -138,14 +139,13 @@ export default function AccountPage() {
       {/* Nav */}
       <header className="h-16 flex items-center justify-between px-6 border-b border-[var(--cf-nav-border)] bg-[var(--cf-nav-bg)] backdrop-blur-md sticky top-0 z-50">
         <div className="flex items-center gap-4">
-          <Link href="/dashboard" className="p-2 rounded-lg hover:bg-[var(--cf-surface-alt)] transition-colors">
+          <Link href="/dashboard" className="p-2 rounded-lg hover:bg-[var(--cf-surface-alt)] transition-colors" title="Back to Dashboard">
             <ArrowLeft className="w-5 h-5 text-[var(--cf-text-muted)]" />
           </Link>
-          <div className="flex items-center gap-2 group">
-             <div className="relative w-8 h-8 bg-gradient-to-br from-[#16232B] to-[#2F6F62] rounded-lg flex items-center justify-center shadow-sm">
-               <span className="text-white font-serif text-sm font-bold">C</span>
-             </div>
-             <span className="font-serif text-lg tracking-tight">Vault Settings</span>
+          <div className="flex items-center gap-3">
+             <CashFloorLogo size="sm" showWordmark={true} />
+             <span className="text-[var(--cf-border)]">/</span>
+             <span className="font-serif text-base tracking-tight text-[var(--cf-text)]">Vault Settings</span>
           </div>
         </div>
         <div className="flex items-center gap-4">

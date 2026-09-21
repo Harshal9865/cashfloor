@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import CashFloorLogo from '@/components/CashFloorLogo';
 
 export default function Footer() {
   return (
@@ -9,17 +10,7 @@ export default function Footer() {
           
           {/* Brand & Social Column */}
           <div className="lg:col-span-2 flex flex-col gap-6">
-            <Link href="/" className="flex items-center gap-3 group inline-flex w-max">
-              <div className="relative w-8 h-8 flex items-center justify-center">
-                <div className="absolute inset-0 bg-[#2F6F62] rounded-lg opacity-25 group-hover:opacity-40 transition-opacity" />
-                <div className="relative w-7 h-7 bg-gradient-to-br from-[#2F6F62] to-[#0f564a] rounded-lg flex items-center justify-center shadow-md">
-                  <span className="text-white font-serif text-sm font-bold">C</span>
-                </div>
-              </div>
-              <span className="text-[var(--cf-text)] font-serif text-xl tracking-tight font-medium">
-                Cash<span className="text-[var(--cf-accent)]">Floor</span>
-              </span>
-            </Link>
+            <CashFloorLogo size="lg" />
             <p className="text-[var(--cf-text-muted)] text-sm max-w-sm leading-relaxed">
               The professional ledger for irregular income. We help freelancers, consultants, and independent professionals stop guessing and build certainty.
             </p>

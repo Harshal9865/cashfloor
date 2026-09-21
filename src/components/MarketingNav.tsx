@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/lib/auth/AuthContext';
+import CashFloorLogo from '@/components/CashFloorLogo';
 
 const navLinks = [
   {
@@ -104,17 +105,7 @@ export default function MarketingNav() {
     >
       <div className="max-w-7xl mx-auto px-4 md:px-8 h-16 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="relative w-8 h-8 flex items-center justify-center">
-            <div className="absolute inset-0 bg-[#2F6F62] rounded-lg opacity-25 group-hover:opacity-40 transition-opacity" />
-            <div className="relative w-7 h-7 bg-gradient-to-br from-[#2F6F62] to-[#0f564a] rounded-lg flex items-center justify-center shadow-md">
-              <span className="text-white font-serif text-sm font-bold">C</span>
-            </div>
-          </div>
-          <span className="text-[var(--cf-text)] font-serif text-lg tracking-tight font-medium">
-            Cash<span className="text-[var(--cf-accent)]">Floor</span>
-          </span>
-        </Link>
+        <CashFloorLogo size="md" />
 
         {/* Desktop Navigation Links */}
         <nav className="hidden md:flex items-center gap-1">
