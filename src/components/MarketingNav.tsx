@@ -24,10 +24,11 @@ const navLinks = [
   {
     label: 'Product',
     items: [
-      { label: 'Studio Dashboard', href: '/dashboard', desc: 'Manage your real-time ledger' },
+      { label: 'Executive Dashboard', href: '/dashboard', desc: 'Daily solvency briefing & action center' },
+      { label: 'Studio Calculation Engine', href: '/studio', desc: 'Interactive ledger, P20 floor & stress tests' },
       { label: 'Daily Cash Stream', href: '/daily', desc: 'Day-by-day cash flow & lag model' },
-      { label: 'Integrations & CSV', href: '/integrations', desc: 'Connect payment feeds & files' },
-      { label: 'Features', href: '/#features', desc: 'Core risk & cash flow tools' }
+      { label: 'Integrations & CSV Ingestion', href: '/integrations', desc: 'Connect payment feeds & files' },
+      { label: 'Platform Features', href: '/#features', desc: 'Core risk & cash flow tools' }
     ]
   },
   { label: 'Pricing', href: '/pricing' },

@@ -26,11 +26,10 @@ interface DashboardNavProps {
 }
 
 const NAV_SECTIONS = [
-  { label: 'Runway', href: '/dashboard#runway' },
-  { label: 'Timeline', href: '/dashboard#cash-flow' },
+  { label: 'Dashboard', href: '/dashboard' },
+  { label: 'Studio Engine', href: '/studio' },
   { label: 'Daily Stream', href: '/daily' },
   { label: 'Integrations', href: '/integrations' },
-  { label: 'Ledger', href: '/dashboard#ledger-archive' },
 ];
 
 export default function DashboardNav({
@@ -65,7 +64,6 @@ export default function DashboardNav({
   const displayName = user?.name || user?.email?.split('@')[0] || 'Independent Pro';
   const initials = getInitials(user?.name || user?.email || '');
 
-  const [activeSection, setActiveSection] = useState('');
   const [avatarOpen, setAvatarOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -89,30 +87,24 @@ export default function DashboardNav({
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  // Active section detection
-  useEffect(() => {
-    if (pathname !== '/dashboard') {
-      setActiveSection('');
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) setActiveSection(entry.target.id);
-        });
-      },
-      { threshold: 0.3 }
-    );
-    NAV_SECTIONS.forEach(({ href }) => {
-      if (href.includes('#')) {
-        const id = href.split('#')[1];
-        const el = document.getElementById(id);
-        if (el) observer.observe(el);
-      }
-    });
-    return () => observer.disconnect();
-  }, [pathname]);
+  const handleDownloadVaultJson = () => {
+    if (typeof window === 'undefined') return;
+    const backupData = {
+      version: 'cashfloor_vault_v1',
+      exportedAt: new Date().toISOString(),
+      ledger: localStorage.getItem('calm_ledger_local_state_v1'),
+      rules: localStorage.getItem('cf_client_rules'),
+      integrations: localStorage.getItem('cf_connected_integrations'),
+    };
+    const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `cashfloor-vault-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    setAvatarOpen(false);
+  };
 
   const syncColor =
     syncStatus === 'synced' ? 'var(--cf-accent)' :
@@ -131,7 +123,7 @@ export default function DashboardNav({
         className={`fixed top-4 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none transition-all duration-500`}
       >
         <div
-          className="pointer-events-auto flex items-center justify-between w-full max-w-4xl px-3 h-12 rounded-2xl border transition-shadow duration-300"
+          className="pointer-events-auto flex items-center justify-between w-full max-w-5xl px-3.5 h-13 rounded-2xl border transition-shadow duration-300"
           style={{
             background: 'var(--cf-nav-bg)',
             backdropFilter: 'blur(20px)',
@@ -159,122 +151,49 @@ export default function DashboardNav({
             <CashFloorLogo size="sm" />
           </div>
 
-          {/* ── Center Tab Nav (desktop) ── */}
-          <nav className="hidden lg:flex items-center gap-0.5 rounded-xl p-1 border"
+          {/* ── Center Route Nav (desktop) ── */}
+          <nav className="hidden lg:flex items-center gap-1 rounded-xl p-1 border"
             style={{ background: 'var(--cf-surface)', borderColor: 'var(--cf-border)' }}>
             {NAV_SECTIONS.map((s) => {
-              const isHash = s.href.includes('#');
-              const isActiveHash = isHash && activeSection === s.href.split('#')[1] && pathname === '/dashboard';
-              const isActivePath = !isHash && pathname === s.href;
-              const isActive = isActiveHash || isActivePath;
+              const isActive = pathname === s.href;
 
               return (
                 <Link
                   key={s.label}
                   href={s.href}
-                  className="relative px-4 py-1.5 rounded-lg text-xs font-medium transition-colors duration-200"
+                  className="relative px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors duration-200"
                   style={{ color: isActive ? 'var(--cf-text)' : 'var(--cf-text-muted)' }}
                 >
                   {isActive && (
                     <motion.div
                       layoutId="nav-pill"
                       className="absolute inset-0 rounded-lg"
-                      style={{ background: 'var(--cf-surface-alt)', boxShadow: 'var(--cf-shadow-sm)' }}
-                      transition={{ type: 'spring', stiffness: 400, damping: 35 }}
+                      style={{ background: 'var(--cf-surface-alt)', border: '1px solid var(--cf-border)' }}
+                      transition={{ type: 'spring', stiffness: 500, damping: 35 }}
                     />
                   )}
-                  <span className="relative">{s.label}</span>
+                  <span className="relative z-10">{s.label}</span>
                 </Link>
               );
             })}
           </nav>
 
-          {/* ── Right actions ── */}
+          {/* ── Right Actions ── */}
           <div className="flex items-center gap-2">
-            {/* Sync / Vault Status pill */}
-            <Link
-              href="/account"
-              title={
-                syncStatus === 'synced'
-                  ? 'All financial models backed up to encrypted cloud'
-                  : 'Zero Bank Surveillance: Operating in 100% Private Local-First Vault'
-              }
-              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono border transition-all hover:border-[var(--cf-accent)]"
-              style={{ background: 'var(--cf-surface)', borderColor: 'var(--cf-border)', color: syncColor }}
+            
+            {/* Sync Status Badge */}
+            <div 
+              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono border"
+              style={{ 
+                borderColor: 'var(--cf-border-soft)',
+                background: 'var(--cf-surface-alt)',
+                color: syncColor
+              }}
+              title={syncStatus === 'synced' ? 'All changes saved to PostgreSQL with RLS' : 'Saved in local browser memory'}
             >
-              {syncStatus === 'saving' ? (
-                <RefreshCw className="w-3 h-3 animate-spin" />
-              ) : syncStatus === 'synced' ? (
-                <Check className="w-3 h-3" />
-              ) : (
-                <Shield className="w-3 h-3 text-[var(--cf-accent)]" />
-              )}
-              <span>{syncLabel}</span>
-            </Link>
-
-            {/* Unauthenticated: Export / Share in main nav */}
-            {!isAuthenticated && (
-              <>
-                <button
-                  type="button"
-                  onClick={onExportCsv}
-                  title="Export CSV"
-                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer"
-                  style={{ color: 'var(--cf-text-muted)' }}
-                  onMouseEnter={e => {
-                    (e.currentTarget as HTMLButtonElement).style.color = 'var(--cf-text)';
-                    (e.currentTarget as HTMLButtonElement).style.background = 'var(--cf-surface)';
-                  }}
-                  onMouseLeave={e => {
-                    (e.currentTarget as HTMLButtonElement).style.color = 'var(--cf-text-muted)';
-                    (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
-                  }}
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>Export</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={onOpenSolvencyModal}
-                  title="CPA & Lease Solvency Report (PDF)"
-                  className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer border border-[var(--cf-border)] hover:border-[var(--cf-accent)]"
-                  style={{ color: 'var(--cf-text-muted)', background: 'var(--cf-surface)' }}
-                >
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-                  <span>Audit PDF</span>
-                </button>
-                {onOpenInvoiceModal && (
-                  <button
-                    type="button"
-                    onClick={onOpenInvoiceModal}
-                    title="Client Invoice Studio (PDF)"
-                    className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer border border-[var(--cf-border)] hover:border-[var(--cf-accent)]"
-                    style={{ color: 'var(--cf-text-muted)', background: 'var(--cf-surface)' }}
-                  >
-                    <FileText className="w-3.5 h-3.5 text-[var(--cf-accent)]" />
-                    <span>Invoice PDF</span>
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={onOpenShareModal}
-                  title="Share"
-                  className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer"
-                  style={{ color: 'var(--cf-text-muted)' }}
-                  onMouseEnter={e => {
-                    (e.currentTarget as HTMLButtonElement).style.color = 'var(--cf-accent)';
-                    (e.currentTarget as HTMLButtonElement).style.background = 'var(--cf-accent-bg)';
-                  }}
-                  onMouseLeave={e => {
-                    (e.currentTarget as HTMLButtonElement).style.color = 'var(--cf-text-muted)';
-                    (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
-                  }}
-                >
-                  <Share2 className="w-3.5 h-3.5" />
-                  <span>Share</span>
-                </button>
-              </>
-            )}
+              <span className="w-1.5 h-1.5 rounded-full" style={{ background: syncColor }} />
+              <span className="font-medium">{syncLabel}</span>
+            </div>
             
             <ThemeToggle className="hidden sm:flex" />
 
@@ -318,6 +237,7 @@ export default function DashboardNav({
                   <ChevronDown className="w-3.5 h-3.5 text-[var(--cf-text-muted)] transition-transform" style={{ transform: avatarOpen ? 'rotate(180deg)' : 'none' }} />
                 </button>
 
+                {/* Refined Tier-1 Professional Profile Menu */}
                 <AnimatePresence>
                   {avatarOpen && (
                     <motion.div
@@ -325,16 +245,16 @@ export default function DashboardNav({
                       animate={{ opacity: 1, scale: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.95, y: -4 }}
                       transition={{ duration: 0.15 }}
-                      className="absolute right-0 top-10 w-60 rounded-2xl overflow-hidden z-50"
+                      className="absolute right-0 top-11 w-64 rounded-2xl overflow-hidden z-50 shadow-2xl border"
                       style={{
                         background: 'var(--cf-surface)',
-                        border: '1px solid var(--cf-border)',
-                        boxShadow: 'var(--cf-shadow-xl)',
+                        borderColor: 'var(--cf-border)',
                       }}
                     >
-                      <div className="px-4 py-3 border-b" style={{ borderColor: 'var(--cf-border)', background: 'var(--cf-surface-alt)' }}>
+                      {/* Identity Card */}
+                      <div className="p-4 border-b space-y-2.5" style={{ borderColor: 'var(--cf-border-soft)', background: 'var(--cf-surface-alt)' }}>
                         <div className="flex items-center gap-2.5">
-                          <div className="w-9 h-9 rounded-full overflow-hidden bg-gradient-to-br from-[#2F6F62] to-[#0f564a] flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-sm">
+                          <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-[#2F6F62] to-[#0f564a] flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-md">
                             {user?.avatar ? (
                               <img src={user.avatar} alt={displayName} className="w-full h-full object-cover" />
                             ) : (
@@ -343,81 +263,95 @@ export default function DashboardNav({
                           </div>
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-1.5">
-                              <p className="text-xs font-bold truncate" style={{ color: 'var(--cf-text)' }}>{displayName}</p>
-                              <span className="text-[10px] font-mono font-bold text-emerald-600 bg-emerald-500/10 px-1 rounded">PRO</span>
+                              <p className="text-xs font-bold truncate text-[var(--cf-text)]">{displayName}</p>
+                              <span className="text-[9px] font-mono font-bold text-emerald-600 bg-emerald-500/15 px-1 py-0.5 rounded border border-emerald-500/20">
+                                PRO
+                              </span>
                             </div>
-                            <p className="text-[11px] truncate" style={{ color: 'var(--cf-text-faint)' }}>{user?.email}</p>
-                            <p className="text-[10px] font-mono truncate text-[#2F6F62]">{user?.role || 'Senior Independent'}</p>
+                            <p className="text-[11px] truncate text-[var(--cf-text-faint)] font-mono">{user?.email}</p>
                           </div>
                         </div>
-                        {lastSavedAt && (
-                          <p className="text-[10px] mt-2 font-mono" style={{ color: 'var(--cf-text-faint)' }}>Auto-synced at {lastSavedAt}</p>
-                        )}
+
+                        <div className="flex items-center justify-between pt-1 text-[10px] font-mono border-t border-[var(--cf-border-soft)]">
+                          <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
+                            <ShieldCheck className="w-3 h-3" />
+                            Enclave Sovereign
+                          </span>
+                          <span className="text-[var(--cf-text-faint)]">{lastSavedAt ? `Sync ${lastSavedAt}` : 'Local-First'}</span>
+                        </div>
                       </div>
+
+                      {/* Primary Workspace Links */}
                       <div className="p-1.5 space-y-0.5">
-                        <button onClick={onLoadSample}
-                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors cursor-pointer text-left">
-                          <Database className="w-3.5 h-3.5 text-[#2F6F62]" /> Load Sample Ledger
-                        </button>
-                        <button onClick={() => { setAvatarOpen(false); openAuthModal('Switching to another freelance persona or account', 'demo'); }}
-                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors cursor-pointer text-left">
-                          <RotateCcw className="w-3.5 h-3.5 text-amber-500" /> Switch Demo Persona
-                        </button>
-                        <Link href="/account" onClick={() => setAvatarOpen(false)}
-                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors cursor-pointer">
-                          <User className="w-3.5 h-3.5 text-[#2F6F62]" /> Account &amp; Security
+                        <div className="px-2.5 py-1 text-[9px] font-mono uppercase tracking-wider text-[var(--cf-text-faint)]">
+                          Workspace &amp; Settings
+                        </div>
+                        <Link 
+                          href="/account" 
+                          onClick={() => setAvatarOpen(false)}
+                          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors"
+                        >
+                          <User className="w-3.5 h-3.5 text-[var(--cf-accent)]" /> 
+                          <span>Account Settings</span>
                         </Link>
-                        <Link href="/subscription" onClick={() => setAvatarOpen(false)}
-                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors cursor-pointer">
-                          <Sparkles className="w-3.5 h-3.5 text-emerald-500" /> Subscription &amp; Billing
+                        <Link 
+                          href="/security" 
+                          onClick={() => setAvatarOpen(false)}
+                          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors"
+                        >
+                          <Shield className="w-3.5 h-3.5 text-emerald-500" /> 
+                          <span>Security &amp; Storage Vault</span>
                         </Link>
-                        <button onClick={() => { setAvatarOpen(false); onOpenSolvencyModal?.(); }}
-                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors cursor-pointer text-left">
-                          <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" /> CPA &amp; Lease Solvency Audit (PDF)
+                        <Link 
+                          href="/subscription" 
+                          onClick={() => setAvatarOpen(false)}
+                          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors"
+                        >
+                          <Sparkles className="w-3.5 h-3.5 text-amber-500" /> 
+                          <span>Pro Plan &amp; Billing</span>
+                        </Link>
+                      </div>
+
+                      {/* Data Portability Section */}
+                      <div className="p-1.5 border-t border-[var(--cf-border-soft)] space-y-0.5">
+                        <div className="px-2.5 py-1 text-[9px] font-mono uppercase tracking-wider text-[var(--cf-text-faint)]">
+                          Data Portability
+                        </div>
+                        <button
+                          onClick={handleDownloadVaultJson}
+                          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors cursor-pointer text-left"
+                        >
+                          <Download className="w-3.5 h-3.5 text-blue-500" />
+                          <span>Export Vault Backup (.json)</span>
                         </button>
-                        {onOpenInvoiceModal && (
-                          <button onClick={() => { setAvatarOpen(false); onOpenInvoiceModal(); }}
-                            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors cursor-pointer text-left">
-                            <FileText className="w-3.5 h-3.5 text-[var(--cf-accent)]" /> Client Invoice Studio (PDF)
+                        {onExportCsv && (
+                          <button
+                            onClick={() => { onExportCsv(); setAvatarOpen(false); }}
+                            className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors cursor-pointer text-left"
+                          >
+                            <Database className="w-3.5 h-3.5 text-emerald-500" />
+                            <span>Export Ledger (.csv)</span>
                           </button>
                         )}
-                        <button onClick={() => { setAvatarOpen(false); onOpenCalibrationWizard?.(); }}
-                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors cursor-pointer text-left">
-                          <Sparkles className="w-3.5 h-3.5 text-amber-500" /> 60s Calibration Wizard
-                        </button>
-                        
-                        <div className="my-1 border-t" style={{ borderColor: 'var(--cf-border)' }}></div>
-
-                        <button onClick={() => { onExportCsv?.(); setAvatarOpen(false); }}
-                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors cursor-pointer text-left">
-                          <Download className="w-3.5 h-3.5" /> Export Data to CSV
-                        </button>
-                        <button onClick={() => { onOpenShareModal?.(); setAvatarOpen(false); }}
-                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors cursor-pointer text-left">
-                          <Share2 className="w-3.5 h-3.5" /> Share Report
-                        </button>
-                        <div className="flex items-center justify-between px-3 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors cursor-pointer">
-                          <div className="flex items-center gap-2.5">
-                            <span className="w-3.5 h-3.5 flex items-center justify-center">🌓</span> Theme
-                          </div>
-                          <ThemeToggle />
-                        </div>
-
-                        <div className="my-1 border-t" style={{ borderColor: 'var(--cf-border)' }}></div>
-                        <button onClick={onResetData}
-                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-caution)] hover:bg-[var(--cf-caution-bg)] transition-colors cursor-pointer text-left">
-                          <RotateCcw className="w-3.5 h-3.5" /> Reset Ledger
-                        </button>
                       </div>
-                      <div className="p-1.5 border-t" style={{ borderColor: 'var(--cf-border)' }}>
+
+                      {/* Danger / Session Zone */}
+                      <div className="p-1.5 border-t border-[var(--cf-border-soft)] space-y-0.5">
+                        {onResetData && (
+                          <button 
+                            onClick={() => { onResetData(); setAvatarOpen(false); }}
+                            className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-amber-600 hover:bg-amber-500/10 transition-colors cursor-pointer text-left"
+                          >
+                            <RotateCcw className="w-3.5 h-3.5" /> 
+                            <span>Reset Local Workspace</span>
+                          </button>
+                        )}
                         <button
                           onClick={async () => { setAvatarOpen(false); await signOut(); }}
-                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs transition-colors cursor-pointer"
-                          style={{ color: 'var(--cf-caution)' }}
-                          onMouseEnter={e => (e.currentTarget.style.background = 'var(--cf-caution-bg)')}
-                          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                          className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-xl text-xs text-rose-600 hover:bg-rose-500/10 transition-colors cursor-pointer text-left"
                         >
-                          <LogOut className="w-3.5 h-3.5" /> Sign Out
+                          <LogOut className="w-3.5 h-3.5" /> 
+                          <span>Sign Out</span>
                         </button>
                       </div>
                     </motion.div>
@@ -459,12 +393,11 @@ export default function DashboardNav({
           >
             <div className="px-4 py-3 flex flex-col gap-1">
               {NAV_SECTIONS.map((s) => (
-                <a
+                <Link
                   key={s.label}
                   href={s.href}
                   onClick={() => setMobileOpen(false)}
                   className="px-3 py-2 rounded-lg text-sm transition-colors"
-                  style={{ color: 'var(--cf-text-muted)' }}
                   onMouseEnter={e => {
                     (e.currentTarget as HTMLAnchorElement).style.color = 'var(--cf-text)';
                     (e.currentTarget as HTMLAnchorElement).style.background = 'var(--cf-surface)';
@@ -475,7 +408,7 @@ export default function DashboardNav({
                   }}
                 >
                   {s.label}
-                </a>
+                </Link>
               ))}
               <div className="px-3 py-2 border-t mt-1" style={{ borderColor: 'var(--cf-border)' }}>
                 <ThemeToggle />

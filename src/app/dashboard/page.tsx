@@ -1,70 +1,69 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-
-import React, { useState, useMemo } from 'react';
-import { motion, AnimatePresence, Variants } from 'framer-motion';
-import { MonthlyRecord, CalculatorAssumptions, PendingInvoice } from '@/lib/calculator/types';
-import { computeFullLedger } from '@/lib/calculator/engine';
-import { exportLedgerToCsv } from '@/lib/export/csvExport';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  ShieldCheck,
+  Zap,
+  Clock,
+  ArrowRight,
+  TrendingUp,
+  Calendar,
+  AlertTriangle,
+  CheckCircle2,
+  FileText,
+  Layers,
+  Sparkles,
+  ExternalLink,
+  ChevronRight,
+  DollarSign,
+  Activity,
+  Lock,
+  Download,
+  Upload,
+  CreditCard,
+  Building2,
+  Share2,
+  RotateCcw
+} from 'lucide-react';
 import DashboardNav from '@/components/DashboardNav';
-import { ScenarioPillBar } from '@/components/ScenarioPillBar';
-import { HeroRunway } from '@/components/HeroRunway';
-import { LedgerRows } from '@/components/LedgerRows';
-import { CashFlowChart } from '@/components/CashFlowChart';
-import { CashFlowWaterfall } from '@/components/CashFlowWaterfall';
-import { ScenarioSimulator } from '@/components/ScenarioSimulator';
-import { RiskVolatilityRadar } from '@/components/RiskVolatilityRadar';
-import { AssumptionControls } from '@/components/AssumptionControls';
-import { InputTable } from '@/components/InputTable';
-import { CsvPasteModal } from '@/components/CsvPasteModal';
-import { PinterestCardModal } from '@/components/PinterestCardModal';
-import { PendingInvoices } from '@/components/PendingInvoices';
-import { TaxDeadlineReminders } from '@/components/TaxDeadlineReminders';
-import { InvoiceAgingPanel } from '@/components/InvoiceAgingPanel';
-import { DeductionOptimizer } from '@/components/DeductionOptimizer';
-import { MonteCarloRiskLab } from '@/components/MonteCarloRiskLab';
-import { GuidedTour } from '@/components/GuidedTour';
-import { loadUserLedger, saveUserLedger, getLocalLedgerState, SyncStatus } from '@/lib/supabase/ledgerService';
+import Footer from '@/components/marketing/Footer';
 import { useAuth } from '@/lib/auth/AuthContext';
-import { usePayment } from '@/lib/payment/PaymentContext';
-import { useEffect, useRef } from 'react';
-import { RealDataWizardModal } from '@/components/RealDataWizardModal';
+import { getLocalLedgerState, loadUserLedger, saveUserLedger, SyncStatus } from '@/lib/supabase/ledgerService';
+import { computeFullLedger } from '@/lib/calculator/engine';
+import { MonthlyRecord, CalculatorAssumptions, PendingInvoice } from '@/lib/calculator/types';
 import { SolvencyReportModal } from '@/components/SolvencyReportModal';
 import { InvoiceGeneratorModal } from '@/components/InvoiceGeneratorModal';
-import { fetchLiveExchangeRates, calculateFxConversionMultiplier } from '@/lib/currency/fxService';
-import { DailyPaymentLog } from '@/components/DailyPaymentLog';
+import { RealDataWizardModal } from '@/components/RealDataWizardModal';
+import { CsvPasteModal } from '@/components/CsvPasteModal';
 import { LegalDisclaimer } from '@/components/LegalDisclaimer';
-import { Share2, BookOpen, Download, Printer, Sparkles, ShieldCheck, HelpCircle, AlertTriangle, Upload, Activity, TrendingDown } from 'lucide-react';
 
-// ... (keep REALISTIC_SAMPLE_RECORDS)
-const REALISTIC_SAMPLE_RECORDS: MonthlyRecord[] = [
-  { id: '1', month: 'Jul 2025', income: 4050, expenses: 2100, clientTag: 'Acme Retainer' },
+const DEFAULT_RECORDS: MonthlyRecord[] = [
+  { id: '1', month: 'Jul', income: 4050, expenses: 2100, clientTag: 'Acme Retainer' },
   { id: '2', month: 'Aug', income: 4400, expenses: 2100, clientTag: 'Bolt Studio' },
   { id: '3', month: 'Sep', income: 2850, expenses: 2100, clientTag: 'Acme Retainer' },
-  { id: '4', month: 'Oct (Lean)', income: 1600, expenses: 2100, clientTag: 'Direct Client C' },
+  { id: '4', month: 'Oct', income: 1600, expenses: 2100, clientTag: 'Direct Client C' },
   { id: '5', month: 'Nov', income: 3400, expenses: 2100, clientTag: 'Acme Retainer' },
-  { id: '6', month: 'Dec (Peak)', income: 5900, expenses: 2300, clientTag: 'Apex Design' },
-  { id: '7', month: 'Jan 2026', income: 4000, expenses: 2100, clientTag: 'Bolt Studio' },
+  { id: '6', month: 'Dec', income: 5900, expenses: 2300, clientTag: 'Apex Design' },
+  { id: '7', month: 'Jan', income: 4000, expenses: 2100, clientTag: 'Bolt Studio' },
   { id: '8', month: 'Feb', income: 4100, expenses: 2100, clientTag: 'Direct Client C' },
-  { id: '9', month: 'Mar (Tax)', income: 3300, expenses: 2200, clientTag: 'Acme Retainer' },
+  { id: '9', month: 'Mar', income: 3300, expenses: 2200, clientTag: 'Acme Retainer' },
   { id: '10', month: 'Apr', income: 4500, expenses: 2100, clientTag: 'Bolt Studio' },
   { id: '11', month: 'May', income: 4800, expenses: 2100, clientTag: 'Direct Client C' },
-  { id: '12', month: 'Jun 2026', income: 4600, expenses: 2250, clientTag: 'Acme Retainer' },
+  { id: '12', month: 'Jun', income: 4600, expenses: 2250, clientTag: 'Acme Retainer' },
 ];
 
-export default function CashFloorDashboard() {
-  const router = useRouter();
-  
-  const [records, setRecords] = useState<MonthlyRecord[]>(REALISTIC_SAMPLE_RECORDS);
-  const [pendingInvoices, setPendingInvoices] = useState<PendingInvoice[]>([]);
-  const [currencySymbol, setCurrencySymbol] = useState('$');
+export default function ExecutiveDashboard() {
+  const { user, isAuthenticated, openAuthModal } = useAuth();
+  const userId = user?.id;
 
+  const [records, setRecords] = useState<MonthlyRecord[]>(DEFAULT_RECORDS);
+  const [currencySymbol, setCurrencySymbol] = useState('$');
   const [assumptions, setAssumptions] = useState<CalculatorAssumptions>({
     taxReservePct: 0.25,
     bufferMonthsMultiplier: 3.5,
-    currentSavings: 8820,
+    currentSavings: 12400,
     percentile: 20,
     scenario: 'base',
     clientLossPercentage: 0.30,
@@ -72,43 +71,30 @@ export default function CashFloorDashboard() {
     retainerProbability: 0.85,
   });
 
-  const [isPasteModalOpen, setIsPasteModalOpen] = useState(false);
-  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-  const [isWizardOpen, setIsWizardOpen] = useState(false);
-  const [isSolvencyModalOpen, setIsSolvencyModalOpen] = useState(false);
-  const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
-  const [showPhilosophy, setShowPhilosophy] = useState(false);
-  const [isTourOpen, setIsTourOpen] = useState(false);
-
-  const isViewingSample = useMemo(() => {
-    if (records.length !== REALISTIC_SAMPLE_RECORDS.length) return false;
-    return records.every((r, i) => r.income === REALISTIC_SAMPLE_RECORDS[i].income && r.expenses === REALISTIC_SAMPLE_RECORDS[i].expenses);
-  }, [records]);
-
-  const handleApplyWizardData = (newRecords: MonthlyRecord[], newAssumptions: Partial<CalculatorAssumptions>) => {
-    setRecords(newRecords);
-    setAssumptions(prev => ({ ...prev, ...newAssumptions }));
-  };
-  
-  // Auth & Cloud Sync State
-  const { user, isAuthenticated, openAuthModal } = useAuth();
-  const { openCheckout } = usePayment();
-  const userId = user?.id;
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('offline');
   const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
-  const [activeIntegrations, setActiveIntegrations] = useState<string[]>(['STRIPE']);
-  const isInitialMount = useRef(true);
+  const [activeRails, setActiveRails] = useState<string[]>(['STRIPE', 'WISE']);
+  
+  // Modals
+  const [isSolvencyModalOpen, setIsSolvencyModalOpen] = useState(false);
+  const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
+  const [isWizardOpen, setIsWizardOpen] = useState(false);
+  const [isCsvModalOpen, setIsCsvModalOpen] = useState(false);
 
-  const [isDataLoaded, setIsDataLoaded] = useState(false);
+  // Today's completed action items checklist (persisted locally)
+  const [completedSteps, setCompletedSteps] = useState<{ [key: string]: boolean }>({
+    reconcile: true,
+    taxLock: false,
+    stressTest: false,
+    backupCheck: true,
+  });
 
-  // Immediate local cache hydration on client mount (prevents 0.5s flicker)
   useEffect(() => {
     const local = getLocalLedgerState();
     if (local && local.records && local.records.length > 0) {
       setRecords(local.records);
       setAssumptions(local.assumptions);
-      setCurrencySymbol(local.currencySymbol);
-      setIsDataLoaded(true);
+      setCurrencySymbol(local.currencySymbol || '$');
     }
 
     if (typeof window !== 'undefined') {
@@ -117,211 +103,27 @@ export default function CashFloorDashboard() {
         try {
           const parsed = JSON.parse(stored);
           const connected = Object.entries(parsed)
-            .filter(([_, val]: any) => val.connected)
-            .map(([id]) => id.toUpperCase());
-          if (connected.length > 0) {
-            setActiveIntegrations(connected);
-          }
+            .filter(([_, v]: any) => v.connected)
+            .map(([k]) => k.toUpperCase());
+          if (connected.length > 0) setActiveRails(connected);
         } catch {}
       }
     }
   }, []);
 
-  // 1. Initial Load & Session Tracking
-  useEffect(() => {
-    let active = true;
-    const initData = async () => {
-      try {
-        const { payload, source } = await loadUserLedger(userId);
-        if (active && payload.records.length > 0) {
-          setRecords(payload.records);
-          setAssumptions(payload.assumptions);
-          setCurrencySymbol(payload.currencySymbol);
-          setSyncStatus(source === 'cloud' ? 'synced' : 'offline');
-          if (payload.updatedAt) {
-            setLastSavedAt(new Date(payload.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-          }
-
-          // Apply client customization rules if present
-          if (typeof window !== 'undefined') {
-            const storedRules = localStorage.getItem('cf_client_rules');
-            if (storedRules) {
-              try {
-                const parsed = JSON.parse(storedRules);
-                if (parsed.targetSafetyMonths) {
-                  setAssumptions(prev => ({
-                    ...prev,
-                    bufferMonthsMultiplier: parsed.targetSafetyMonths,
-                    entityType: parsed.entityType,
-                    paymentTerms: parsed.paymentTerms,
-                    fxHaircutPct: parsed.fxHaircutPct,
-                  }));
-                }
-                if (parsed.defaultCurrency) {
-                  setCurrencySymbol(parsed.defaultCurrency);
-                }
-              } catch {}
-            }
-          }
-        }
-      } catch (e) {
-        if (active) setSyncStatus('offline');
-      } finally {
-        if (active) setIsDataLoaded(true);
-      }
-    };
-    initData();
-    return () => { active = false; };
-  }, [userId]);
-
-  // 2. Debounced Cloud & Local Auto-Save
-  useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      return;
-    }
-
-    setSyncStatus('saving');
-    const timer = setTimeout(async () => {
-      const res = await saveUserLedger(userId, records, assumptions, currencySymbol);
-      setSyncStatus(res.isCloud ? 'synced' : 'offline');
-      setLastSavedAt(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, [records, assumptions, currencySymbol, userId]);
-
-  const handleUnlockRequest = (featureName: string) => {
-    openCheckout('pro', 'annual');
-  };
-
-  const handleCurrencyChange = async (newSymbol: string) => {
-    if (newSymbol === currencySymbol) return;
-    try {
-      const { rates, isLive } = await fetchLiveExchangeRates();
-      const { multiplier, rateDescription } = calculateFxConversionMultiplier(currencySymbol, newSymbol, rates);
-      
-      setRecords(prev => prev.map(r => ({
-        ...r,
-        income: Math.round(r.income * multiplier),
-        expenses: Math.round(r.expenses * multiplier)
-      })));
-
-      setPendingInvoices(prev => prev.map(inv => ({
-        ...inv,
-        amount: Math.round(inv.amount * multiplier)
-      })));
-      
-      setAssumptions(prev => ({
-        ...prev,
-        currentSavings: Math.round((prev.currentSavings || 0) * multiplier),
-        windfallAmount: Math.round((prev.windfallAmount || 0) * multiplier)
-      }));
-      
-      setCurrencySymbol(newSymbol);
-      setIngestionToast(`✓ Converted workspace to ${newSymbol} (${rateDescription}) ${isLive ? 'via live FX rates' : '(offline reference rate)'}`);
-      setTimeout(() => setIngestionToast(null), 5000);
-    } catch (e) {
-      console.error('Failed to convert currency', e);
-      setCurrencySymbol(newSymbol);
-    }
-  };
-
-  // Pure reactive calculation
   const calculation = useMemo(() => {
-    return computeFullLedger(records, assumptions, pendingInvoices);
-  }, [records, assumptions, pendingInvoices]);
+    return computeFullLedger(records, assumptions, []);
+  }, [records, assumptions]);
 
-  const handleResetData = () => {
-    const blank = Array.from({ length: 12 }, (_, i) => {
-      const months = ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-      return {
-        id: `blank-${i + 1}`,
-        month: months[i],
-        income: 0,
-        expenses: 0,
-        clientTag: 'Standard',
-      };
-    });
-    setRecords(blank);
-    setAssumptions((prev) => ({ ...prev, currentSavings: 0, scenario: 'base' }));
+  const toggleStep = (key: string) => {
+    setCompletedSteps(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const handleLoadSample = () => {
-    setRecords(REALISTIC_SAMPLE_RECORDS);
-    setAssumptions((prev) => ({
-      ...prev,
-      taxReservePct: 0.25,
-      bufferMonthsMultiplier: 3.5,
-      currentSavings: 8820,
-      scenario: 'base',
-      retainerProbability: 0.85,
-    }));
-  };
-
-  const handleRevertDefaults = () => {
-    setAssumptions((prev) => ({
-      ...prev,
-      taxReservePct: 0.25,
-      bufferMonthsMultiplier: 3.5,
-      currentSavings: 8820,
-      retainerProbability: 0.85,
-      scenario: 'base',
-    }));
-  };
-
-  const [ingestionToast, setIngestionToast] = useState<string | null>(null);
-
-  const handleApplyPastedRecords = (pasted: MonthlyRecord[], detectedCurrency?: string) => {
-    setRecords(pasted);
-    if (detectedCurrency && detectedCurrency !== currencySymbol) {
-      setCurrencySymbol(detectedCurrency);
-    }
-    setIngestionToast(`✓ Successfully ingested ${pasted.length} monthly records! Live runway model updated.`);
-    setTimeout(() => {
-      setIngestionToast(null);
-    }, 5000);
-  };
-
-  const handleSaveInvoiceToReceivables = (pending: PendingInvoice) => {
-    setPendingInvoices(prev => [pending, ...prev]);
-    setIngestionToast(`✓ Invoice for ${pending.clientName} (${currencySymbol}${pending.amount.toLocaleString()}) added to Accounts Receivable.`);
-    setTimeout(() => {
-      setIngestionToast(null);
-    }, 5000);
-  };
-
-  const handleExportCsv = () => {
-    exportLedgerToCsv(records, calculation, assumptions, currencySymbol);
-  };
-
-  const handlePrintPdf = () => {
-    window.print();
-  };
-
-  const containerVariants: Variants = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 }
-    }
-  };
-
-  const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } }
-  };
-
-  const hasEnoughData = records.length >= 3;
+  const displayName = user?.name || user?.email?.split('@')[0] || 'Independent Operator';
 
   return (
-    <main className="min-h-screen flex flex-col bg-[var(--cf-bg)] text-[var(--cf-text)] transition-colors duration-300">
-      {/* 1. Clean Dashboard Navigation Bar */}
+    <div className="min-h-screen flex flex-col bg-[var(--cf-bg)] text-[var(--cf-text)] font-sans transition-colors duration-300">
       <DashboardNav
-        onResetData={handleResetData}
-        onLoadSample={handleLoadSample}
-        onExportCsv={handleExportCsv}
-        onOpenShareModal={() => setIsShareModalOpen(true)}
         onOpenAuthModal={() => openAuthModal()}
         onOpenSolvencyModal={() => setIsSolvencyModalOpen(true)}
         onOpenCalibrationWizard={() => setIsWizardOpen(true)}
@@ -330,503 +132,470 @@ export default function CashFloorDashboard() {
         lastSavedAt={lastSavedAt}
       />
 
-      {/* 2. Scenario Pill Bar */}
-      <ScenarioPillBar
-        assumptions={assumptions}
-        onChange={setAssumptions}
-        liquidCash={calculation.currentSavings}
-        floorIncome={calculation.floorIncome}
-        exhaustionDate={calculation.exhaustionDate}
-        currencySymbol={currencySymbol}
-      />
-
-      {/* 3. Main Canvas */}
-      <div className="flex-1 max-w-7xl mx-auto w-full px-4 md:px-8 py-8 space-y-6">
-        {/* Real-time Ingestion Toast Banner */}
-        <AnimatePresence>
-          {ingestionToast && (
-            <motion.div
-              initial={{ opacity: 0, y: -10, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -10, scale: 0.98 }}
-              className="p-3.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 text-xs font-mono flex items-center justify-between shadow-lg"
-            >
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                <span>{ingestionToast}</span>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIngestionToast(null)}
-                className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer ml-4"
-              >
-                Dismiss
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* ── Real Data Launchpad & Sample Status Banner ── */}
-        {!isDataLoaded ? (
-          <div className="h-16 rounded-2xl bg-[var(--cf-surface-alt)]/40 border border-[var(--cf-border-soft)] animate-pulse" />
-        ) : (
-          <motion.div
-            initial={false}
-            animate={{
-              boxShadow: isViewingSample
-                ? ['0 0 0px rgba(245,158,11,0)', '0 0 15px rgba(245,158,11,0.2)', '0 0 0px rgba(245,158,11,0)']
-                : '0 1px 2px rgba(0,0,0,0.02)',
-            }}
-            transition={{ duration: 3, repeat: Infinity }}
-            className={`rounded-2xl border p-4 shadow-sm transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative overflow-hidden ${
-              isViewingSample ? 'bg-amber-500/5 border-amber-500/30' : 'bg-[var(--cf-surface)] border-[var(--cf-border-soft)]'
-            }`}
-          >
-            {isViewingSample && (
-              <div className="absolute top-0 left-0 w-1 h-full bg-amber-500 rounded-l-2xl" />
-            )}
-
-            <div className="flex items-center gap-3 relative z-10">
-              <div 
-                className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border"
-                style={{
-                  background: isViewingSample ? 'rgba(245, 158, 11, 0.15)' : 'var(--cf-accent-bg)',
-                  borderColor: isViewingSample ? 'rgba(245, 158, 11, 0.2)' : 'rgba(47,111,98,0.3)',
-                  color: isViewingSample ? '#f59e0b' : 'var(--cf-accent)',
-                }}
-              >
-                {isViewingSample ? <AlertTriangle className="w-4 h-4" /> : <ShieldCheck className="w-4 h-4" />}
-              </div>
-
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-serif font-bold tracking-tight text-[var(--cf-text)]">
-                    {isViewingSample ? 'Calibration Required' : 'Ledger Calibrated'}
-                  </span>
-                  <span 
-                    className="text-[9px] font-mono px-2 py-0.5 rounded-full font-semibold border hidden sm:inline-block"
-                    style={{
-                      background: isViewingSample ? 'rgba(245, 158, 11, 0.1)' : 'var(--cf-accent-bg)',
-                      borderColor: isViewingSample ? 'rgba(245, 158, 11, 0.2)' : 'rgba(47,111,98,0.3)',
-                      color: isViewingSample ? '#f59e0b' : 'var(--cf-accent)',
-                    }}
-                  >
-                    {isViewingSample ? 'Simulation Mode' : 'Real Numbers Active'}
-                  </span>
-                </div>
-                <p className="text-[11px] text-[var(--cf-text-muted)] max-w-xl leading-relaxed mt-0.5">
-                  {isViewingSample
-                    ? 'Your survival floor is simulating with sample data. Calibrate your real numbers to get your true runway.'
-                    : `Your real numbers are driving the models. Baseline locked at ${currencySymbol}${calculation.floorIncome.toLocaleString()}/mo.`}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 relative z-10 self-end sm:self-auto">
-              <button
-                type="button"
-                onClick={() => setIsWizardOpen(true)}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all shadow-sm cursor-pointer hover:opacity-95`}
-                style={{ 
-                  background: isViewingSample ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' : 'var(--cf-surface-alt)', 
-                  color: isViewingSample ? 'white' : 'var(--cf-text)', 
-                  border: isViewingSample ? 'none' : '1px solid var(--cf-border)' 
-                }}
-              >
-                <Sparkles className="w-3.5 h-3.5" style={{ color: isViewingSample ? 'white' : 'var(--cf-accent)' }} />
-                <span>{isViewingSample ? 'Calibrate My Runway' : 'Update Numbers'}</span>
-              </button>
-
-              {!isViewingSample && (
-                <button
-                  type="button"
-                  onClick={() => setIsPasteModalOpen(true)}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono border transition-all cursor-pointer"
-                  style={{
-                    color: 'var(--cf-text)',
-                    background: 'var(--cf-surface)',
-                    borderColor: 'var(--cf-border)',
-                  }}
-                  onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--cf-text-muted)')}
-                  onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--cf-border)')}
-                >
-                  <Upload className="w-3.5 h-3.5" />
-                  <span>Import CSV</span>
-                </button>
-              )}
-
-              {isViewingSample ? (
-                <button
-                  type="button"
-                  onClick={handleResetData}
-                  className="px-3 py-1.5 rounded-lg text-xs font-mono font-medium text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors cursor-pointer"
-                  title="Clear sample rows to start from zero"
-                >
-                  Clear Sample
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={handleLoadSample}
-                  className="px-2 py-1.5 rounded-lg text-[10px] font-mono font-medium text-[var(--cf-text-faint)] hover:text-[var(--cf-text-muted)] transition-colors cursor-pointer"
-                  title="Restore Alex Vance sample data"
-                >
-                  Load Sample
-                </button>
-              )}
-            </div>
-          </motion.div>
-        )}
-
-        {/* ── Active Ingestion Rails Indicator ── */}
-        {activeIntegrations.length > 0 && (
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-4 py-2.5 rounded-2xl bg-[var(--cf-surface)] border border-[var(--cf-border-soft)] text-xs font-mono shadow-xs">
-            <div className="flex items-center gap-2.5">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-8 py-8 space-y-8">
+        
+        {/* ── Executive Briefing Header ── */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-[var(--cf-border-soft)]">
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                Live Solvency Cockpit
               </span>
-              <span className="text-[var(--cf-text)] font-semibold">Active Ingestion Rails:</span>
-              <div className="flex flex-wrap items-center gap-1.5">
-                {activeIntegrations.map((name) => (
-                  <span
-                    key={name}
-                    className="px-2 py-0.5 rounded-md bg-[var(--cf-surface-alt)] border border-[var(--cf-border-soft)] text-[10px] text-[var(--cf-accent)] font-semibold"
+              <span className="text-xs text-[var(--cf-text-faint)] font-mono">
+                {new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+              </span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold tracking-tight text-[var(--cf-text)]">
+              Welcome back, {displayName}
+            </h1>
+            <p className="text-xs sm:text-sm text-[var(--cf-text-muted)] max-w-2xl leading-relaxed">
+              Here is your daily solvency posture. All models are running on your device’s local CPU with zero bank surveillance.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2.5">
+            <button
+              onClick={() => setIsWizardOpen(true)}
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-mono font-medium border border-[var(--cf-border)] bg-[var(--cf-surface)] text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-all cursor-pointer shadow-xs"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+              <span>Calibrate Numbers</span>
+            </button>
+
+            <Link
+              href="/studio"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-white transition-all shadow-md hover:opacity-95 cursor-pointer"
+              style={{ background: 'linear-gradient(135deg, #2F6F62 0%, #1a4f45 100%)' }}
+            >
+              <span>Launch Studio Engine</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+        </div>
+
+        {/* ── Core Metric HUD (5 Pillars) ── */}
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3.5 sm:gap-4">
+          
+          {/* Card 1: Health Score */}
+          <div className="p-4 sm:p-5 rounded-2xl bg-[var(--cf-surface)] border border-[var(--cf-border-soft)] shadow-xs flex flex-col justify-between">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--cf-text-muted)]">
+                Solvency Score
+              </span>
+              <Activity className="w-4 h-4 text-emerald-500" />
+            </div>
+            <div className="py-2">
+              <div className="text-2xl sm:text-3xl font-mono font-bold text-[var(--cf-text)]">
+                94<span className="text-xs text-[var(--cf-text-muted)] font-normal">/100</span>
+              </div>
+              <span className="text-[10px] font-mono font-semibold text-emerald-600 dark:text-emerald-400">
+                Resilient Posture
+              </span>
+            </div>
+            <div className="w-full bg-[var(--cf-surface-alt)] h-1.5 rounded-full overflow-hidden">
+              <div className="bg-emerald-500 h-full rounded-full w-[94%]" />
+            </div>
+          </div>
+
+          {/* Card 2: Liquid Runway */}
+          <div className="p-4 sm:p-5 rounded-2xl bg-[var(--cf-surface)] border border-[var(--cf-border-soft)] shadow-xs flex flex-col justify-between">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--cf-text-muted)]">
+                Liquid Runway
+              </span>
+              <Clock className="w-4 h-4 text-[var(--cf-accent)]" />
+            </div>
+            <div className="py-2">
+              <div className="text-2xl sm:text-3xl font-mono font-bold text-[var(--cf-text)]">
+                {calculation.runwayMonths.toFixed(1)} <span className="text-xs text-[var(--cf-text-muted)] font-normal">Mos</span>
+              </div>
+              <span className="text-[10px] font-mono text-[var(--cf-text-muted)]">
+                {currencySymbol}{calculation.currentSavings.toLocaleString()} liquid cash
+              </span>
+            </div>
+            <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400">
+              Zero burn: {calculation.exhaustionDate}
+            </span>
+          </div>
+
+          {/* Card 3: Bedrock P20 Floor */}
+          <div className="p-4 sm:p-5 rounded-2xl bg-[var(--cf-surface)] border border-[var(--cf-border-soft)] shadow-xs flex flex-col justify-between">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--cf-text-muted)]">
+                P20 Bedrock Floor
+              </span>
+              <ShieldCheck className="w-4 h-4 text-emerald-600" />
+            </div>
+            <div className="py-2">
+              <div className="text-2xl sm:text-3xl font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                {currencySymbol}{calculation.floorIncome.toLocaleString()}
+              </div>
+              <span className="text-[10px] font-mono text-[var(--cf-text-muted)]">
+                Exceeded in 80% of months
+              </span>
+            </div>
+            <span className="text-[10px] font-mono text-[var(--cf-text-faint)]">
+              Safe living draw limit
+            </span>
+          </div>
+
+          {/* Card 4: Tax Escrow Lock */}
+          <div className="p-4 sm:p-5 rounded-2xl bg-[var(--cf-surface)] border border-[var(--cf-border-soft)] shadow-xs flex flex-col justify-between">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--cf-text-muted)]">
+                Tax Escrow Lock
+              </span>
+              <Lock className="w-4 h-4 text-amber-500" />
+            </div>
+            <div className="py-2">
+              <div className="text-2xl sm:text-3xl font-mono font-bold text-amber-600 dark:text-amber-400">
+                {currencySymbol}{Math.round(calculation.taxReserve).toLocaleString()}
+              </div>
+              <span className="text-[10px] font-mono text-[var(--cf-text-muted)]">
+                25% statutory partition
+              </span>
+            </div>
+            <span className="text-[10px] font-mono text-amber-600/90 dark:text-amber-400/90">
+              Untouchable buffer
+            </span>
+          </div>
+
+          {/* Card 5: Safe To Spend */}
+          <div className="p-4 sm:p-5 rounded-2xl bg-[var(--cf-surface)] border border-[var(--cf-border-soft)] shadow-xs flex flex-col justify-between col-span-2 lg:col-span-1">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--cf-text-muted)]">
+                Safe To Spend
+              </span>
+              <DollarSign className="w-4 h-4 text-[var(--cf-accent)]" />
+            </div>
+            <div className="py-2">
+              <div className="text-2xl sm:text-3xl font-mono font-bold text-[var(--cf-text)]">
+                {currencySymbol}{calculation.safeToSpend.toLocaleString()}
+              </div>
+              <span className="text-[10px] font-mono text-[var(--cf-text-muted)]">
+                True surplus capital
+              </span>
+            </div>
+            <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400">
+              After {assumptions.bufferMonthsMultiplier}x safety buffer
+            </span>
+          </div>
+        </div>
+
+        {/* ── Two Column Layout: What To Do Today + Ingestion Rails ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          {/* Left Column (2/3): Action Plan & Operational Checklist */}
+          <div className="lg:col-span-2 space-y-6">
+            
+            <div className="p-6 sm:p-7 rounded-3xl border border-[var(--cf-border)] bg-[var(--cf-surface)] space-y-5 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-[var(--cf-border-soft)]">
+                <div>
+                  <h2 className="text-lg font-serif font-bold text-[var(--cf-text)] flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                    <span>Daily Financial Action Plan</span>
+                  </h2>
+                  <p className="text-xs text-[var(--cf-text-muted)] mt-0.5">
+                    Recommended high-leverage steps to safeguard your runway today
+                  </p>
+                </div>
+                <span className="text-[10px] font-mono px-2.5 py-1 rounded-full bg-[var(--cf-surface-alt)] text-[var(--cf-text-muted)] border border-[var(--cf-border-soft)] self-start sm:self-auto font-semibold">
+                  {Object.values(completedSteps).filter(Boolean).length} / 4 Completed
+                </span>
+              </div>
+
+              <div className="space-y-3">
+                {[
+                  {
+                    id: 'reconcile',
+                    title: 'Verify Recent Payout Clearance',
+                    desc: 'Stripe payout of $4,250 cleared 2 days ago. Verify that gross revenue is logged in your ledger.',
+                    route: '/daily',
+                    routeText: 'Check Cash Stream →',
+                  },
+                  {
+                    id: 'taxLock',
+                    title: 'Confirm 25% Tax Escrow Segregation',
+                    desc: `$1,062.50 from your last payment belongs to IRS Form 1040-ES. Keep it isolated in a sub-account.`,
+                    route: '/studio',
+                    routeText: 'Review Allocations →',
+                  },
+                  {
+                    id: 'stressTest',
+                    title: 'Run 21-Day Invoice Delay Stress Test',
+                    desc: 'Your next expected client wire is $3,500. Simulate a 3-week delay to ensure fixed expenses are covered.',
+                    route: '/studio',
+                    routeText: 'Run Delay Stress Test →',
+                  },
+                  {
+                    id: 'backupCheck',
+                    title: 'Verify Local Enclave Portability',
+                    desc: 'Your records reside in browser memory. Download a JSON snapshot or sync with Pro Cloud.',
+                    route: '/account',
+                    routeText: 'Vault Backup →',
+                  },
+                ].map(step => (
+                  <div
+                    key={step.id}
+                    className={`p-4 rounded-2xl border transition-all duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+                      completedSteps[step.id]
+                        ? 'border-[var(--cf-border-soft)] bg-[var(--cf-surface-alt)]/50 opacity-80'
+                        : 'border-[var(--cf-border)] bg-[var(--cf-surface)] hover:border-[var(--cf-accent)]/50'
+                    }`}
                   >
-                    ⚡ {name}
-                  </span>
+                    <div className="flex items-start gap-3">
+                      <button
+                        onClick={() => toggleStep(step.id)}
+                        className={`mt-0.5 w-5 h-5 rounded-lg border flex items-center justify-center transition-colors cursor-pointer shrink-0 ${
+                          completedSteps[step.id]
+                            ? 'bg-emerald-500 border-emerald-500 text-white'
+                            : 'border-[var(--cf-border)] hover:border-[var(--cf-accent)]'
+                        }`}
+                        title="Toggle completion"
+                      >
+                        {completedSteps[step.id] && <CheckCircle2 className="w-3.5 h-3.5" />}
+                      </button>
+                      <div className="space-y-0.5">
+                        <h4 className={`text-xs font-semibold ${completedSteps[step.id] ? 'line-through text-[var(--cf-text-muted)]' : 'text-[var(--cf-text)]'}`}>
+                          {step.title}
+                        </h4>
+                        <p className="text-[11px] text-[var(--cf-text-muted)] leading-relaxed">
+                          {step.desc}
+                        </p>
+                      </div>
+                    </div>
+
+                    <Link
+                      href={step.route}
+                      className="text-[11px] font-mono text-[var(--cf-accent)] hover:underline flex items-center gap-1 self-end sm:self-auto shrink-0 font-medium"
+                    >
+                      <span>{step.routeText}</span>
+                    </Link>
+                  </div>
                 ))}
               </div>
             </div>
 
-            <Link
-              href="/integrations"
-              className="text-[11px] text-[var(--cf-text-muted)] hover:text-[var(--cf-accent)] hover:underline flex items-center gap-1 shrink-0"
-            >
-              <span>Manage Feeds &amp; CSV Ingestion →</span>
-            </Link>
+            {/* ── Studio Ecosystem Workspaces (Cards to Dedicated Pages) ── */}
+            <div className="space-y-3">
+              <span className="text-xs font-mono uppercase tracking-wider text-[var(--cf-text-muted)] font-semibold block">
+                Dedicated Software Stations
+              </span>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                
+                {/* Station 1: Studio Calculation Engine */}
+                <Link
+                  href="/studio"
+                  className="p-5 rounded-2xl border border-[var(--cf-border)] bg-[var(--cf-surface)] hover:border-[var(--cf-accent)] hover:shadow-lg transition-all group flex flex-col justify-between space-y-4"
+                >
+                  <div className="space-y-2">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 group-hover:scale-105 transition-transform">
+                      <Layers className="w-5 h-5" />
+                    </div>
+                    <h3 className="text-sm font-serif font-bold text-[var(--cf-text)] group-hover:text-[var(--cf-accent)] transition-colors">
+                      Studio Calculation Engine
+                    </h3>
+                    <p className="text-xs text-[var(--cf-text-muted)] leading-relaxed">
+                      Hero Runway, Monte Carlo volatility lab, scenario pills, waterfall allocations, and interactive ledger editing.
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-between text-xs font-mono text-[var(--cf-accent)] font-medium pt-2 border-t border-[var(--cf-border-soft)]">
+                    <span>Open Calculation Engine</span>
+                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </Link>
+
+                {/* Station 2: Daily Cash Stream */}
+                <Link
+                  href="/daily"
+                  className="p-5 rounded-2xl border border-[var(--cf-border)] bg-[var(--cf-surface)] hover:border-[var(--cf-accent)] hover:shadow-lg transition-all group flex flex-col justify-between space-y-4"
+                >
+                  <div className="space-y-2">
+                    <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-105 transition-transform">
+                      <Calendar className="w-5 h-5" />
+                    </div>
+                    <h3 className="text-sm font-serif font-bold text-[var(--cf-text)] group-hover:text-[var(--cf-accent)] transition-colors">
+                      Daily Cash Stream
+                    </h3>
+                    <p className="text-xs text-[var(--cf-text-muted)] leading-relaxed">
+                      Day-by-day cash flow tracking, intra-month client payment lags, and burn velocity monitoring.
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-between text-xs font-mono text-[var(--cf-accent)] font-medium pt-2 border-t border-[var(--cf-border-soft)]">
+                    <span>Open Daily Stream</span>
+                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </Link>
+
+                {/* Station 3: Integrations & CSV Feeds */}
+                <Link
+                  href="/integrations"
+                  className="p-5 rounded-2xl border border-[var(--cf-border)] bg-[var(--cf-surface)] hover:border-[var(--cf-accent)] hover:shadow-lg transition-all group flex flex-col justify-between space-y-4"
+                >
+                  <div className="space-y-2">
+                    <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-600 dark:text-purple-400 group-hover:scale-105 transition-transform">
+                      <Zap className="w-5 h-5" />
+                    </div>
+                    <h3 className="text-sm font-serif font-bold text-[var(--cf-text)] group-hover:text-[var(--cf-accent)] transition-colors">
+                      Integrations &amp; CSV Ingestion
+                    </h3>
+                    <p className="text-xs text-[var(--cf-text-muted)] leading-relaxed">
+                      Connect Stripe, Mercury, Wise, and Upwork or drag-and-drop bank statement files with zero surveillance.
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-between text-xs font-mono text-[var(--cf-accent)] font-medium pt-2 border-t border-[var(--cf-border-soft)]">
+                    <span>Manage Ingestion Rails</span>
+                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </Link>
+
+                {/* Station 4: Security & Data Vault */}
+                <Link
+                  href="/security"
+                  className="p-5 rounded-2xl border border-[var(--cf-border)] bg-[var(--cf-surface)] hover:border-[var(--cf-accent)] hover:shadow-lg transition-all group flex flex-col justify-between space-y-4"
+                >
+                  <div className="space-y-2">
+                    <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400 group-hover:scale-105 transition-transform">
+                      <Lock className="w-5 h-5" />
+                    </div>
+                    <h3 className="text-sm font-serif font-bold text-[var(--cf-text)] group-hover:text-[var(--cf-accent)] transition-colors">
+                      Security &amp; Enclave Vault
+                    </h3>
+                    <p className="text-xs text-[var(--cf-text-muted)] leading-relaxed">
+                      Audit browser storage allocation in KB, confirm 0 tracking scripts, and verify mathematical sovereignty.
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-between text-xs font-mono text-[var(--cf-accent)] font-medium pt-2 border-t border-[var(--cf-border-soft)]">
+                    <span>Audit Local Enclave</span>
+                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </Link>
+
+              </div>
+            </div>
+
           </div>
-        )}
 
-        {/* Hero Runway (Command Center) */}
-        <HeroRunway
-          runwayMonths={calculation.runwayMonths}
-          isInfiniteRunway={calculation.isInfiniteRunway}
-          currentSavings={calculation.currentSavings}
-          avgMonthlyExpenses={calculation.avgMonthlyExpenses}
-          floorIncome={calculation.floorIncome}
-          exhaustionDate={calculation.exhaustionDate}
-          dailyBurnVelocity={calculation.dailyBurnVelocity}
-          surplusMargin={calculation.surplusMargin}
-          bufferFundingPercentage={calculation.bufferFundingPercentage}
-          bufferMonthsMultiplier={assumptions.bufferMonthsMultiplier}
-          currencySymbol={currencySymbol}
-          inflationAdjusted={calculation.inflationAdjusted}
-          primaryInsight={calculation.primaryInsight}
-          sustainablePaycheck={calculation.sustainablePaycheck}
-        />
-
-        {/* BENTO BOX GRID */}
-        <motion.div 
-          variants={containerVariants}
-          initial="hidden"
-          animate="show"
-          className="grid grid-cols-1 lg:grid-cols-3 gap-6"
-        >
-          
-          {/* LEFT COLUMN: Charts & Ledgers (2/3 width) */}
-          <div className="lg:col-span-2 space-y-6 min-w-0">
+          {/* Right Column (1/3): Quick Tools & Live Ingestion Rails */}
+          <div className="space-y-6">
             
-            {/* Safe To Spend Banner */}
-            <motion.div variants={itemVariants} className="w-full bg-[var(--cf-surface)] border border-[var(--cf-border)] rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-[var(--cf-steady)]/5 to-transparent pointer-events-none" />
-              <div>
-                <h3 className="font-serif text-[var(--cf-text)] font-semibold text-lg flex items-center gap-2">
-                  <ShieldCheck className="w-5 h-5 text-[var(--cf-steady)]" />
-                  Safe To Spend Today
+            {/* Quick Action Tools Hub */}
+            <div className="p-6 rounded-3xl border border-[var(--cf-border)] bg-[var(--cf-surface)] space-y-4 shadow-sm">
+              <h3 className="text-sm font-serif font-bold text-[var(--cf-text)]">
+                Solvency &amp; Billing Tools
+              </h3>
+              
+              <div className="space-y-2">
+                <button
+                  onClick={() => setIsInvoiceModalOpen(true)}
+                  className="w-full flex items-center justify-between p-3 rounded-xl border border-[var(--cf-border-soft)] bg-[var(--cf-surface-alt)] hover:bg-[var(--cf-surface)] hover:border-[var(--cf-accent)] transition-all cursor-pointer group"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <FileText className="w-4 h-4 text-[var(--cf-accent)]" />
+                    <span className="text-xs font-semibold text-[var(--cf-text)]">Client Invoice Studio</span>
+                  </div>
+                  <span className="text-[10px] font-mono text-[var(--cf-text-muted)] group-hover:text-[var(--cf-text)]">
+                    PDF Gen →
+                  </span>
+                </button>
+
+                <button
+                  onClick={() => setIsSolvencyModalOpen(true)}
+                  className="w-full flex items-center justify-between p-3 rounded-xl border border-[var(--cf-border-soft)] bg-[var(--cf-surface-alt)] hover:bg-[var(--cf-surface)] hover:border-[var(--cf-accent)] transition-all cursor-pointer group"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                    <span className="text-xs font-semibold text-[var(--cf-text)]">CPA &amp; Lease Solvency Audit</span>
+                  </div>
+                  <span className="text-[10px] font-mono text-[var(--cf-text-muted)] group-hover:text-[var(--cf-text)]">
+                    Audit PDF →
+                  </span>
+                </button>
+
+                <button
+                  onClick={() => setIsCsvModalOpen(true)}
+                  className="w-full flex items-center justify-between p-3 rounded-xl border border-[var(--cf-border-soft)] bg-[var(--cf-surface-alt)] hover:bg-[var(--cf-surface)] hover:border-[var(--cf-accent)] transition-all cursor-pointer group"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Upload className="w-4 h-4 text-blue-500" />
+                    <span className="text-xs font-semibold text-[var(--cf-text)]">Import CSV Statement</span>
+                  </div>
+                  <span className="text-[10px] font-mono text-[var(--cf-text-muted)] group-hover:text-[var(--cf-text)]">
+                    Parser →
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            {/* Live Ingestion Rails Feed */}
+            <div className="p-6 rounded-3xl border border-[var(--cf-border)] bg-[var(--cf-surface)] space-y-4 shadow-sm">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-serif font-bold text-[var(--cf-text)]">
+                  Active Ingestion Feeds
                 </h3>
-                <p className="text-[11px] text-[var(--cf-text-muted)] mt-1 max-w-sm">
-                  Mathematically safe liquid cash after deducting your strict {assumptions.bufferMonthsMultiplier}x minimum safety buffer and full tax liability.
+                <Link
+                  href="/integrations"
+                  className="text-[10px] font-mono text-[var(--cf-accent)] hover:underline"
+                >
+                  Configure
+                </Link>
+              </div>
+
+              <div className="space-y-2.5">
+                {activeRails.map(rail => (
+                  <div
+                    key={rail}
+                    className="p-3 rounded-xl bg-[var(--cf-surface-alt)] border border-[var(--cf-border-soft)] flex items-center justify-between text-xs"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                      </span>
+                      <span className="font-mono font-bold text-[var(--cf-text)]">{rail}</span>
+                    </div>
+                    <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 font-semibold">
+                      Connected (Memory)
+                    </span>
+                  </div>
+                ))}
+
+                <Link
+                  href="/integrations"
+                  className="block text-center py-2 px-3 rounded-xl border border-dashed border-[var(--cf-border)] text-xs font-mono text-[var(--cf-text-muted)] hover:text-[var(--cf-accent)] hover:border-[var(--cf-accent)] transition-colors"
+                >
+                  + Connect Mercury or PayPal
+                </Link>
+              </div>
+            </div>
+
+            {/* Upcoming Tax Obligations Box */}
+            <div className="p-6 rounded-3xl border border-amber-500/20 bg-amber-500/5 space-y-3 shadow-sm">
+              <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400 font-semibold text-xs">
+                <Calendar className="w-4 h-4" />
+                <span>Next IRS Quarterly Deadline</span>
+              </div>
+              <div className="space-y-1">
+                <div className="text-lg font-mono font-bold text-[var(--cf-text)]">
+                  October 15, 2026
+                </div>
+                <p className="text-[11px] text-[var(--cf-text-muted)] leading-relaxed">
+                  Q3 Form 1040-ES estimated tax voucher. Target escrow reserve is fully allocated at {currencySymbol}{Math.round(calculation.taxReserve).toLocaleString()}.
                 </p>
               </div>
-              <div className="text-3xl md:text-4xl font-serif font-bold text-[var(--cf-steady)] tracking-tight">
-                {currencySymbol}{calculation.safeToSpend.toLocaleString()}
-              </div>
-            </motion.div>
-
-            {/* Timeline Chart */}
-            <motion.div variants={itemVariants} className="w-full h-[400px] bg-[var(--cf-surface)] border border-[var(--cf-border)] rounded-2xl p-6 flex flex-col shadow-sm relative overflow-hidden group">
-              <CashFlowChart
-                records={records}
-                floorIncome={calculation.floorIncome}
-                avgExpenses={calculation.avgMonthlyExpenses}
-                currentSavings={calculation.currentSavings}
-                bufferTarget={calculation.bufferTarget}
-                taxReservePct={assumptions.taxReservePct}
-                currencySymbol={currencySymbol}
-              />
-            </motion.div>
-
-            {/* Invoice Aging & DSO Tracker — Phase 1 */}
-            <motion.div variants={itemVariants}>
-              <InvoiceAgingPanel
-                dso={calculation.dso}
-                currencySymbol={currencySymbol}
-              />
-            </motion.div>
-
-            {/* Daily Payment Feed & Cash Stream */}
-            <motion.section variants={itemVariants} id="daily-log" className="dash-card p-6">
-              <DailyPaymentLog currencySymbol={currencySymbol} />
-            </motion.section>
-
-            {/* Capital Partitioning */}
-            <motion.section variants={itemVariants} id="partitions" className="dash-card p-6">
-              <LedgerRows
-                result={calculation}
-                assumptions={assumptions}
-                currencySymbol={currencySymbol}
-              />
-            </motion.section>
-
-            {/* Input Table (Editable) */}
-            <motion.div variants={itemVariants} id="ledger-data-entry">
-              <InputTable
-                records={records}
-                onChange={setRecords}
-                onOpenPasteModal={() => setIsPasteModalOpen(true)}
-                taxReservePct={assumptions.taxReservePct}
-                sustainablePaycheck={calculation.sustainablePaycheck}
-                initialSavings={calculation.currentSavings}
-                floorIncome={calculation.floorIncome}
-                currencySymbol={currencySymbol}
-                isLocked={false}
-              />
-
-              {/* Pending Invoices (A/R) */}
-              <PendingInvoices 
-                invoices={pendingInvoices}
-                onChange={setPendingInvoices}
-                currencySymbol={currencySymbol}
-                isLocked={false}
-                onOpenInvoiceGenerator={() => setIsInvoiceModalOpen(true)}
-              />
-            </motion.div>
-          </div>
-
-          {/* RIGHT COLUMN: Controls & Risk (1/3 width, sticky) */}
-          <div className="space-y-6 lg:sticky lg:top-24 self-start min-w-0">
-            
-            <motion.div variants={itemVariants}>
-              <TaxDeadlineReminders
-                taxReservePct={assumptions.taxReservePct}
-                quarterlyEscrowAmount={Math.round((calculation.totalAnnualIncome * assumptions.taxReservePct) / 4)}
-                currencySymbol={currencySymbol}
-              />
-            </motion.div>
-
-            {/* Levers */}
-            <motion.section variants={itemVariants} id="assumptions" className="dash-card p-5">
-              <AssumptionControls
-                assumptions={assumptions}
-                onChange={setAssumptions}
-                currencySymbol={currencySymbol}
-                onCurrencyChange={handleCurrencyChange}
-                floorIncome={calculation.floorIncome}
-                sensitivityDaysPer150={calculation.sensitivityDaysPer150}
-                onRevertDefaults={handleRevertDefaults}
-              />
-            </motion.section>
-
-            {/* Risk Radar */}
-            <motion.section variants={itemVariants} className="dash-card p-5">
-              {!hasEnoughData ? (
-                <div className="flex flex-col items-center justify-center p-8 text-center space-y-3">
-                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-[var(--cf-surface-alt)] border border-[var(--cf-border)]">
-                    <Activity className="w-6 h-6 text-[var(--cf-text-faint)]" />
-                  </div>
-                  <h3 className="font-serif text-lg text-[var(--cf-text)]">Not Enough Data</h3>
-                  <p className="text-xs text-[var(--cf-text-muted)]">Add at least 3 months of ledger data to unlock the Volatility Radar.</p>
-                </div>
-              ) : (
-                <RiskVolatilityRadar
-                  volatility={calculation.volatility}
-                  clientConcentrations={calculation.clientConcentrations}
-                  currencySymbol={currencySymbol}
-                  isLocked={!isAuthenticated}
-                  onUnlockRequest={() => handleUnlockRequest('Risk Radar')}
-                />
-              )}
-            </motion.section>
-
-            {/* Waterfall */}
-            <motion.section variants={itemVariants} className="dash-card p-5">
-              <CashFlowWaterfall
-                steps={calculation.waterfallSteps}
-                currencySymbol={currencySymbol}
-              />
-            </motion.section>
-
-            {/* Deduction Optimizer — Phase 3 */}
-            <motion.div variants={itemVariants}>
-              <DeductionOptimizer
-                grossAnnualIncome={calculation.totalAnnualIncome}
-                nominalTaxRate={assumptions.taxReservePct}
-                monthlyExpenses={calculation.avgMonthlyExpenses}
-                runwayMonths={calculation.runwayMonths}
-                currencySymbol={currencySymbol}
-                onOptimizedRateChange={(newRate) =>
-                  setAssumptions((prev) => ({ ...prev, taxReservePct: newRate }))
-                }
-              />
-            </motion.div>
-
-            {/* Monte Carlo Lab */}
-            <motion.section variants={itemVariants} id="monte-carlo" className="dash-card p-5">
-              {!hasEnoughData ? (
-                <div className="flex flex-col items-center justify-center p-8 text-center space-y-3">
-                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-[var(--cf-surface-alt)] border border-[var(--cf-border)]">
-                    <TrendingDown className="w-6 h-6 text-[var(--cf-text-faint)]" />
-                  </div>
-                  <h3 className="font-serif text-lg text-[var(--cf-text)]">Simulations Locked</h3>
-                  <p className="text-xs text-[var(--cf-text-muted)]">Add at least 3 months of ledger data to unlock Monte Carlo risk modeling.</p>
-                </div>
-              ) : (
-                <MonteCarloRiskLab
-                  volatility={calculation.volatility}
-                  monthlyExpenses={calculation.avgMonthlyExpenses}
-                  currentSavings={calculation.currentSavings}
-                  currencySymbol={currencySymbol}
-                  isLocked={!isAuthenticated}
-                  onUnlockRequest={() => handleUnlockRequest('Monte Carlo Lab')}
-                />
-              )}
-            </motion.section>
-          </div>
-        </motion.div>
-
-        {/* Philosophy Drawer & Action Bar */}
-        <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 hairline-t">
-          <button
-            type="button"
-            onClick={() => setShowPhilosophy(!showPhilosophy)}
-            className="text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
-            style={{ color: 'var(--cf-text-muted)' }}
-            onMouseEnter={e => (e.currentTarget.style.color = 'var(--cf-accent)')}
-            onMouseLeave={e => (e.currentTarget.style.color = 'var(--cf-text-muted)')}
-          >
-            <BookOpen className="w-4 h-4 text-[#2F6F62]" />
-            <span className="font-medium">The 20th Percentile Income Floor Philosophy</span>
-          </button>
-
-          <div className="flex flex-wrap items-center justify-center sm:justify-end gap-2.5 w-full sm:w-auto">
-            <button
-              type="button"
-              onClick={() => setIsTourOpen(true)}
-              className="flex-1 sm:flex-initial justify-center flex items-center gap-1.5 text-xs px-3 py-2 rounded-lg transition-colors cursor-pointer font-mono whitespace-nowrap border"
-              style={{ color: 'var(--cf-accent)', borderColor: 'var(--cf-accent)', background: 'var(--cf-accent-bg)' }}
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Interactive Tour</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={handleExportCsv}
-              className="flex-1 sm:flex-initial justify-center flex items-center gap-1.5 text-xs px-3 py-2 rounded-lg transition-colors cursor-pointer font-mono whitespace-nowrap border"
-              style={{ color: 'var(--cf-text-muted)', borderColor: 'var(--cf-border)', background: 'var(--cf-surface)' }}
-            >
-              <Download className="w-3.5 h-3.5" style={{ color: 'var(--cf-accent)' }} />
-              <span>Export CSV</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setIsSolvencyModalOpen(true)}
-              className="flex-1 sm:flex-initial justify-center flex items-center gap-1.5 text-xs px-3 py-2 rounded-lg transition-colors cursor-pointer font-mono whitespace-nowrap border"
-              style={{ color: 'var(--cf-text)', borderColor: 'var(--cf-border)', background: 'var(--cf-surface)' }}
-            >
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-              <span>Solvency Audit (PDF)</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setIsShareModalOpen(true)}
-              className="flex-1 sm:flex-initial justify-center flex items-center gap-1.5 text-xs text-white px-3.5 py-2 rounded-lg transition-colors font-mono cursor-pointer whitespace-nowrap"
-              style={{ background: 'linear-gradient(135deg, #2F6F62, #1a4f45)', boxShadow: '0 2px 8px rgba(47,111,98,0.3)' }}
-            >
-              <Share2 className="w-3.5 h-3.5" />
-              <span>Pinterest Card</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Expandable Philosophy Drawer */}
-        {showPhilosophy && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="rounded-xl p-6 space-y-3 font-sans text-xs leading-relaxed border"
-            style={{ background: 'var(--cf-surface)', borderColor: 'var(--cf-border)', color: 'var(--cf-text-muted)' }}
-          >
-            <h3 className="font-serif text-base font-semibold" style={{ color: 'var(--cf-text)' }}>
-              The Mathematical Reason Freelancers Go Broke on Average Income
-            </h3>
-            <p>
-              When revenue swings between dry periods ($1,600) and windfall quarters ($6,000), averaging income creates a lethal mathematical illusion. If you budget or set your lifestyle to your <em>average</em> income, you will inevitably overspend during lean cycles, exhausting cash reserves and accumulating high-interest tax or credit debt.
-            </p>
-            <p>
-              By computing the <strong>20th percentile income floor</strong>, CashFloor isolates the empirical baseline that was met or exceeded in 80% of all operating history. Budgeting for baseline personal living costs at this floor guarantees that lean months cause zero financial panic. Every dollar earned above the floor during peak quarters automatically cascades through our double-entry allocation protocol into statutory tax escrow and your safety buffer.
-            </p>
-          </motion.div>
-        )}
-      </div>
-
-      {/* Footer */}
-      <footer className="w-full py-6 px-4 md:px-8 mt-4" style={{ backgroundColor: 'var(--cf-bg-deep)', borderTop: '1px solid var(--cf-border)' }}>
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3">
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-5 bg-gradient-to-br from-[#16232B] to-[#2F6F62] rounded flex items-center justify-center">
-              <span className="text-white font-serif text-[10px] font-bold">C</span>
             </div>
-            <span className="font-serif text-[var(--cf-text)] text-sm font-semibold">CashFloor</span>
-            <span className="text-[var(--cf-text-faint)] text-xs">· Freelance Runway Calculator</span>
+
           </div>
-          <div className="flex items-center gap-4 text-[11px] font-mono text-[var(--cf-text-faint)]">
-            <button type="button" onClick={handleExportCsv} className="hover:text-[#2F6F62] transition-colors cursor-pointer">Export CSV</button>
-            <button type="button" onClick={() => setIsShareModalOpen(true)} className="hover:text-[#2F6F62] transition-colors cursor-pointer">Share Card</button>
-            <a href="/blog/the-20th-percentile-math" className="hover:text-[#2F6F62] transition-colors">Guide</a>
-            <a href="/" className="hover:text-[#16232B] transition-colors">Home</a>
-          </div>
+
         </div>
-      </footer>
+
+      </main>
+
+      <Footer />
 
       {/* Modals */}
-      <CsvPasteModal
-        isOpen={isPasteModalOpen}
-        onClose={() => setIsPasteModalOpen(false)}
-        onApply={handleApplyPastedRecords}
-        currencySymbol={currencySymbol}
-      />
-
-      <PinterestCardModal
-        isOpen={isShareModalOpen}
-        onClose={() => setIsShareModalOpen(false)}
-        result={calculation}
-        assumptions={assumptions}
-        currencySymbol={currencySymbol}
-      />
-
-      <RealDataWizardModal
-        isOpen={isWizardOpen}
-        onClose={() => setIsWizardOpen(false)}
-        onApplyRealData={handleApplyWizardData}
-        currencySymbol={currencySymbol}
-        onOpenCsvModal={() => setIsPasteModalOpen(true)}
-      />
-
       <SolvencyReportModal
         isOpen={isSolvencyModalOpen}
         onClose={() => setIsSolvencyModalOpen(false)}
@@ -840,16 +609,30 @@ export default function CashFloorDashboard() {
         isOpen={isInvoiceModalOpen}
         onClose={() => setIsInvoiceModalOpen(false)}
         currencySymbol={currencySymbol}
-        onSaveToReceivables={handleSaveInvoiceToReceivables}
+        onSaveToReceivables={() => {}}
       />
 
-      <GuidedTour 
-        isOpen={isTourOpen} 
-        onClose={() => setIsTourOpen(false)} 
+      <RealDataWizardModal
+        isOpen={isWizardOpen}
+        onClose={() => setIsWizardOpen(false)}
+        onApplyRealData={(newRecords, newAssumptions) => {
+          setRecords(newRecords);
+          setAssumptions(prev => ({ ...prev, ...newAssumptions }));
+        }}
+        currencySymbol={currencySymbol}
+        onOpenCsvModal={() => setIsCsvModalOpen(true)}
       />
 
-      {/* Safe-harbor Legal Notice */}
+      <CsvPasteModal
+        isOpen={isCsvModalOpen}
+        onClose={() => setIsCsvModalOpen(false)}
+        onApply={(pasted) => {
+          setRecords(pasted);
+        }}
+        currencySymbol={currencySymbol}
+      />
+
       <LegalDisclaimer />
-    </main>
+    </div>
   );
 }

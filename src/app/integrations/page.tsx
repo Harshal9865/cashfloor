@@ -400,9 +400,9 @@ export default function IntegrationsPage() {
             return (
               <motion.div
                 key={tool.id}
-                whileHover={{ y: -3 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                className="rounded-3xl border p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 relative overflow-hidden"
+                whileHover={{ y: -6, scale: 1.012 }}
+                transition={{ type: 'spring', stiffness: 320, damping: 24 }}
+                className="rounded-3xl border p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 relative overflow-hidden group hover:border-[var(--cf-accent)]/60 hover:shadow-2xl cursor-default"
                 style={{
                   background: 'var(--cf-surface)',
                   borderColor: isConnected ? 'var(--cf-accent)' : 'var(--cf-border)',
@@ -411,6 +411,9 @@ export default function IntegrationsPage() {
                     : 'var(--cf-shadow-sm)',
                 }}
               >
+                {/* Dynamic Holographic Hover Accent Glow */}
+                <div className="absolute inset-0 bg-gradient-to-br from-[var(--cf-accent)]/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+
                 {/* Glowing Background Overlay when connected */}
                 {isConnected && (
                   <div className="absolute inset-0 bg-gradient-to-br from-[var(--cf-accent-glow)] to-transparent pointer-events-none opacity-25" />
@@ -420,13 +423,13 @@ export default function IntegrationsPage() {
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
                       <div 
-                        className="w-11 h-11 rounded-2xl flex items-center justify-center font-bold text-white shadow-md text-base shrink-0"
+                        className="w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-white shadow-md text-base shrink-0 group-hover:scale-110 group-hover:rotate-1 transition-transform duration-300"
                         style={{ background: tool.color }}
                       >
                         {tool.logoText}
                       </div>
                       <div>
-                        <h2 className="text-base font-serif font-bold text-[var(--cf-text)]">
+                        <h2 className="text-base font-serif font-bold text-[var(--cf-text)] group-hover:text-[var(--cf-accent)] transition-colors">
                           {tool.name}
                         </h2>
                         <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--cf-text-faint)]">

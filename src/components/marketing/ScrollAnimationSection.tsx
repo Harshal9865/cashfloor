@@ -15,14 +15,14 @@ export default function ScrollAnimationSection() {
   // Ultra-smooth physics for luxurious parallax
   const smoothProgress = useSpring(scrollYProgress, { stiffness: 40, damping: 25, restDelta: 0.001 });
 
-  // Parallax transforms for floating elements with wider spreads
-  const y1 = useTransform(smoothProgress, [0, 1], [100, -300]);
-  const y2 = useTransform(smoothProgress, [0, 1], [200, -400]);
-  const y3 = useTransform(smoothProgress, [0, 1], [50, -200]);
-  const y4 = useTransform(smoothProgress, [0, 1], [150, -350]);
+  // Parallax transforms constrained to card container bounds to prevent text collision
+  const y1 = useTransform(smoothProgress, [0, 1], [40, -80]);
+  const y2 = useTransform(smoothProgress, [0, 1], [60, -90]);
+  const y3 = useTransform(smoothProgress, [0, 1], [20, -70]);
+  const y4 = useTransform(smoothProgress, [0, 1], [50, -85]);
   
   // Subtle scaling and opacity for the center card to give a "breathing" effect
-  const scaleCenter = useTransform(smoothProgress, [0.2, 0.5, 0.8], [0.95, 1.02, 0.95]);
+  const scaleCenter = useTransform(smoothProgress, [0.2, 0.5, 0.8], [0.96, 1.02, 0.96]);
   
   // Mouse tilt effect physics
   const mouseX = useSpring(0, { stiffness: 150, damping: 20 });
@@ -53,21 +53,32 @@ export default function ScrollAnimationSection() {
   };
 
   return (
-    <section ref={containerRef} className="relative py-40 overflow-hidden bg-[var(--cf-bg)] border-y border-[var(--cf-border)]">
+    <section ref={containerRef} className="relative py-32 md:py-44 overflow-hidden bg-[var(--cf-bg)] border-y border-[var(--cf-border)]">
       {/* Background Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[var(--cf-accent)]/10 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 md:px-8 relative z-10 flex flex-col items-center">
         
-        <div className="text-center mb-24 max-w-3xl">
+        {/* Header with high-craft typography */}
+        <div className="text-center mb-20 max-w-3xl">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-mono font-medium border border-emerald-500/25 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 mb-6"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span>Algorithmic Solvency Engine</span>
+          </motion.div>
+
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="font-serif text-5xl md:text-7xl font-bold text-[var(--cf-text)] tracking-tight leading-tight mb-6"
+            className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-[var(--cf-text)] tracking-tight leading-[1.12] mb-6"
           >
             Engineered for <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--cf-steady)] to-[var(--cf-warm)]">
+            <span className="italic font-serif bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 via-teal-500 to-amber-600 dark:from-[#3DE8C8] dark:via-emerald-300 dark:to-[#F5C97A]">
               absolute certainty.
             </span>
           </motion.h2>
@@ -76,7 +87,7 @@ export default function ScrollAnimationSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-lg md:text-xl text-[var(--cf-text-muted)] leading-relaxed"
+            className="text-base sm:text-lg md:text-xl text-[var(--cf-text-muted)] max-w-2xl mx-auto leading-relaxed font-sans"
           >
             Interactive financial modeling that turns unpredictable freelance income into a mathematically secure runway.
           </motion.p>
