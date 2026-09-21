@@ -60,6 +60,10 @@ export function RealDataWizardModal({
   if (!isOpen) return null;
 
   const totalMonthlyBurn = housingCost + livingCost + softwareTools + insuranceCost;
+  const estFloorIncome = inputMode === 'quick' 
+    ? Math.round(worstMonthIncome + (typicalMonthIncome - worstMonthIncome) * 0.25)
+    : Math.round(exactIncomes.slice().sort((a,b) => a - b)[Math.floor(exactIncomes.length * 0.2)] || 0);
+  const estRunwayMonths = totalMonthlyBurn > 0 ? (currentCash / totalMonthlyBurn).toFixed(1) : '0.0';
 
   const handleFinish = () => {
     let finalMonthlyIncomes: number[] = [];
@@ -444,6 +448,27 @@ export function RealDataWizardModal({
                     <span className="absolute right-3 top-2.5 text-xs font-mono text-[var(--cf-text-faint)]">
                       %
                     </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Instant Calibration Preview */}
+              <div className="p-4 rounded-2xl border border-[var(--cf-border)] bg-[var(--cf-surface-alt)] space-y-2.5">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--cf-accent)] font-bold block">
+                  ⚡ Instant Calibration Preview
+                </span>
+                <div className="grid grid-cols-3 gap-2 text-center">
+                  <div className="p-2.5 rounded-xl bg-[var(--cf-surface)] border border-[var(--cf-border-soft)]">
+                    <span className="text-[10px] font-mono text-[var(--cf-text-muted)] block">20th% Floor</span>
+                    <span className="font-serif text-sm font-bold text-[var(--cf-text)]">{currencySymbol}{estFloorIncome.toLocaleString()}/mo</span>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-[var(--cf-surface)] border border-[var(--cf-border-soft)]">
+                    <span className="text-[10px] font-mono text-[var(--cf-text-muted)] block">Monthly Burn</span>
+                    <span className="font-serif text-sm font-bold text-[#B4573F]">{currencySymbol}{totalMonthlyBurn.toLocaleString()}/mo</span>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-[var(--cf-surface)] border border-[var(--cf-border-soft)]">
+                    <span className="text-[10px] font-mono text-[var(--cf-text-muted)] block">Cash Runway</span>
+                    <span className="font-serif text-sm font-bold text-emerald-600">{estRunwayMonths} Mo</span>
                   </div>
                 </div>
               </div>

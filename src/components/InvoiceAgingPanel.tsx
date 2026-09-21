@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { DSOMetrics } from '../lib/calculator/types';
-import { Clock, AlertCircle, CheckCircle2, TrendingDown, FileText } from 'lucide-react';
+import { Clock, AlertCircle, CheckCircle2, TrendingDown, FileText, Mail, Check, Copy } from 'lucide-react';
 
 interface InvoiceAgingPanelProps {
   dso: DSOMetrics;
@@ -19,6 +19,9 @@ export const InvoiceAgingPanel: React.FC<InvoiceAgingPanelProps> = ({
   dso,
   currencySymbol = '$',
 }) => {
+  const [copiedReminder, setCopiedReminder] = useState(false);
+  const [showReminderDraft, setShowReminderDraft] = useState(false);
+
   const hasData = dso.dso > 0 || dso.totalOutstanding > 0 || dso.agingBuckets.some(b => b.count > 0);
 
   const dsoColor =
@@ -34,6 +37,29 @@ export const InvoiceAgingPanel: React.FC<InvoiceAgingPanelProps> = ({
       : dso.dsoRating === 'lagging'
       ? Clock
       : AlertCircle;
+
+  const reminderEmailTemplate = `Subject: Friendly follow-up: Outstanding invoice payment status
+
+Hi [Client Name],
+
+Hope you're having a productive week!
+
+I am following up on our outstanding invoice balance of ${currencySymbol}${dso.totalOutstanding.toLocaleString()}, which has recently crossed its payment terms.
+
+Could you kindly check if this invoice is scheduled in your next accounts payable disbursement? If you need me to resend the original PDF invoice or payment details, please let me know and I'll send it right over.
+
+Thank you so much for your partnership!
+
+Warm regards,
+[Your Name / Studio]`;
+
+  const handleCopyReminder = () => {
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(reminderEmailTemplate);
+      setCopiedReminder(true);
+      setTimeout(() => setCopiedReminder(false), 3000);
+    }
+  };
 
   return (
     <section
@@ -53,7 +79,7 @@ export const InvoiceAgingPanel: React.FC<InvoiceAgingPanelProps> = ({
               className="font-serif text-lg font-normal tracking-tight"
               style={{ color: 'var(--cf-text)' }}
             >
-              Invoice Aging & DSO Tracker
+              Invoice Aging &amp; DSO Tracker
             </h2>
           </div>
           <p className="text-xs" style={{ color: 'var(--cf-text-muted)' }}>
@@ -62,21 +88,71 @@ export const InvoiceAgingPanel: React.FC<InvoiceAgingPanelProps> = ({
         </div>
 
         {hasData && (
-          <div
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-mono border shrink-0"
-            style={{
-              color: dsoColor,
-              borderColor: `${dsoColor}44`,
-              background: `${dsoColor}11`,
-            }}
-          >
-            <StatusIcon className="w-3.5 h-3.5" />
-            <span className="font-semibold uppercase tracking-wider">
-              {dso.dsoRating}
-            </span>
+          <div className="flex items-center gap-2">
+            {dso.totalOutstanding > 0 && (
+              <button
+                type="button"
+                onClick={() => setShowReminderDraft(!showReminderDraft)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono border transition-all cursor-pointer hover:border-[var(--cf-accent)]"
+                style={{
+                  background: 'var(--cf-surface-alt)',
+                  borderColor: 'var(--cf-border)',
+                  color: 'var(--cf-text)',
+                }}
+              >
+                <Mail className="w-3.5 h-3.5 text-amber-500" />
+                <span>Follow-up Template</span>
+              </button>
+            )}
+
+            <div
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-mono border shrink-0"
+              style={{
+                color: dsoColor,
+                borderColor: `${dsoColor}44`,
+                background: `${dsoColor}11`,
+              }}
+            >
+              <StatusIcon className="w-3.5 h-3.5" />
+              <span className="font-semibold uppercase tracking-wider">
+                {dso.dsoRating}
+              </span>
+            </div>
           </div>
         )}
       </div>
+
+      {/* Draft Reminder Modal / Accordion */}
+      {showReminderDraft && (
+        <div className="p-4 rounded-2xl border border-amber-500/30 bg-amber-500/5 space-y-3 animate-fadeIn text-xs">
+          <div className="flex items-center justify-between">
+            <span className="font-mono font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+              <Mail className="w-3.5 h-3.5" />
+              <span>Gentle Client Reminder Email (Pre-calibrated)</span>
+            </span>
+            <button
+              type="button"
+              onClick={handleCopyReminder}
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[var(--cf-surface)] border border-[var(--cf-border)] font-mono text-[11px] text-[var(--cf-text)] hover:border-[var(--cf-accent)] transition-colors cursor-pointer"
+            >
+              {copiedReminder ? (
+                <>
+                  <Check className="w-3.5 h-3.5 text-emerald-500" />
+                  <span className="text-emerald-600 font-semibold">Copied!</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="w-3.5 h-3.5 text-[var(--cf-accent)]" />
+                  <span>Copy Template</span>
+                </>
+              )}
+            </button>
+          </div>
+          <pre className="p-3 rounded-xl bg-[var(--cf-surface)] border border-[var(--cf-border)] font-mono text-[11px] text-[var(--cf-text)] whitespace-pre-wrap leading-relaxed select-all">
+            {reminderEmailTemplate}
+          </pre>
+        </div>
+      )}
 
       {!hasData ? (
         /* Empty state */

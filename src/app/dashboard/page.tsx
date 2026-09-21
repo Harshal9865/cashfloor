@@ -30,6 +30,7 @@ import { useAuth } from '@/lib/auth/AuthContext';
 import { usePayment } from '@/lib/payment/PaymentContext';
 import { useEffect, useRef } from 'react';
 import { RealDataWizardModal } from '@/components/RealDataWizardModal';
+import { SolvencyReportModal } from '@/components/SolvencyReportModal';
 import { DailyPaymentLog } from '@/components/DailyPaymentLog';
 import { LegalDisclaimer } from '@/components/LegalDisclaimer';
 import { Share2, BookOpen, Download, Printer, Sparkles, ShieldCheck, HelpCircle, AlertTriangle, Upload, Activity, TrendingDown } from 'lucide-react';
@@ -71,6 +72,7 @@ export default function CashFloorDashboard() {
   const [isPasteModalOpen, setIsPasteModalOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isWizardOpen, setIsWizardOpen] = useState(false);
+  const [isSolvencyModalOpen, setIsSolvencyModalOpen] = useState(false);
   const [showPhilosophy, setShowPhilosophy] = useState(false);
   const [isTourOpen, setIsTourOpen] = useState(false);
 
@@ -296,6 +298,8 @@ export default function CashFloorDashboard() {
         onExportCsv={handleExportCsv}
         onOpenShareModal={() => setIsShareModalOpen(true)}
         onOpenAuthModal={() => openAuthModal()}
+        onOpenSolvencyModal={() => setIsSolvencyModalOpen(true)}
+        onOpenCalibrationWizard={() => setIsWizardOpen(true)}
         syncStatus={syncStatus}
         lastSavedAt={lastSavedAt}
       />
@@ -557,7 +561,11 @@ export default function CashFloorDashboard() {
           <div className="space-y-6 lg:sticky lg:top-24 self-start min-w-0">
             
             <motion.div variants={itemVariants}>
-              <TaxDeadlineReminders />
+              <TaxDeadlineReminders
+                taxReservePct={assumptions.taxReservePct}
+                quarterlyEscrowAmount={Math.round((calculation.totalAnnualIncome * assumptions.taxReservePct) / 4)}
+                currencySymbol={currencySymbol}
+              />
             </motion.div>
 
             {/* Levers */}
@@ -677,12 +685,12 @@ export default function CashFloorDashboard() {
 
             <button
               type="button"
-              onClick={handlePrintPdf}
+              onClick={() => setIsSolvencyModalOpen(true)}
               className="flex-1 sm:flex-initial justify-center flex items-center gap-1.5 text-xs px-3 py-2 rounded-lg transition-colors cursor-pointer font-mono whitespace-nowrap border"
-              style={{ color: 'var(--cf-text-muted)', borderColor: 'var(--cf-border)', background: 'var(--cf-surface)' }}
+              style={{ color: 'var(--cf-text)', borderColor: 'var(--cf-border)', background: 'var(--cf-surface)' }}
             >
-              <Printer className="w-3.5 h-3.5" style={{ color: 'var(--cf-text-faint)' }} />
-              <span>Print / PDF</span>
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+              <span>Solvency Audit (PDF)</span>
             </button>
 
             <button
@@ -760,6 +768,15 @@ export default function CashFloorDashboard() {
         onApplyRealData={handleApplyWizardData}
         currencySymbol={currencySymbol}
         onOpenCsvModal={() => setIsPasteModalOpen(true)}
+      />
+
+      <SolvencyReportModal
+        isOpen={isSolvencyModalOpen}
+        onClose={() => setIsSolvencyModalOpen(false)}
+        result={calculation}
+        assumptions={assumptions}
+        records={records}
+        currencySymbol={currencySymbol}
       />
 
       <GuidedTour 

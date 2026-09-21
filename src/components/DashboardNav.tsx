@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Download, Database, RotateCcw, Cloud, User, RefreshCw,
-  ChevronDown, LogOut, Share2, Check, Menu, X, Shield, Sparkles
+  ChevronDown, LogOut, Share2, Check, Menu, X, Shield, ShieldCheck, Sparkles
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/lib/auth/AuthContext';
@@ -18,6 +18,8 @@ interface DashboardNavProps {
   onExportCsv?: () => void;
   onOpenShareModal?: () => void;
   onOpenAuthModal?: () => void;
+  onOpenSolvencyModal?: () => void;
+  onOpenCalibrationWizard?: () => void;
   syncStatus?: 'offline' | 'saving' | 'synced' | 'error';
   lastSavedAt?: string | null;
 }
@@ -35,6 +37,8 @@ export default function DashboardNav({
   onExportCsv,
   onOpenShareModal,
   onOpenAuthModal,
+  onOpenSolvencyModal,
+  onOpenCalibrationWizard,
   syncStatus = 'offline',
   lastSavedAt,
 }: DashboardNavProps) {
@@ -228,6 +232,16 @@ export default function DashboardNav({
                 </button>
                 <button
                   type="button"
+                  onClick={onOpenSolvencyModal}
+                  title="CPA & Lease Solvency Report (PDF)"
+                  className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer border border-[var(--cf-border)] hover:border-[var(--cf-accent)]"
+                  style={{ color: 'var(--cf-text-muted)', background: 'var(--cf-surface)' }}
+                >
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+                  <span>Audit PDF</span>
+                </button>
+                <button
+                  type="button"
                   onClick={onOpenShareModal}
                   title="Share"
                   className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer"
@@ -342,6 +356,14 @@ export default function DashboardNav({
                           className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors cursor-pointer">
                           <Sparkles className="w-3.5 h-3.5 text-emerald-500" /> Subscription &amp; Billing
                         </Link>
+                        <button onClick={() => { setAvatarOpen(false); onOpenSolvencyModal?.(); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors cursor-pointer text-left">
+                          <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" /> CPA &amp; Lease Solvency Audit (PDF)
+                        </button>
+                        <button onClick={() => { setAvatarOpen(false); onOpenCalibrationWizard?.(); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors cursor-pointer text-left">
+                          <Sparkles className="w-3.5 h-3.5 text-amber-500" /> 60s Calibration Wizard
+                        </button>
                         
                         <div className="my-1 border-t" style={{ borderColor: 'var(--cf-border)' }}></div>
 
