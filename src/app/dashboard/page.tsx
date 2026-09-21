@@ -18,6 +18,9 @@ import { InputTable } from '@/components/InputTable';
 import { CsvPasteModal } from '@/components/CsvPasteModal';
 import { PinterestCardModal } from '@/components/PinterestCardModal';
 import { TaxDeadlineReminders } from '@/components/TaxDeadlineReminders';
+import { InvoiceAgingPanel } from '@/components/InvoiceAgingPanel';
+import { DeductionOptimizer } from '@/components/DeductionOptimizer';
+import { MonteCarloRiskLab } from '@/components/MonteCarloRiskLab';
 import { loadUserLedger, saveUserLedger, SyncStatus } from '@/lib/supabase/ledgerService';
 import { useAuth } from '@/lib/auth/AuthContext';
 import { useEffect, useRef } from 'react';
@@ -347,21 +350,21 @@ export default function Home() {
         </motion.div>
 
         {/* Hero Runway (Command Center) */}
-        <section id="runway" className="dash-card p-6 md:p-8">
-          <HeroRunway
-            runwayMonths={calculation.runwayMonths}
-            isInfiniteRunway={calculation.isInfiniteRunway}
-            currentSavings={calculation.currentSavings}
-            avgMonthlyExpenses={calculation.avgMonthlyExpenses}
-            floorIncome={calculation.floorIncome}
-            exhaustionDate={calculation.exhaustionDate}
-            dailyBurnVelocity={calculation.dailyBurnVelocity}
-            surplusMargin={calculation.surplusMargin}
-            bufferFundingPercentage={calculation.bufferFundingPercentage}
-            bufferMonthsMultiplier={assumptions.bufferMonthsMultiplier}
-            currencySymbol={currencySymbol}
-          />
-        </section>
+        <HeroRunway
+          runwayMonths={calculation.runwayMonths}
+          isInfiniteRunway={calculation.isInfiniteRunway}
+          currentSavings={calculation.currentSavings}
+          avgMonthlyExpenses={calculation.avgMonthlyExpenses}
+          floorIncome={calculation.floorIncome}
+          exhaustionDate={calculation.exhaustionDate}
+          dailyBurnVelocity={calculation.dailyBurnVelocity}
+          surplusMargin={calculation.surplusMargin}
+          bufferFundingPercentage={calculation.bufferFundingPercentage}
+          bufferMonthsMultiplier={assumptions.bufferMonthsMultiplier}
+          currencySymbol={currencySymbol}
+          inflationAdjusted={calculation.inflationAdjusted}
+          primaryInsight={calculation.primaryInsight}
+        />
 
         {/* BENTO BOX GRID */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -381,6 +384,12 @@ export default function Home() {
                 currencySymbol={currencySymbol}
               />
             </section>
+
+            {/* Invoice Aging & DSO Tracker — Phase 1 */}
+            <InvoiceAgingPanel
+              dso={calculation.dso}
+              currencySymbol={currencySymbol}
+            />
 
             {/* Daily Payment Feed & Cash Stream */}
             <section id="daily-log" className="dash-card p-6">
@@ -449,6 +458,28 @@ export default function Home() {
                 currencySymbol={currencySymbol}
               />
             </section>
+
+            {/* Deduction Optimizer — Phase 3 */}
+            <DeductionOptimizer
+              grossAnnualIncome={calculation.totalAnnualIncome}
+              nominalTaxRate={assumptions.taxReservePct}
+              monthlyExpenses={calculation.avgMonthlyExpenses}
+              runwayMonths={calculation.runwayMonths}
+              currencySymbol={currencySymbol}
+              onOptimizedRateChange={(newRate) =>
+                setAssumptions((prev) => ({ ...prev, taxReservePct: newRate }))
+              }
+            />
+
+            {/* Monte Carlo Risk Lab — Phase 4 */}
+            <MonteCarloRiskLab
+              volatility={calculation.volatility}
+              monthlyExpenses={calculation.avgMonthlyExpenses}
+              currentSavings={calculation.currentSavings}
+              currencySymbol={currencySymbol}
+              isLocked={!isAuthenticated}
+              onUnlockRequest={() => handleUnlockRequest('Monte Carlo Risk Lab')}
+            />
           </div>
         </div>
 

@@ -27,6 +27,7 @@ export const AssumptionControls: React.FC<AssumptionControlsProps> = ({
   const bufferMonths = assumptions.bufferMonthsMultiplier ?? 3.5;
   const currentSavings = assumptions.currentSavings ?? 8820;
   const retainerProb = Math.round((assumptions.retainerProbability ?? 0.85) * 100);
+  const inflationPct = Math.round((assumptions.annualInflationRate ?? 0.055) * 1000) / 10;
 
   return (
     <section className="p-6 md:p-8 space-y-6 transition-colors rounded-2xl border" style={{ background: 'var(--cf-surface)', borderColor: 'var(--cf-border)' }} id="assumptions">
@@ -207,7 +208,40 @@ export const AssumptionControls: React.FC<AssumptionControlsProps> = ({
         </div>
       </div>
 
-      {/* Real-time Editorial Sensitivity Callout matching Google Stitch */}
+      {/* Lever 5: Annual Inflation Rate — Phase 2 */}
+      <div className="p-4 rounded-xl border flex flex-col justify-between space-y-4" style={{ background: 'var(--cf-surface-alt)', borderColor: 'var(--cf-border)' }}>
+        <div>
+          <div className="flex justify-between items-center font-mono text-[10px] uppercase mb-1" style={{ color: 'var(--cf-text-muted)' }}>
+            <span>Inflation Rate</span>
+            <span className="font-semibold" style={{ color: '#875205' }}>CPI DRAG</span>
+          </div>
+          <div className="flex items-baseline space-x-1">
+            <span className="font-mono text-xl font-bold tabular-nums" style={{ color: 'var(--cf-text)' }}>
+              {inflationPct}%
+            </span>
+          </div>
+          <p className="text-[11px] mt-0.5" style={{ color: 'var(--cf-text-muted)' }}>
+            Annual purchasing power erosion applied to real runway.
+          </p>
+        </div>
+        <input
+          type="range"
+          min={0.02}
+          max={0.12}
+          step={0.005}
+          value={assumptions.annualInflationRate ?? 0.055}
+          onChange={(e) =>
+            onChange({ ...assumptions, annualInflationRate: parseFloat(e.target.value) })
+          }
+          className="w-full"
+        />
+        <div className="flex justify-between text-[10px] font-mono mt-1" style={{ color: 'var(--cf-text-muted)' }}>
+          <span>2% (Low)</span>
+          <span>12% (High)</span>
+        </div>
+      </div>
+
+      {/* Sensitivity Callout */}
       <div className="p-4 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs" style={{ background: 'var(--cf-accent-bg)', borderColor: 'var(--cf-border)', color: 'var(--cf-text)' }}>
         <div className="flex items-start sm:items-center space-x-2.5">
           <Lightbulb className="w-4 h-4 shrink-0" style={{ color: 'var(--cf-accent)' }} />
