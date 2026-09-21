@@ -12,7 +12,7 @@ export function exportLedgerToCsv(
   const lines: string[] = [];
 
   // Header Banner
-  lines.push('CALM LEDGER — FREELANCE IRREGULAR INCOME & CASH RUNWAY REPORT');
+  lines.push('CASHFLOOR — FREELANCE RUNWAY & INCOME EQUILIBRIUM REPORT');
   lines.push(`Generated on: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`);
   lines.push(`Currency: ${currencySymbol}`);
   lines.push('');
@@ -20,11 +20,12 @@ export function exportLedgerToCsv(
   // Executive Summary
   lines.push('EXECUTIVE FINANCIAL EQUILIBRIUM');
   lines.push(`Cash Runway Months at $0 New Income,${result.isInfiniteRunway ? 'Infinite' : result.runwayMonths}`);
-  lines.push(`Conservative Income Floor (20th Percentile),${result.floorIncome}`);
-  lines.push(`Sustainable Monthly Paycheck,${result.sustainablePaycheck}`);
-  lines.push(`Recommended Monthly Tax Reserve (${Math.round(assumptions.taxReservePct * 100)}%),${result.taxReserve}`);
-  lines.push(`Safety Buffer Goal (${assumptions.bufferMonthsMultiplier} months),${result.bufferTarget}`);
-  lines.push(`Current Liquid Cash Reserve,${result.currentSavings}`);
+  lines.push(`Conservative Income Floor (20th Percentile),${currencySymbol}${result.floorIncome}`);
+  lines.push(`Safe Weekly Owner Draw,${currencySymbol}${Math.round(result.sustainablePaycheck / 4.33)}`);
+  lines.push(`Sustainable Monthly Paycheck,${currencySymbol}${result.sustainablePaycheck}`);
+  lines.push(`Recommended Monthly Tax Reserve (${Math.round(assumptions.taxReservePct * 100)}%),${currencySymbol}${result.taxReserve}`);
+  lines.push(`Safety Buffer Goal (${assumptions.bufferMonthsMultiplier} months),${currencySymbol}${result.bufferTarget}`);
+  lines.push(`Current Liquid Cash Reserve,${currencySymbol}${result.currentSavings}`);
   lines.push(`Buffer Funding Status,${result.bufferFundingPercentage}% (${result.isBufferComplete ? 'Fully Funded' : 'In Progress'})`);
   lines.push(`Income Volatility Tier,${result.volatility.volatilityTier.toUpperCase()} (CV: ${result.volatility.coefficientOfVariation})`);
   lines.push('');
@@ -45,12 +46,12 @@ export function exportLedgerToCsv(
   lines.push(`Average Monthly Outflow,,,"${result.avgMonthlyExpenses}",`);
   lines.push('');
   lines.push('LEGAL DISCLAIMER');
-  lines.push('"This report provides general mathematical calculations based on user-entered numbers. It does not constitute personalized financial, legal, tax, or investment advice."');
+  lines.push('"This report provides general mathematical simulations based on user-entered data. It does not constitute formal CPA, tax, legal, or investment advice."');
 
   const csvContent = 'data:text/csv;charset=utf-8,' + encodeURIComponent(lines.join('\n'));
   const downloadLink = document.createElement('a');
   downloadLink.setAttribute('href', csvContent);
-  downloadLink.setAttribute('download', `calm-ledger-financial-plan-${Date.now()}.csv`);
+  downloadLink.setAttribute('download', `cashfloor-runway-report-${Date.now()}.csv`);
   document.body.appendChild(downloadLink);
   downloadLink.click();
   document.body.removeChild(downloadLink);

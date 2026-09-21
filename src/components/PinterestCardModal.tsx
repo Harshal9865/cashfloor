@@ -36,7 +36,7 @@ export const PinterestCardModal: React.FC<PinterestCardModalProps> = ({
       });
 
       const link = document.createElement('a');
-      link.download = `calm-ledger-runway-${result.runwayMonths}mo.png`;
+      link.download = `cashfloor-runway-${result.runwayMonths}mo.png`;
       link.href = dataUrl;
       link.click();
     } catch (err) {
@@ -85,7 +85,7 @@ export const PinterestCardModal: React.FC<PinterestCardModalProps> = ({
                   C
                 </span>
                 <span className="text-xs font-semibold text-[#16232B] tracking-wider uppercase font-sans">
-                  Calm Ledger
+                  CashFloor
                 </span>
               </div>
 
@@ -140,7 +140,7 @@ export const PinterestCardModal: React.FC<PinterestCardModalProps> = ({
               <p className="font-medium text-[#16232B]">
                 Budget off your floor, not your average.
               </p>
-              <p className="mt-1 text-[10px]">calmledger.app · Free & anonymous</p>
+              <p className="mt-1 text-[10px]">cashfloor.app · Free &amp; anonymous</p>
             </div>
           </div>
         </div>
