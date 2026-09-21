@@ -41,7 +41,7 @@ export default function ScrollAnimationSection() {
           style={{ x }}
         >
           {/* Vignette 1: The Intro */}
-          <div className="w-[100vw] h-full flex flex-col items-center justify-center px-4 md:px-20 relative">
+          <div className="w-[100vw] h-full shrink-0 flex flex-col items-center justify-center px-4 md:px-20 relative">
             <div className="max-w-4xl text-center">
               <h2 className="font-serif text-5xl md:text-7xl font-bold text-[var(--cf-text)] tracking-tight leading-tight mb-6">
                 Stop guessing your <br />
@@ -59,7 +59,7 @@ export default function ScrollAnimationSection() {
           </div>
 
           {/* Vignette 2: The Core Tech */}
-          <div className="w-[100vw] h-full flex items-center justify-center px-4 md:px-20 relative">
+          <div className="w-[100vw] h-full shrink-0 flex items-center justify-center px-4 md:px-20 relative">
             <div className="w-full max-w-7xl grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
               <div className="order-2 md:order-1">
                 <div className="p-8 md:p-12 rounded-[2rem] border border-[var(--cf-border)] bg-[var(--cf-surface)]/60 backdrop-blur-2xl shadow-2xl relative overflow-hidden">
@@ -85,7 +85,7 @@ export default function ScrollAnimationSection() {
           </div>
 
           {/* Vignette 3: The Lab & Privacy */}
-          <div className="w-[100vw] h-full flex items-center justify-center px-4 md:px-20 relative">
+          <div className="w-[100vw] h-full shrink-0 flex items-center justify-center px-4 md:px-20 relative">
             <div className="w-full max-w-7xl grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
               <div className="flex flex-col justify-center">
                 <h2 className="font-serif text-5xl md:text-6xl font-bold text-[var(--cf-text)] tracking-tight mb-6">
