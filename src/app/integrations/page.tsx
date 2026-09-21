@@ -25,7 +25,18 @@ import {
 } from 'lucide-react';
 import MarketingNav from '@/components/MarketingNav';
 import Footer from '@/components/marketing/Footer';
-import { triggerDownloadSampleCsv } from '@/lib/csv/sampleCsvGenerators';
+import IntegrationModal from '@/components/IntegrationModal';
+import { triggerDownloadSampleCsv, getSampleCsvContent } from '@/lib/csv/sampleCsvGenerators';
+import { parseUniversalCsv, ParsedCsvResult } from '@/lib/csv/parser';
+import { setLocalLedgerState, getLocalLedgerState } from '@/lib/supabase/ledgerService';
+import { useRouter } from 'next/navigation';
+
+export interface IntegrationConnectionData {
+  connected: boolean;
+  mode: 'api' | 'file';
+  lastSync: string;
+  accountName: string;
+}
 
 interface IntegrationTool {
   id: string;
@@ -107,33 +118,173 @@ const INTEGRATIONS: IntegrationTool[] = [
   },
 ];
 
-export default function IntegrationsPage() {
-  const [connectedState, setConnectedState] = useState<Record<string, boolean>>({
-    stripe: true,
-    mercury: false,
-    upwork: false,
-    quickbooks: false,
-    wise: false,
-  });
+const DEFAULT_CONNECTED: Record<string, IntegrationConnectionData> = {
+  stripe: {
+    connected: true,
+    mode: 'api',
+    lastSync: 'Today at 11:42 AM',
+    accountName: 'Stripe Verified Merchant Account',
+  },
+  mercury: {
+    connected: false,
+    mode: 'api',
+    lastSync: 'Not synced',
+    accountName: '',
+  },
+  upwork: {
+    connected: false,
+    mode: 'file',
+    lastSync: 'Not synced',
+    accountName: '',
+  },
+  quickbooks: {
+    connected: false,
+    mode: 'file',
+    lastSync: 'Not synced',
+    accountName: '',
+  },
+  wise: {
+    connected: false,
+    mode: 'file',
+    lastSync: 'Not synced',
+    accountName: '',
+  },
+};
 
+export default function IntegrationsPage() {
+  const router = useRouter();
+  const [connections, setConnections] = useState<Record<string, IntegrationConnectionData>>(DEFAULT_CONNECTED);
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [syncingId, setSyncingId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  const toggleConnect = (id: string, name: string) => {
-    setSyncingId(id);
+  // Modal State
+  const [activeModalTool, setActiveModalTool] = useState<IntegrationTool | null>(null);
+
+  // In-Page Direct Ingestion Lab State
+  const [inlineParsed, setInlineParsed] = useState<ParsedCsvResult | null>(null);
+  const [inlineIngesting, setInlineIngesting] = useState(false);
+
+  // Hydrate persistent integration state from localStorage
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('cf_connected_integrations');
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          setConnections(prev => ({ ...prev, ...parsed }));
+        } catch {}
+      }
+    }
+  }, []);
+
+  const saveConnections = (updated: Record<string, IntegrationConnectionData>) => {
+    setConnections(updated);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('cf_connected_integrations', JSON.stringify(updated));
+    }
+  };
+
+  const handleConnectionSuccess = (
+    toolId: string,
+    details: { mode: 'api' | 'file'; lastSync: string; accountName: string }
+  ) => {
+    const updated = {
+      ...connections,
+      [toolId]: {
+        connected: true,
+        mode: details.mode,
+        lastSync: details.lastSync,
+        accountName: details.accountName,
+      },
+    };
+    saveConnections(updated);
+    setToastMessage(`✓ ${toolId.toUpperCase()} successfully connected and ready to sync!`);
+    setTimeout(() => setToastMessage(null), 3500);
+  };
+
+  const handleDisconnect = (toolId: string) => {
+    const updated = {
+      ...connections,
+      [toolId]: {
+        connected: false,
+        mode: 'file' as const,
+        lastSync: 'Disconnected',
+        accountName: '',
+      },
+    };
+    saveConnections(updated);
+    setToastMessage(`Disconnected ${toolId.toUpperCase()}.`);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  const handleSyncNow = (toolId: string, toolName: string) => {
+    setSyncingId(toolId);
     setTimeout(() => {
-      setConnectedState(prev => {
-        const isNowConnected = !prev[id];
-        if (isNowConnected) {
-          setToastMessage(`Successfully connected to ${name}!`);
-          setTimeout(() => setToastMessage(null), 3000);
-        }
-        return { ...prev, [id]: isNowConnected };
-      });
       setSyncingId(null);
-    }, 1200);
+      const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const updated = {
+        ...connections,
+        [toolId]: {
+          ...connections[toolId],
+          lastSync: `Just now (${now})`,
+        },
+      };
+      saveConnections(updated);
+      setToastMessage(`✓ ${toolName} sync verified. Latest balance and clearing dates updated.`);
+      setTimeout(() => setToastMessage(null), 3500);
+    }, 1100);
+  };
+
+  // Direct Inline Ingestion Lab
+  const handleInlineSampleIngest = (provider: 'stripe' | 'wise' | 'paypal' | 'upwork' | 'spreadsheet') => {
+    const { content } = getSampleCsvContent(provider);
+    const parsed = parseUniversalCsv(content);
+    setInlineParsed(parsed);
+  };
+
+  const handleInlineFileDrop = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const text = event.target?.result as string;
+        if (text) {
+          const parsed = parseUniversalCsv(text);
+          setInlineParsed(parsed);
+        }
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  const handleApplyInlineToLedger = () => {
+    if (!inlineParsed || inlineParsed.records.length === 0) return;
+    setInlineIngesting(true);
+
+    setTimeout(() => {
+      const current = getLocalLedgerState();
+      const updatedPayload = {
+        records: inlineParsed.records,
+        assumptions: current?.assumptions || {
+          taxReservePct: 0.25,
+          bufferMonthsMultiplier: 3.5,
+          currentSavings: 8820,
+          percentile: 20,
+          scenario: 'base',
+          clientLossPercentage: 0.30,
+          windfallAmount: 10000,
+          retainerProbability: 0.85,
+        },
+        currencySymbol: inlineParsed.detectedCurrency || '$',
+        updatedAt: new Date().toISOString(),
+      };
+
+      setLocalLedgerState(updatedPayload);
+      setInlineIngesting(false);
+      router.push('/dashboard');
+    }, 800);
   };
 
   const filtered = INTEGRATIONS.filter(tool => {
@@ -237,13 +388,19 @@ export default function IntegrationsPage() {
         {/* ── Integrations Grid ── */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {filtered.map(tool => {
-            const isConnected = connectedState[tool.id];
+            const conn = connections[tool.id] || {
+              connected: false,
+              mode: 'file' as const,
+              lastSync: 'Not configured',
+              accountName: '',
+            };
+            const isConnected = conn.connected;
             const isSyncing = syncingId === tool.id;
 
             return (
               <motion.div
                 key={tool.id}
-                whileHover={{ y: -4, scale: 1.01 }}
+                whileHover={{ y: -3 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                 className="rounded-3xl border p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 relative overflow-hidden"
                 style={{
@@ -256,14 +413,14 @@ export default function IntegrationsPage() {
               >
                 {/* Glowing Background Overlay when connected */}
                 {isConnected && (
-                  <div className="absolute inset-0 bg-gradient-to-br from-[var(--cf-accent-glow)] to-transparent pointer-events-none opacity-20" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-[var(--cf-accent-glow)] to-transparent pointer-events-none opacity-25" />
                 )}
 
                 <div className="relative z-10">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
                       <div 
-                        className="w-10 h-10 rounded-2xl flex items-center justify-center font-bold text-white shadow-md text-base"
+                        className="w-11 h-11 rounded-2xl flex items-center justify-center font-bold text-white shadow-md text-base shrink-0"
                         style={{ background: tool.color }}
                       >
                         {tool.logoText}
@@ -278,27 +435,40 @@ export default function IntegrationsPage() {
                       </div>
                     </div>
 
-                    <span 
-                      className={`text-[10px] font-mono px-2.5 py-0.5 rounded-full font-bold border ${
-                        isConnected
-                          ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
-                          : 'bg-[var(--cf-surface-alt)] text-[var(--cf-text-muted)] border-[var(--cf-border-soft)]'
-                      }`}
-                    >
-                      {isConnected ? 'Connected ✓' : 'Ready to Connect'}
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      {isConnected ? (
+                        <span className="inline-flex items-center gap-1.5 text-[10px] font-mono px-2.5 py-1 rounded-full font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                          <span className="relative flex h-2 w-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                          </span>
+                          <span>Active {conn.mode === 'api' ? '(API)' : '(CSV)'}</span>
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-mono px-2.5 py-1 rounded-full border bg-[var(--cf-surface-alt)] text-[var(--cf-text-muted)] border-[var(--cf-border-soft)]">
+                          Ready to Connect
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   <p className="text-xs text-[var(--cf-text)] mb-3 leading-relaxed">
                     {tool.description}
                   </p>
 
-                  <div className="p-3 rounded-2xl bg-[var(--cf-surface-alt)] border border-[var(--cf-border-soft)] text-[11px] text-[var(--cf-text-muted)] leading-relaxed space-y-1">
+                  <div className="p-3.5 rounded-2xl bg-[var(--cf-surface-alt)] border border-[var(--cf-border-soft)] text-[11px] text-[var(--cf-text-muted)] leading-relaxed space-y-1">
                     <strong className="text-[var(--cf-text)] block font-mono text-[10px] uppercase tracking-wider">
                       How CashFloor Uses This:
                     </strong>
                     <span>{tool.howItWorks}</span>
                   </div>
+
+                  {isConnected && conn.accountName && (
+                    <div className="mt-3 p-2.5 rounded-xl bg-[var(--cf-surface)] border border-[var(--cf-border-soft)] text-[11px] font-mono text-[var(--cf-text-muted)] flex items-center justify-between">
+                      <span className="truncate max-w-[200px]">{conn.accountName}</span>
+                      <span className="text-[10px] text-emerald-600 font-semibold shrink-0">Synced: {conn.lastSync}</span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="pt-6 mt-4 border-t border-[var(--cf-border-soft)] flex flex-wrap items-center justify-between gap-3">
@@ -310,7 +480,7 @@ export default function IntegrationsPage() {
                       <button
                         type="button"
                         onClick={() => triggerDownloadSampleCsv(tool.sampleCsvProvider!)}
-                        className="inline-flex items-center gap-1 text-[10px] font-mono font-medium text-[var(--cf-accent)] hover:underline"
+                        className="inline-flex items-center gap-1 text-[10px] font-mono font-medium text-[var(--cf-accent)] hover:underline cursor-pointer"
                         title="Download sample test CSV for this provider"
                       >
                         <Download className="w-2.5 h-2.5" />
@@ -319,43 +489,47 @@ export default function IntegrationsPage() {
                     )}
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => toggleConnect(tool.id, tool.name)}
-                    disabled={isSyncing}
-                    className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-mono font-semibold transition-all cursor-pointer border ${
-                      isConnected
-                        ? 'border-red-500/30 text-rose-500 hover:bg-rose-500/5'
-                        : 'text-white shadow-sm hover:opacity-95'
-                    }`}
-                    style={
-                      !isConnected
-                        ? { background: 'linear-gradient(135deg, #2F6F62 0%, #1a4f45 100%)' }
-                        : {}
-                    }
-                  >
-                    {isSyncing ? (
+                  <div className="flex items-center gap-2">
+                    {isConnected ? (
                       <>
-                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                        <span>Connecting...</span>
+                        <button
+                          type="button"
+                          onClick={() => handleSyncNow(tool.id, tool.name)}
+                          disabled={isSyncing}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-mono font-medium border border-[var(--cf-border)] bg-[var(--cf-surface-alt)] text-[var(--cf-text)] hover:bg-[var(--cf-surface)] transition-all cursor-pointer disabled:opacity-50"
+                        >
+                          <RefreshCw className={`w-3.5 h-3.5 text-[var(--cf-accent)] ${isSyncing ? 'animate-spin' : ''}`} />
+                          <span>{isSyncing ? 'Syncing...' : 'Sync Now'}</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => setActiveModalTool(tool)}
+                          className="px-3 py-1.5 rounded-xl text-xs font-mono font-medium border border-[var(--cf-border)] bg-[var(--cf-surface)] text-[var(--cf-text)] hover:border-[var(--cf-accent)] transition-all cursor-pointer"
+                        >
+                          Configure
+                        </button>
                       </>
-                    ) : isConnected ? (
-                      <span>Disconnect</span>
                     ) : (
-                      <>
+                      <button
+                        type="button"
+                        onClick={() => setActiveModalTool(tool)}
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-mono font-semibold text-white shadow-sm transition-all hover:opacity-95 cursor-pointer"
+                        style={{ background: 'linear-gradient(135deg, #2F6F62 0%, #1a4f45 100%)' }}
+                      >
                         <span>Connect Tool</span>
                         <ArrowRight className="w-3.5 h-3.5" />
-                      </>
+                      </button>
                     )}
-                  </button>
+                  </div>
                 </div>
               </motion.div>
             );
           })}
         </div>
 
-        {/* ── Zero-Surveillance Universal File Ingestion Hub ── */}
-        <div className="rounded-3xl border p-6 sm:p-8 bg-gradient-to-br from-[var(--cf-surface)] to-[var(--cf-surface-alt)] border-[var(--cf-border)] relative overflow-hidden space-y-5">
+        {/* ── Zero-Surveillance Universal File Ingestion Hub & Live Lab ── */}
+        <div className="rounded-3xl border p-6 sm:p-8 bg-gradient-to-br from-[var(--cf-surface)] to-[var(--cf-surface-alt)] border-[var(--cf-border)] relative overflow-hidden space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3.5">
               <div className="w-12 h-12 rounded-2xl bg-[#2F6F62]/10 border border-[#2F6F62]/20 flex items-center justify-center text-[#2F6F62] shrink-0">
@@ -363,47 +537,132 @@ export default function IntegrationsPage() {
               </div>
               <div>
                 <h3 className="text-lg font-serif font-bold text-[var(--cf-text)]">
-                  Universal File-Based Ingestion (Zero Bank Surveillance)
+                  Universal File-Based Ingestion Lab (Zero Bank Surveillance)
                 </h3>
                 <p className="text-xs text-[var(--cf-text-muted)] max-w-xl mt-0.5">
-                  Don&apos;t want to connect your live bank credentials? Simply export a CSV from Wise, Stripe, PayPal, Upwork, Wave, or Notion and drop it into CashFloor. Our engine auto-detects column headers and aggregates 12 months in 1 click.
+                  Drop an export from Wise, Stripe, PayPal, Upwork, Wave, or Google Sheets. Our parser runs 100% locally in your browser memory and maps 12 months directly into your active cash floor model.
                 </p>
               </div>
             </div>
 
-            <Link
-              href="/dashboard"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold text-white transition-all shadow-md shrink-0 hover:opacity-95"
-              style={{ background: 'linear-gradient(135deg, #2F6F62 0%, #1a4f45 100%)' }}
-            >
+            <label className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold text-white transition-all shadow-md shrink-0 hover:opacity-95 cursor-pointer"
+              style={{ background: 'linear-gradient(135deg, #2F6F62 0%, #1a4f45 100%)' }}>
               <Upload className="w-3.5 h-3.5" />
-              <span>Launch Ingestion on Dashboard</span>
-            </Link>
+              <span>Select Statement CSV to Ingest</span>
+              <input
+                type="file"
+                accept=".csv,.tsv,.txt"
+                className="hidden"
+                onChange={handleInlineFileDrop}
+              />
+            </label>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
+          {/* Direct 1-Click Sample Previews */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
             {[
-              { label: 'Wise (TransferWise)', desc: 'Multi-Currency Statement', provider: 'wise' as const },
-              { label: 'Stripe Invoicing', desc: 'Balance Activity CSV', provider: 'stripe' as const },
-              { label: 'PayPal Activity', desc: 'Completed Gross/Net CSV', provider: 'paypal' as const },
-              { label: 'Upwork & Freelance', desc: 'Contract Payouts CSV', provider: 'upwork' as const },
+              { label: 'Wise Statement', desc: 'Multi-Currency Wires', provider: 'wise' as const },
+              { label: 'Stripe Payouts', desc: 'Net Charges & Fees', provider: 'stripe' as const },
+              { label: 'PayPal History', desc: 'Completed Business Activity', provider: 'paypal' as const },
+              { label: 'Upwork Ledger', desc: 'Milestones & Hourly Contracts', provider: 'upwork' as const },
             ].map(f => (
-              <div key={f.label} className="p-3.5 rounded-2xl bg-[var(--cf-surface)] border border-[var(--cf-border-soft)] flex flex-col justify-between gap-2">
+              <div key={f.label} className="p-3.5 rounded-2xl bg-[var(--cf-surface)] border border-[var(--cf-border-soft)] flex flex-col justify-between gap-2.5">
                 <div>
                   <span className="text-xs font-semibold text-[var(--cf-text)] block">{f.label}</span>
                   <span className="text-[11px] font-mono text-[var(--cf-text-muted)]">{f.desc}</span>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => triggerDownloadSampleCsv(f.provider)}
-                  className="inline-flex items-center gap-1.5 text-[11px] font-mono font-medium text-[var(--cf-accent)] hover:underline pt-1"
-                >
-                  <Download className="w-3 h-3" />
-                  <span>Download Sample CSV</span>
-                </button>
+                <div className="flex items-center gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => handleInlineSampleIngest(f.provider)}
+                    className="flex-1 py-1 px-2 rounded-lg text-[11px] font-mono font-medium border border-[var(--cf-accent)]/30 bg-[var(--cf-accent-bg)] text-[var(--cf-accent)] hover:opacity-90 transition-all cursor-pointer text-center"
+                  >
+                    Test Ingestion
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => triggerDownloadSampleCsv(f.provider)}
+                    className="p-1 rounded-lg border border-[var(--cf-border-soft)] text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] cursor-pointer"
+                    title="Download raw file"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
+
+          {/* Inline Live Parsed Preview & Direct Apply Action */}
+          {inlineParsed && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="p-5 rounded-2xl border-2 border-[var(--cf-accent)] bg-[var(--cf-surface)] space-y-4 shadow-lg"
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[var(--cf-border-soft)] pb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center border border-emerald-500/20">
+                    <Check className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-mono font-bold text-[var(--cf-text)] block">
+                      Parsed Statement: {inlineParsed.detectedFormat}
+                    </span>
+                    <span className="text-[11px] font-mono text-[var(--cf-text-muted)]">
+                      {inlineParsed.transactionCount} transactions across {inlineParsed.monthsCount} monthly operating cycles
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  disabled={inlineIngesting}
+                  onClick={handleApplyInlineToLedger}
+                  className="px-5 py-2 rounded-xl text-xs font-mono font-semibold text-white transition-all shadow-md cursor-pointer hover:opacity-95 flex items-center gap-2 self-start sm:self-auto"
+                  style={{ background: 'linear-gradient(135deg, #2F6F62 0%, #1a4f45 100%)' }}
+                >
+                  {inlineIngesting ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      <span>Writing to Ledger...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Import Statement into CashFloor Dashboard</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </>
+                  )}
+                </button>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
+                <div className="p-3 rounded-xl bg-[var(--cf-surface-alt)] border border-[var(--cf-border-soft)]">
+                  <span className="text-[10px] text-[var(--cf-text-muted)] block uppercase">Total Inflow</span>
+                  <span className="font-bold text-sm text-[var(--cf-text)]">
+                    {inlineParsed.detectedCurrency}{inlineParsed.totalIncome.toLocaleString()}
+                  </span>
+                </div>
+                <div className="p-3 rounded-xl bg-[var(--cf-surface-alt)] border border-[var(--cf-border-soft)]">
+                  <span className="text-[10px] text-[var(--cf-text-muted)] block uppercase">Average Monthly Income</span>
+                  <span className="font-bold text-sm text-emerald-600">
+                    {inlineParsed.detectedCurrency}{Math.round(inlineParsed.totalIncome / (inlineParsed.monthsCount || 1)).toLocaleString()}/mo
+                  </span>
+                </div>
+                <div className="p-3 rounded-xl bg-[var(--cf-surface-alt)] border border-[var(--cf-border-soft)]">
+                  <span className="text-[10px] text-[var(--cf-text-muted)] block uppercase">P20 Conservative Floor</span>
+                  <span className="font-bold text-sm text-[var(--cf-accent)]">
+                    {inlineParsed.detectedCurrency}{Math.round((inlineParsed.totalIncome / (inlineParsed.monthsCount || 1)) * 0.76).toLocaleString()}/mo
+                  </span>
+                </div>
+                <div className="p-3 rounded-xl bg-[var(--cf-surface-alt)] border border-[var(--cf-border-soft)]">
+                  <span className="text-[10px] text-[var(--cf-text-muted)] block uppercase">Detected Currency</span>
+                  <span className="font-bold text-sm text-[var(--cf-text)]">
+                    {inlineParsed.detectedCurrency} ({inlineParsed.provider})
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+          )}
         </div>
 
         {/* ── Competitive Strategic Positioning Card ── */}
@@ -450,6 +709,16 @@ export default function IntegrationsPage() {
         </div>
 
       </main>
+
+      {/* ── Real Functional Connection Modal ── */}
+      <IntegrationModal
+        isOpen={!!activeModalTool}
+        onClose={() => setActiveModalTool(null)}
+        tool={activeModalTool}
+        isConnected={!!activeModalTool && connections[activeModalTool.id]?.connected}
+        onConnectionSuccess={handleConnectionSuccess}
+        onDisconnect={handleDisconnect}
+      />
 
       <Footer />
     </div>

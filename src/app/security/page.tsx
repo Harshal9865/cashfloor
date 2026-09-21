@@ -7,6 +7,8 @@ import Link from 'next/link';
 import { Shield, Lock, Server, CheckCircle2, Key, ArrowRight, EyeOff, ShieldCheck, Database } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+import EnclaveInspector from '@/components/security/EnclaveInspector';
+
 export default function SecurityPage() {
   return (
     <div className="min-h-screen bg-[var(--cf-bg)] flex flex-col font-sans transition-colors duration-300">
@@ -81,6 +83,9 @@ export default function SecurityPage() {
               description="Your cloud records are isolated by database-enforced cryptographic security policies. Only your authenticated user UUID can access your ledger."
             />
           </motion.div>
+
+          {/* ── Live Local Enclave Inspector ── */}
+          <EnclaveInspector />
 
           {/* ── Visual Cryptographic Flow Architecture ── */}
           <div className="p-8 sm:p-10 rounded-3xl border border-[var(--cf-border)] bg-[var(--cf-surface-alt)] space-y-8">

@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
@@ -95,6 +96,7 @@ export default function CashFloorDashboard() {
   const userId = user?.id;
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('offline');
   const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
+  const [activeIntegrations, setActiveIntegrations] = useState<string[]>(['STRIPE']);
   const isInitialMount = useRef(true);
 
   const [isDataLoaded, setIsDataLoaded] = useState(false);
@@ -107,6 +109,21 @@ export default function CashFloorDashboard() {
       setAssumptions(local.assumptions);
       setCurrencySymbol(local.currencySymbol);
       setIsDataLoaded(true);
+    }
+
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('cf_connected_integrations');
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          const connected = Object.entries(parsed)
+            .filter(([_, val]: any) => val.connected)
+            .map(([id]) => id.toUpperCase());
+          if (connected.length > 0) {
+            setActiveIntegrations(connected);
+          }
+        } catch {}
+      }
     }
   }, []);
 
@@ -459,6 +476,36 @@ export default function CashFloorDashboard() {
               )}
             </div>
           </motion.div>
+        )}
+
+        {/* ── Active Ingestion Rails Indicator ── */}
+        {activeIntegrations.length > 0 && (
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-4 py-2.5 rounded-2xl bg-[var(--cf-surface)] border border-[var(--cf-border-soft)] text-xs font-mono shadow-xs">
+            <div className="flex items-center gap-2.5">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              <span className="text-[var(--cf-text)] font-semibold">Active Ingestion Rails:</span>
+              <div className="flex flex-wrap items-center gap-1.5">
+                {activeIntegrations.map((name) => (
+                  <span
+                    key={name}
+                    className="px-2 py-0.5 rounded-md bg-[var(--cf-surface-alt)] border border-[var(--cf-border-soft)] text-[10px] text-[var(--cf-accent)] font-semibold"
+                  >
+                    ⚡ {name}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <Link
+              href="/integrations"
+              className="text-[11px] text-[var(--cf-text-muted)] hover:text-[var(--cf-accent)] hover:underline flex items-center gap-1 shrink-0"
+            >
+              <span>Manage Feeds &amp; CSV Ingestion →</span>
+            </Link>
+          </div>
         )}
 
         {/* Hero Runway (Command Center) */}

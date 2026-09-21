@@ -22,6 +22,8 @@ import {
   ArrowDown
 } from 'lucide-react';
 
+import P20InteractiveSandbox from '@/components/about/P20InteractiveSandbox';
+
 export const metadata: Metadata = {
   title: 'About & Methodology | The Sovereign Financial Manifesto',
   description: 'Learn why CashFloor was built: empirical 20th-percentile cash flow engineering, zero bank surveillance, and the 5-pillar capital partition system.',
@@ -175,6 +177,11 @@ export default function AboutPage() {
               </p>
             </div>
           </div>
+        </section>
+
+        {/* ── 3b. Interactive P20 Methodology Sandbox ── */}
+        <section className="relative z-10">
+          <P20InteractiveSandbox />
         </section>
 
         {/* ── 4. The 5-Pillar Capital Partition Architecture ── */}
