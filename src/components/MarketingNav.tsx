@@ -20,11 +20,23 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/lib/auth/AuthContext';
 
 const navLinks = [
-  { label: 'How It Works', href: '/#how-it-works' },
-  { label: 'Features', href: '/#features' },
-  { label: 'Integrations', href: '/integrations' },
-  { label: 'Calculators', href: '/dashboard' },
-  { label: 'Philosophy', href: '/blog/the-20th-percentile-math' },
+  {
+    label: 'Product',
+    items: [
+      { label: 'Studio Dashboard', href: '/dashboard', desc: 'Manage your real-time ledger' },
+      { label: 'Features', href: '/#features', desc: 'Core risk & cash flow tools' },
+      { label: 'Integrations', href: '/integrations', desc: 'Connect to your banks & tools' }
+    ]
+  },
+  { label: 'Pricing', href: '/pricing' },
+  {
+    label: 'Resources',
+    items: [
+      { label: 'Philosophy', href: '/blog/the-20th-percentile-math', desc: 'Read our core math principles' },
+      { label: 'Blog', href: '/blog', desc: 'Updates & freelancer guides' },
+      { label: 'How it Works', href: '/#how-it-works', desc: 'Step-by-step product tour' }
+    ]
+  }
 ];
 
 function getInitials(nameOrEmail: string): string {
@@ -107,32 +119,36 @@ export default function MarketingNav() {
         {/* Desktop Navigation Links */}
         <nav className="hidden md:flex items-center gap-1">
           {navLinks.map((link) => {
-            const isHash = link.href.includes('#');
-            const isActive = !isHash && pathname === link.href;
+            if (link.items) {
+              return (
+                <div key={link.label} className="relative group px-1 py-4">
+                  <button className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] transition-colors rounded-lg hover:bg-[var(--cf-surface-alt)]">
+                    {link.label}
+                    <ChevronDown className="w-3 h-3 opacity-50 group-hover:rotate-180 transition-transform" />
+                  </button>
+                  <div className="absolute top-full left-0 mt-0 w-64 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0 z-50">
+                    <div className="p-2 rounded-2xl border border-[var(--cf-border)] bg-[var(--cf-surface)] shadow-2xl backdrop-blur-xl flex flex-col gap-1">
+                      {link.items.map(item => (
+                        <Link
+                          key={item.label}
+                          href={item.href}
+                          className="flex flex-col px-3 py-2 rounded-xl hover:bg-[var(--cf-surface-alt)] transition-colors"
+                        >
+                          <span className="text-[var(--cf-text)] text-sm font-medium">{item.label}</span>
+                          <span className="text-[var(--cf-text-muted)] text-[10px]">{item.desc}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              );
+            }
 
             return (
               <Link
                 key={link.label}
-                href={link.href}
-                className={`px-3.5 py-1.5 text-xs font-medium transition-colors duration-200 rounded-lg ${
-                  isActive ? 'font-bold' : ''
-                }`}
-                style={{
-                  color: isActive ? 'var(--cf-accent)' : 'var(--cf-text-muted)',
-                  background: isActive ? 'var(--cf-accent-bg)' : 'transparent',
-                }}
-                onMouseEnter={(e) => {
-                  if (!isActive) {
-                    e.currentTarget.style.color = 'var(--cf-accent)';
-                    e.currentTarget.style.background = 'var(--cf-accent-bg)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isActive) {
-                    e.currentTarget.style.color = 'var(--cf-text-muted)';
-                    e.currentTarget.style.background = 'transparent';
-                  }
-                }}
+                href={link.href!}
+                className="px-3.5 py-1.5 text-xs font-medium text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] transition-colors rounded-lg hover:bg-[var(--cf-surface-alt)]"
               >
                 {link.label}
               </Link>
@@ -365,15 +381,35 @@ export default function MarketingNav() {
           >
             <div className="px-5 py-4 flex flex-col gap-2">
               {navLinks.map((link) => (
-                <Link
-                  key={link.label}
-                  href={link.href}
-                  onClick={() => setMobileOpen(false)}
-                  className="px-3 py-2 text-sm rounded-xl transition-colors"
-                  style={{ color: 'var(--cf-text)' }}
-                >
-                  {link.label}
-                </Link>
+                <div key={link.label} className="flex flex-col gap-1">
+                  {link.items ? (
+                    <>
+                      <div className="px-3 py-2 text-xs font-bold text-[var(--cf-text-faint)] uppercase tracking-wider">
+                        {link.label}
+                      </div>
+                      {link.items.map(item => (
+                        <Link
+                          key={item.label}
+                          href={item.href}
+                          onClick={() => setMobileOpen(false)}
+                          className="px-4 py-2 text-sm rounded-xl transition-colors pl-6"
+                          style={{ color: 'var(--cf-text)' }}
+                        >
+                          {item.label}
+                        </Link>
+                      ))}
+                    </>
+                  ) : (
+                    <Link
+                      href={link.href!}
+                      onClick={() => setMobileOpen(false)}
+                      className="px-3 py-2 text-sm font-semibold rounded-xl transition-colors"
+                      style={{ color: 'var(--cf-text)' }}
+                    >
+                      {link.label}
+                    </Link>
+                  )}
+                </div>
               ))}
 
               <div className="flex items-center justify-between px-3 py-2 border-t pt-3" style={{ borderColor: 'var(--cf-border)' }}>

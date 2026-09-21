@@ -198,7 +198,9 @@ export const InputTable: React.FC<InputTableProps> = ({
             </div>
             <h3 className="font-serif text-lg mb-2" style={{ color: 'var(--cf-text)' }}>No Ledger Data</h3>
             <p className="text-sm max-w-md mx-auto mb-6 leading-relaxed" style={{ color: 'var(--cf-text-muted)' }}>
-              Your financial ledger is currently empty. Add your first record manually, or paste a CSV from your accounting software.
+              Your financial ledger is currently empty. 
+              <br/><br/>
+              <strong className="text-[var(--cf-text)]">Pro Tip:</strong> Export a 12-month CSV transaction history from your bank, <strong>Upwork, Stripe, or QuickBooks</strong>, and paste it directly into CashFloor.
             </p>
             <div className="flex items-center gap-3">
               <button

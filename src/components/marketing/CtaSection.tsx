@@ -65,17 +65,47 @@ export default function CtaSection() {
           </p>
 
           {/* Steps */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4 text-left">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-8 text-left">
             {[
-              { step: '01', label: 'Enter 12 months of invoices', desc: 'Past income and expenses, month by month' },
-              { step: '02', label: 'Set your assumptions', desc: 'Tax rate, savings buffer, and scenario mode' },
-              { step: '03', label: 'Know your real runway', desc: 'Conservative floor, exhaustion date, and stress tests' },
-            ].map((s) => (
-              <div key={s.step} className="glass-card rounded-xl p-5">
-                <div className="text-[10px] font-mono text-[var(--cf-accent-bright)] tracking-widest mb-2">{s.step}</div>
-                <div className="text-[var(--cf-text)] font-semibold text-sm mb-1 leading-tight">{s.label}</div>
-                <div className="text-[var(--cf-text-muted)] text-xs leading-relaxed">{s.desc}</div>
-              </div>
+              { step: '01', label: 'Connect Your Data', desc: 'Import a CSV from Upwork, Stripe, or your bank, or enter manually.' },
+              { step: '02', label: 'Set Assumptions', desc: 'Dial in your tax rate, savings buffer, and custom scenario testing.' },
+              { step: '03', label: 'Know Your Runway', desc: 'Get your conservative financial floor and exact zero-income date.' },
+            ].map((s, i) => (
+              <motion.div 
+                key={s.step} 
+                className="group relative rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 cursor-pointer overflow-hidden"
+                style={{
+                  background: 'var(--cf-surface)',
+                  border: '1px solid var(--cf-border)',
+                  boxShadow: 'var(--cf-shadow-sm)',
+                }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.15 }}
+                whileHover={{ 
+                  boxShadow: '0 20px 40px -10px rgba(47,111,98,0.2)',
+                  borderColor: 'var(--cf-accent)' 
+                }}
+              >
+                {/* Hover Glow */}
+                <div className="absolute inset-0 bg-gradient-to-br from-[var(--cf-accent-bg)] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                
+                <div className="relative z-10 flex items-center justify-between mb-4">
+                  <div className="text-[10px] font-mono font-bold px-2 py-1 rounded bg-[var(--cf-surface-alt)] border border-[var(--cf-border)] text-[var(--cf-text-muted)] group-hover:text-[var(--cf-accent)] group-hover:border-[var(--cf-accent)]/30 transition-colors">
+                    {s.step}
+                  </div>
+                  <div className="w-8 h-8 rounded-full bg-[var(--cf-surface-alt)] border border-[var(--cf-border)] group-hover:bg-[var(--cf-accent)] group-hover:border-[var(--cf-accent)] flex items-center justify-center transition-colors">
+                    <ArrowRight className="w-3.5 h-3.5 text-[var(--cf-text-faint)] group-hover:text-[var(--cf-bg)] transition-colors" />
+                  </div>
+                </div>
+                <div className="relative z-10 text-[var(--cf-text)] font-serif text-lg font-bold mb-2 leading-tight group-hover:text-[var(--cf-accent)] transition-colors">
+                  {s.label}
+                </div>
+                <div className="relative z-10 text-[var(--cf-text-muted)] text-sm leading-relaxed">
+                  {s.desc}
+                </div>
+              </motion.div>
             ))}
           </div>
 

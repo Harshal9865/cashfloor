@@ -53,9 +53,14 @@ export const CsvPasteModal: React.FC<CsvPasteModalProps> = ({
           </button>
         </div>
 
-        <p className="text-xs text-[#5C6D77] mb-3">
-          Copy 2 or 3 columns from your spreadsheet (e.g. Month, Income, Expenses) and paste them below:
-        </p>
+        <div className="text-xs text-[#5C6D77] mb-3 space-y-2">
+          <p>
+            <strong>Where to get data:</strong> Export a 12-month CSV transaction history from your bank, Upwork, Stripe, or QuickBooks.
+          </p>
+          <p>
+            Copy 2 or 3 columns from your spreadsheet (e.g. Month, Income, Expenses) and paste them below:
+          </p>
+        </div>
 
         <textarea
           rows={7}

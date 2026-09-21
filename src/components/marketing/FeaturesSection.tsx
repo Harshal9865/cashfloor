@@ -87,6 +87,32 @@ export default function FeaturesSection() {
                 </p>
               </motion.div>
             ))}
+
+            {/* Final CTA Block to fill the pb-[50vh] void */}
+            <motion.div
+              className="mt-10 mb-[20vh] flex flex-col justify-center"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ margin: '-20% 0px -20% 0px' }}
+              transition={{ duration: 0.8 }}
+            >
+              <div className="p-8 rounded-3xl border border-[var(--cf-border)] bg-[var(--cf-surface-alt)] shadow-xl relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-[var(--cf-accent)]/10 to-transparent pointer-events-none" />
+                <h3 className="text-2xl font-serif font-bold text-[var(--cf-text)] mb-3 relative z-10">
+                  Ready to stop guessing?
+                </h3>
+                <p className="text-[var(--cf-text-muted)] mb-6 relative z-10">
+                  Join independent professionals who build their business on certainty.
+                </p>
+                <a 
+                  href="/dashboard"
+                  className="inline-flex items-center justify-center px-6 py-3 rounded-full text-white font-medium shadow-md hover:shadow-lg transition-all relative z-10"
+                  style={{ background: 'linear-gradient(135deg, #2F6F62 0%, #1a4f45 100%)' }}
+                >
+                  Enter the Dashboard &rarr;
+                </a>
+              </div>
+            </motion.div>
           </div>
 
           {/* Right Column: Visual (Sticky) */}
