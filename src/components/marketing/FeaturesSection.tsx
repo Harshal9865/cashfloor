@@ -82,9 +82,25 @@ export default function FeaturesSection() {
                 <h3 className="text-3xl md:text-4xl font-serif font-semibold text-[var(--cf-text)] mb-4 leading-snug">
                   {f.title}
                 </h3>
-                <p className="text-lg md:text-xl text-[var(--cf-text-muted)] leading-relaxed max-w-lg">
+                <p className="text-lg md:text-xl text-[var(--cf-text-muted)] leading-relaxed max-w-lg mb-8">
                   {f.description}
                 </p>
+
+                {/* Mobile/Tablet Visual Card (Hidden on Desktop) */}
+                <div className="lg:hidden relative w-full rounded-2xl overflow-hidden shadow-xl border border-[var(--cf-border)] mb-12" style={{ background: 'var(--cf-surface-alt)' }}>
+                  <div className="flex items-center gap-2 p-3 border-b border-[var(--cf-border)] bg-[var(--cf-bg)]">
+                    <div className="w-2.5 h-2.5 rounded-full bg-[var(--cf-caution)]" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-[var(--cf-warm)]" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-[var(--cf-accent)]" />
+                  </div>
+                  <div className="p-6 font-mono text-sm leading-relaxed text-[var(--cf-text-muted)] whitespace-pre-wrap">
+                    <span style={{ color: f.color }}>$</span> {f.visualCode}
+                  </div>
+                  <div 
+                    className="absolute inset-0 z-[-1] opacity-10 pointer-events-none"
+                    style={{ background: `radial-gradient(circle at 80% 80%, ${f.color}, transparent 60%)` }}
+                  />
+                </div>
               </motion.div>
             ))}
 
@@ -139,10 +155,10 @@ export default function FeaturesSection() {
               <div className="p-8 font-mono text-sm md:text-base leading-relaxed text-[var(--cf-text-muted)] whitespace-pre-wrap">
                 <motion.div
                   key={activeIndex}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.5, ease: "easeOut" }}
+                  initial={{ opacity: 0, y: 30, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -30, scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 200, damping: 20 }}
                 >
                   <span style={{ color: features[activeIndex].color }}>$</span> {features[activeIndex].visualCode}
                 </motion.div>
