@@ -31,8 +31,8 @@ export const InputTable: React.FC<InputTableProps> = ({
 }) => {
   const handleRecordChange = (
     index: number,
-    field: 'month' | 'income' | 'expenses' | 'clientTag',
-    val: string
+    field: keyof MonthlyRecord,
+    val: any
   ) => {
     if (isLocked) {
       onUnlockRequest?.();
@@ -41,6 +41,8 @@ export const InputTable: React.FC<InputTableProps> = ({
     const updated = [...records];
     if (field === 'month' || field === 'clientTag') {
       updated[index] = { ...updated[index], [field]: val };
+    } else if (field === 'isForeignCurrency') {
+      updated[index] = { ...updated[index], [field]: Boolean(val) };
     } else {
       const num = Math.max(0, parseFloat(val) || 0);
       updated[index] = { ...updated[index], [field]: num };
