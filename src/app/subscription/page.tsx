@@ -19,6 +19,7 @@ import {
   ChevronDown
 } from 'lucide-react';
 import MarketingNav from '@/components/MarketingNav';
+import Footer from '@/components/marketing/Footer';
 import { useAuth } from '@/lib/auth/AuthContext';
 import { usePayment } from '@/lib/payment/PaymentContext';
 
@@ -539,6 +540,8 @@ export default function SubscriptionPage() {
         </div>
 
       </main>
+
+      <Footer />
     </div>
   );
 }

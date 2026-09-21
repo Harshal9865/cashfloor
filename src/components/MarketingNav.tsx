@@ -25,17 +25,20 @@ const navLinks = [
     label: 'Product',
     items: [
       { label: 'Studio Dashboard', href: '/dashboard', desc: 'Manage your real-time ledger' },
-      { label: 'Features', href: '/#features', desc: 'Core risk & cash flow tools' },
-      { label: 'Integrations', href: '/integrations', desc: 'Connect to your banks & tools' }
+      { label: 'Daily Cash Stream', href: '/daily', desc: 'Day-by-day cash flow & lag model' },
+      { label: 'Integrations & CSV', href: '/integrations', desc: 'Connect payment feeds & files' },
+      { label: 'Features', href: '/#features', desc: 'Core risk & cash flow tools' }
     ]
   },
   { label: 'Pricing', href: '/pricing' },
   {
     label: 'Resources',
     items: [
-      { label: 'Philosophy', href: '/blog/the-20th-percentile-math', desc: 'Read our core math principles' },
-      { label: 'Blog', href: '/blog', desc: 'Updates & freelancer guides' },
-      { label: 'How it Works', href: '/#how-it-works', desc: 'Step-by-step product tour' }
+      { label: 'About & Manifesto', href: '/about', desc: 'The Sovereign Freelancer Manifesto' },
+      { label: 'Methodology', href: '/blog/the-20th-percentile-math', desc: '20th-percentile math & 5 pillars' },
+      { label: 'Security & Privacy', href: '/security', desc: 'Zero-bank-surveillance architecture' },
+      { label: 'Articles & Guides', href: '/blog', desc: 'Freelance financial playbooks' },
+      { label: 'Product Tour', href: '/#how-it-works', desc: 'Step-by-step operating guide' }
     ]
   }
 ];

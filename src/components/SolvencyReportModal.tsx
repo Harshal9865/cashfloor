@@ -246,8 +246,8 @@ export function SolvencyReportModal({
               </span>
             </h3>
 
-            <div className="overflow-x-auto rounded-2xl border border-[var(--cf-border)]">
-              <table className="w-full text-xs font-mono text-left border-collapse">
+            <div className="overflow-x-auto mobile-touch-scroll rounded-2xl border border-[var(--cf-border)]">
+              <table className="w-full min-w-[560px] text-xs font-mono text-left border-collapse">
                 <thead>
                   <tr className="bg-[var(--cf-surface-alt)] border-b border-[var(--cf-border)] text-[var(--cf-text-muted)]">
                     <th className="p-2.5 font-bold">Month</th>

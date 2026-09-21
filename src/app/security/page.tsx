@@ -82,6 +82,83 @@ export default function SecurityPage() {
             />
           </motion.div>
 
+          {/* ── Visual Cryptographic Flow Architecture ── */}
+          <div className="p-8 sm:p-10 rounded-3xl border border-[var(--cf-border)] bg-[var(--cf-surface-alt)] space-y-8">
+            <div className="text-center max-w-xl mx-auto space-y-2">
+              <span className="text-[11px] font-mono uppercase tracking-widest text-[var(--cf-accent)] font-semibold">
+                Cryptographic Data Flow
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[var(--cf-text)]">
+                The Sovereign Privacy Lifecycle
+              </h2>
+              <p className="text-xs text-[var(--cf-text-muted)]">
+                How CashFloor guarantees complete mathematical privacy at every step of your workflow
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 relative">
+              {[
+                {
+                  step: '01',
+                  title: 'Raw Data Entry',
+                  sub: 'Browser Sandboxed',
+                  desc: 'Invoices, expenses, or CSV files enter your local browser memory only. No tracking webhooks or scraping scripts.',
+                  badge: 'Zero Transmission',
+                  color: 'border-blue-500/20 bg-blue-500/5 text-blue-600',
+                },
+                {
+                  step: '02',
+                  title: 'Client-Side Math',
+                  sub: 'Local CPU Execution',
+                  desc: '20th-percentile algorithms, buffer countdowns, and Monte Carlo runs execute on your computer via React & JS.',
+                  badge: 'Local Execution',
+                  color: 'border-emerald-500/20 bg-emerald-500/5 text-emerald-600',
+                },
+                {
+                  step: '03',
+                  title: 'Encrypted Vault',
+                  sub: 'Browser Storage Enclave',
+                  desc: 'Client rules and active ledgers reside in your browser’s localStorage. Clearing site data destroys the local record completely.',
+                  badge: 'Device Isolated',
+                  color: 'border-amber-500/20 bg-amber-500/5 text-amber-600',
+                },
+                {
+                  step: '04',
+                  title: 'Pro Cloud Sync',
+                  sub: 'TLS 1.3 & RLS Only',
+                  desc: 'If authenticated, records sync through TLS 1.3 encrypted sockets to an RLS-locked PostgreSQL partition.',
+                  badge: 'E2E Authenticated',
+                  color: 'border-purple-500/20 bg-purple-500/5 text-purple-600',
+                },
+              ].map((flow, idx) => (
+                <div 
+                  key={flow.step}
+                  className="p-5 rounded-2xl bg-[var(--cf-surface)] border border-[var(--cf-border)] flex flex-col justify-between space-y-4 relative"
+                >
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-mono font-bold text-[var(--cf-text-muted)]">
+                        {flow.step}
+                      </span>
+                      <span className={`text-[10px] font-mono px-2 py-0.5 rounded-md font-semibold border ${flow.color}`}>
+                        {flow.badge}
+                      </span>
+                    </div>
+                    <h4 className="text-sm font-serif font-bold text-[var(--cf-text)]">
+                      {flow.title}
+                    </h4>
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--cf-text-faint)] block">
+                      {flow.sub}
+                    </span>
+                    <p className="text-[11px] text-[var(--cf-text-muted)] leading-relaxed">
+                      {flow.desc}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
           {/* Interactive Safe-Harbor CTA */}
           <div className="p-8 rounded-3xl border border-[var(--cf-border)] bg-[var(--cf-surface)] space-y-5 text-center shadow-xl relative overflow-hidden">
             <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[var(--cf-text)]">

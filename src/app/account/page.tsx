@@ -8,14 +8,16 @@ import { Camera, Save, LogOut, Loader2, ArrowLeft, Shield, DollarSign, Percent, 
 import Link from 'next/link';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import CashFloorLogo from '@/components/CashFloorLogo';
+import Footer from '@/components/marketing/Footer';
 
 export default function AccountPage() {
-  const { user, signOut, refreshProfile, updateProfileData } = useAuth();
+  const { user, signOut, refreshProfile, updateProfileData, openAuthModal } = useAuth();
   const router = useRouter();
   const supabase = createClient();
   
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
   
   const [fullName, setFullName] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
@@ -31,12 +33,29 @@ export default function AccountPage() {
   const [fxHaircutPct, setFxHaircutPct] = useState<string>('3');
 
   useEffect(() => {
+    // Load client customization rules from local storage regardless of auth state
+    if (typeof window !== 'undefined') {
+      const storedRules = localStorage.getItem('cf_client_rules');
+      if (storedRules) {
+        try {
+          const parsed = JSON.parse(storedRules);
+          if (parsed.entityType) setEntityType(parsed.entityType);
+          if (parsed.paymentTerms) setPaymentTerms(parsed.paymentTerms);
+          if (parsed.targetSafetyMonths) setTargetSafetyMonths(parsed.targetSafetyMonths);
+          if (parsed.fxHaircutPct !== undefined) setFxHaircutPct((parsed.fxHaircutPct * 100).toString());
+          if (parsed.defaultCurrency) setDefaultCurrency(parsed.defaultCurrency);
+          if (parsed.defaultTaxRate !== undefined) setDefaultTaxRate((parsed.defaultTaxRate * 100).toString());
+          if (parsed.fullName) setFullName(parsed.fullName);
+        } catch {}
+      }
+    }
+
     if (!user) {
-      router.push('/');
+      // Offline / Sovereign Local Vault mode - do NOT redirect!
       return;
     }
     
-    // Load profile
+    // Load profile from Supabase if logged in
     const loadProfile = async () => {
       setLoading(true);
       try {
@@ -47,24 +66,10 @@ export default function AccountPage() {
           .maybeSingle();
           
         if (data) {
-          setFullName(data.full_name || '');
-          setAvatarUrl(data.avatar_url || '');
-          setDefaultCurrency(data.default_currency || '$');
-          setDefaultTaxRate(data.default_tax_rate ? (data.default_tax_rate * 100).toString() : '25');
-        }
-
-        // Load client customization rules from local storage
-        if (typeof window !== 'undefined') {
-          const storedRules = localStorage.getItem('cf_client_rules');
-          if (storedRules) {
-            try {
-              const parsed = JSON.parse(storedRules);
-              if (parsed.entityType) setEntityType(parsed.entityType);
-              if (parsed.paymentTerms) setPaymentTerms(parsed.paymentTerms);
-              if (parsed.targetSafetyMonths) setTargetSafetyMonths(parsed.targetSafetyMonths);
-              if (parsed.fxHaircutPct !== undefined) setFxHaircutPct((parsed.fxHaircutPct * 100).toString());
-            } catch {}
-          }
+          if (data.full_name) setFullName(data.full_name);
+          if (data.avatar_url) setAvatarUrl(data.avatar_url);
+          if (data.default_currency) setDefaultCurrency(data.default_currency);
+          if (data.default_tax_rate) setDefaultTaxRate((data.default_tax_rate * 100).toString());
         }
       } catch (error) {
         console.error('Error loading profile:', error);
@@ -74,43 +79,52 @@ export default function AccountPage() {
     };
     
     loadProfile();
-  }, [user, router]);
+  }, [user, supabase]);
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
-    
     setSaving(true);
+    setSaveSuccess(false);
+
     try {
-      const updates = {
-        id: user.id,
-        full_name: fullName,
-        avatar_url: avatarUrl,
-        default_currency: defaultCurrency,
-        default_tax_rate: parseFloat(defaultTaxRate) / 100,
-        updated_at: new Date().toISOString(),
-      };
-
-      const { error } = await supabase.from('profiles').upsert(updates);
-      if (error) throw error;
-
-      // Save client business rules locally & in sync
+      // Always save client business rules locally
       if (typeof window !== 'undefined') {
-        localStorage.setItem('cf_client_rules', JSON.stringify({
+        const rulesData = {
+          fullName,
           entityType,
           paymentTerms,
           targetSafetyMonths,
           fxHaircutPct: parseFloat(fxHaircutPct) / 100,
           defaultCurrency,
           defaultTaxRate: parseFloat(defaultTaxRate) / 100,
-        }));
+        };
+        localStorage.setItem('cf_client_rules', JSON.stringify(rulesData));
+        localStorage.setItem('cf_currency', defaultCurrency);
+        localStorage.setItem('cf_tax_rate', (parseFloat(defaultTaxRate) / 100).toString());
       }
 
       updateProfileData({ name: fullName, avatar: avatarUrl });
-      await refreshProfile();
-      alert('Profile and Business Rules updated securely in the vault.');
+
+      // If user is authenticated, sync with Supabase cloud
+      if (user) {
+        const updates = {
+          id: user.id,
+          full_name: fullName,
+          avatar_url: avatarUrl,
+          default_currency: defaultCurrency,
+          default_tax_rate: parseFloat(defaultTaxRate) / 100,
+          updated_at: new Date().toISOString(),
+        };
+
+        const { error } = await supabase.from('profiles').upsert(updates);
+        if (error) throw error;
+        await refreshProfile();
+      }
+
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 4000);
     } catch (error: any) {
-      alert(error.message);
+      alert(error.message || 'Failed to save settings');
     } finally {
       setSaving(false);
     }
@@ -125,8 +139,22 @@ export default function AccountPage() {
       }
       
       const file = event.target.files[0];
+
+      if (!user) {
+        // In local vault mode, read as Data URL
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const url = e.target?.result as string;
+          setAvatarUrl(url);
+          updateProfileData({ avatar: url });
+        };
+        reader.readAsDataURL(file);
+        setUploading(false);
+        return;
+      }
+
       const fileExt = file.name.split('.').pop();
-      const fileName = `${user?.id}-${Math.random()}.${fileExt}`;
+      const fileName = `${user.id}-${Math.random()}.${fileExt}`;
       const filePath = `${fileName}`;
       
       const { error: uploadError } = await supabase.storage
@@ -142,14 +170,12 @@ export default function AccountPage() {
       
       // Instantly propagate new avatar across the entire website
       updateProfileData({ avatar: data.publicUrl });
-      if (user?.id) {
-        await supabase.from('profiles').upsert({
-          id: user.id,
-          avatar_url: data.publicUrl,
-          updated_at: new Date().toISOString(),
-        });
-        await refreshProfile();
-      }
+      await supabase.from('profiles').upsert({
+        id: user.id,
+        avatar_url: data.publicUrl,
+        updated_at: new Date().toISOString(),
+      });
+      await refreshProfile();
     } catch (error: any) {
       alert(error.message);
     } finally {
@@ -157,7 +183,7 @@ export default function AccountPage() {
     }
   };
 
-  if (loading || !user) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-[var(--cf-bg)] flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-[var(--cf-accent)]" />
@@ -166,7 +192,7 @@ export default function AccountPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--cf-bg)] text-[var(--cf-text)] pb-24 transition-colors duration-300">
+    <div className="min-h-screen bg-[var(--cf-bg)] text-[var(--cf-text)] pb-24 transition-colors duration-300 flex flex-col justify-between">
       {/* Nav */}
       <header className="h-16 flex items-center justify-between px-6 border-b border-[var(--cf-nav-border)] bg-[var(--cf-nav-bg)] backdrop-blur-md sticky top-0 z-50">
         <div className="flex items-center gap-4">
@@ -181,14 +207,52 @@ export default function AccountPage() {
         </div>
         <div className="flex items-center gap-4">
           <ThemeToggle />
-          <button onClick={() => signOut()} className="p-2 rounded-lg hover:bg-[var(--cf-caution-bg)] hover:text-[var(--cf-caution)] transition-colors text-[var(--cf-text-muted)] flex items-center gap-2 text-sm font-medium">
-            <LogOut className="w-4 h-4" />
-            <span className="hidden sm:inline">Sign Out</span>
-          </button>
+          {user ? (
+            <button onClick={() => signOut()} className="p-2 rounded-lg hover:bg-[var(--cf-caution-bg)] hover:text-[var(--cf-caution)] transition-colors text-[var(--cf-text-muted)] flex items-center gap-2 text-sm font-medium">
+              <LogOut className="w-4 h-4" />
+              <span className="hidden sm:inline">Sign Out</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => openAuthModal()}
+              className="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-white transition-all shadow-sm hover:opacity-95 cursor-pointer"
+              style={{ background: 'linear-gradient(135deg, #2F6F62 0%, #1a4f45 100%)' }}
+            >
+              Sign In to Sync
+            </button>
+          )}
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto mt-12 px-4">
+      <main className="max-w-2xl mx-auto mt-8 px-4 w-full space-y-6 flex-1">
+        
+        {/* Local Sovereign Mode Notification */}
+        {!user && (
+          <div className="p-4 rounded-2xl border border-[var(--cf-accent)]/30 bg-[var(--cf-accent-bg)]/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5">
+              <Shield className="w-4 h-4 text-[var(--cf-accent)] shrink-0" />
+              <p className="text-xs text-[var(--cf-text)]">
+                <strong className="font-semibold">Local Vault Mode:</strong> Your legal entity and tax parameters are saved privately to your local browser storage.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => openAuthModal()}
+              className="text-xs font-mono font-medium text-[var(--cf-accent)] hover:underline shrink-0 cursor-pointer"
+            >
+              Sign in for Cloud Backup →
+            </button>
+          </div>
+        )}
+
+        {saveSuccess && (
+          <div className="p-3.5 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 text-xs font-semibold flex items-center gap-2">
+            <Shield className="w-4 h-4" />
+            <span>Vault settings and business rules updated successfully.</span>
+          </div>
+        )}
+
         <form onSubmit={handleUpdateProfile} className="space-y-8">
           
           {/* Avatar Section */}
@@ -200,7 +264,7 @@ export default function AccountPage() {
                     <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                   ) : (
                     <span className="text-3xl font-serif text-[var(--cf-text-muted)]">
-                      {fullName ? fullName.charAt(0).toUpperCase() : user.email?.charAt(0).toUpperCase()}
+                      {fullName ? fullName.charAt(0).toUpperCase() : (user?.email ? user.email.charAt(0).toUpperCase() : 'V')}
                     </span>
                   )}
                 </div>
@@ -208,7 +272,7 @@ export default function AccountPage() {
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploading}
-                  className="absolute -bottom-2 -right-2 p-2 rounded-xl bg-[var(--cf-accent)] text-white shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
+                  className="absolute -bottom-2 -right-2 p-2 rounded-xl bg-[var(--cf-accent)] text-white shadow-lg hover:shadow-xl transition-all disabled:opacity-50 cursor-pointer"
                 >
                   {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
                 </button>
@@ -222,13 +286,13 @@ export default function AccountPage() {
               </div>
               
               <div className="space-y-1 flex-1">
-                <h2 className="font-serif text-xl">Identity & Encryption</h2>
+                <h2 className="font-serif text-xl">Identity &amp; Encryption</h2>
                 <p className="text-sm text-[var(--cf-text-muted)] leading-relaxed">
                   Your identity is locked in our end-to-end encrypted vault. This avatar only displays on your local device dashboards.
                 </p>
                 <div className="flex items-center gap-1.5 mt-2 text-xs font-mono text-emerald-600 bg-emerald-500/10 w-max px-2 py-1 rounded">
                   <Shield className="w-3 h-3" />
-                  <span>RLS Enforced</span>
+                  <span>{user ? 'RLS Cloud Enforced' : 'Device Local Enclave'}</span>
                 </div>
               </div>
             </div>
@@ -236,7 +300,7 @@ export default function AccountPage() {
             <div className="space-y-4">
               <div className="space-y-1.5">
                 <label className="text-xs font-mono font-medium text-[var(--cf-text-muted)] uppercase tracking-wide">
-                  Account Name
+                  Account / Studio Name
                 </label>
                 <input
                   type="text"
@@ -252,9 +316,9 @@ export default function AccountPage() {
                 </label>
                 <input
                   type="email"
-                  value={user.email || ''}
+                  value={user?.email || 'Local Vault (No account attached)'}
                   disabled
-                  className="w-full bg-transparent border-b border-[var(--cf-border)] py-2 text-[var(--cf-text-muted)] focus:outline-none cursor-not-allowed opacity-50"
+                  className="w-full bg-transparent border-b border-[var(--cf-border)] py-2 text-[var(--cf-text-muted)] focus:outline-none cursor-not-allowed opacity-50 font-mono text-xs"
                 />
               </div>
             </div>
@@ -413,7 +477,7 @@ export default function AccountPage() {
             <button
               type="submit"
               disabled={saving}
-              className="px-6 py-3 rounded-full text-sm font-semibold text-white shadow-md hover:shadow-lg transition-all flex items-center gap-2 disabled:opacity-50"
+              className="px-6 py-3 rounded-full text-sm font-semibold text-white shadow-md hover:shadow-lg transition-all flex items-center gap-2 disabled:opacity-50 cursor-pointer"
               style={{ background: 'linear-gradient(135deg, var(--cf-accent), #1a4f45)' }}
             >
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
@@ -422,6 +486,8 @@ export default function AccountPage() {
           </div>
         </form>
       </main>
+
+      <Footer />
     </div>
   );
 }

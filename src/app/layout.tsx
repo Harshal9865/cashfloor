@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Fraunces, IBM_Plex_Sans, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/lib/theme/ThemeContext';
@@ -8,6 +8,17 @@ import { WorkspaceLoader } from '@/components/WorkspaceLoader';
 import { PaymentProvider } from '@/lib/payment/PaymentContext';
 import MockCheckoutModal from '@/components/payment/MockCheckoutModal';
 import { PwaRegister } from '@/components/pwa/PwaRegister';
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#F1F4F2' },
+    { media: '(prefers-color-scheme: dark)', color: '#080C10' },
+  ],
+};
 
 const fraunces = Fraunces({
   subsets: ['latin'],

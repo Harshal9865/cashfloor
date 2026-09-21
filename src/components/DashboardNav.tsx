@@ -29,6 +29,7 @@ const NAV_SECTIONS = [
   { label: 'Runway', href: '/dashboard#runway' },
   { label: 'Timeline', href: '/dashboard#cash-flow' },
   { label: 'Daily Stream', href: '/daily' },
+  { label: 'Integrations', href: '/integrations' },
   { label: 'Ledger', href: '/dashboard#ledger-archive' },
 ];
 

@@ -110,8 +110,8 @@ export const PendingInvoices: React.FC<PendingInvoicesProps> = ({
         </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+      <div className="overflow-x-auto mobile-touch-scroll">
+        <table className="w-full min-w-[560px] text-left border-collapse">
           <thead>
             <tr className="font-mono text-[10px] tracking-wider uppercase border-b" style={{ color: 'var(--cf-text-muted)', borderColor: 'var(--cf-border)', background: 'var(--cf-surface-alt)' }}>
               <th className="py-2.5 px-4 font-semibold">Expected Date</th>

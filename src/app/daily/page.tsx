@@ -13,9 +13,12 @@ import {
   Layers,
   ArrowRight,
   TrendingUp,
-  Download
+  Download,
+  Clock,
+  Activity
 } from 'lucide-react';
 import DashboardNav from '@/components/DashboardNav';
+import Footer from '@/components/marketing/Footer';
 import { CashFlowChart } from '@/components/CashFlowChart';
 import { DailyPaymentLog, DailyTransaction } from '@/components/DailyPaymentLog';
 import { MonthlyRecord } from '@/lib/calculator/types';
@@ -78,6 +81,69 @@ export default function DailyPage() {
           </div>
         </div>
 
+        {/* ── Daily Top KPI Metric Chips ── */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div 
+            className="p-4 sm:p-5 rounded-3xl border flex items-center gap-4 transition-all"
+            style={{ background: 'var(--cf-surface)', borderColor: 'var(--cf-border)' }}
+          >
+            <div className="w-11 h-11 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-500/20">
+              <DollarSign className="w-5 h-5" />
+            </div>
+            <div>
+              <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--cf-text-muted)] block">
+                Today&apos;s Cleared Inflow
+              </span>
+              <div className="text-xl font-bold font-mono text-[var(--cf-text)]">
+                {currencySymbol}4,250.00
+              </div>
+              <span className="text-[10px] font-mono text-emerald-600">
+                +2 transactions logged
+              </span>
+            </div>
+          </div>
+
+          <div 
+            className="p-4 sm:p-5 rounded-3xl border flex items-center gap-4 transition-all"
+            style={{ background: 'var(--cf-surface)', borderColor: 'var(--cf-border)' }}
+          >
+            <div className="w-11 h-11 rounded-2xl bg-[var(--cf-accent-bg)] text-[var(--cf-accent)] flex items-center justify-center shrink-0 border border-[var(--cf-accent)]/20">
+              <Clock className="w-5 h-5" />
+            </div>
+            <div>
+              <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--cf-text-muted)] block">
+                Intra-Month Lag Risk
+              </span>
+              <div className="text-xl font-bold font-mono text-emerald-600">
+                Protected (0 Days)
+              </div>
+              <span className="text-[10px] font-mono text-[var(--cf-text-muted)]">
+                Buffer shields Day 1 rent
+              </span>
+            </div>
+          </div>
+
+          <div 
+            className="p-4 sm:p-5 rounded-3xl border flex items-center gap-4 transition-all"
+            style={{ background: 'var(--cf-surface)', borderColor: 'var(--cf-border)' }}
+          >
+            <div className="w-11 h-11 rounded-2xl bg-amber-500/10 text-amber-600 flex items-center justify-center shrink-0 border border-amber-500/20">
+              <Activity className="w-5 h-5" />
+            </div>
+            <div>
+              <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--cf-text-muted)] block">
+                Daily Burn Velocity
+              </span>
+              <div className="text-xl font-bold font-mono text-[var(--cf-text)]">
+                {currencySymbol}70.00<span className="text-xs font-normal text-[var(--cf-text-muted)]">/day</span>
+              </div>
+              <span className="text-[10px] font-mono text-[var(--cf-text-muted)]">
+                Baseline baseline fixed cost
+              </span>
+            </div>
+          </div>
+        </div>
+
         {/* ── Daily Cash Flow Chart Section ── */}
         <div 
           className="dash-card rounded-3xl border overflow-hidden shadow-sm"
@@ -125,6 +191,8 @@ export default function DailyPage() {
         </div>
 
       </main>
+
+      <Footer />
     </div>
   );
 }

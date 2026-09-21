@@ -19,9 +19,13 @@ import {
   HelpCircle,
   Upload,
   Lock,
-  Zap
+  Zap,
+  Search,
+  Download
 } from 'lucide-react';
 import MarketingNav from '@/components/MarketingNav';
+import Footer from '@/components/marketing/Footer';
+import { triggerDownloadSampleCsv } from '@/lib/csv/sampleCsvGenerators';
 
 interface IntegrationTool {
   id: string;
@@ -34,6 +38,7 @@ interface IntegrationTool {
   syncFrequency: string;
   status: 'available' | 'connected' | 'coming_soon';
   color: string;
+  sampleCsvProvider?: 'stripe' | 'wise' | 'paypal' | 'upwork' | 'spreadsheet';
 }
 
 const INTEGRATIONS: IntegrationTool[] = [
@@ -48,6 +53,7 @@ const INTEGRATIONS: IntegrationTool[] = [
     syncFrequency: 'Real-Time Webhook',
     status: 'connected',
     color: '#635BFF',
+    sampleCsvProvider: 'stripe',
   },
   {
     id: 'mercury',
@@ -72,6 +78,7 @@ const INTEGRATIONS: IntegrationTool[] = [
     syncFrequency: 'On Milestone Release',
     status: 'available',
     color: '#14A800',
+    sampleCsvProvider: 'upwork',
   },
   {
     id: 'quickbooks',
@@ -96,6 +103,7 @@ const INTEGRATIONS: IntegrationTool[] = [
     syncFrequency: 'On Payout',
     status: 'available',
     color: '#00B9FF',
+    sampleCsvProvider: 'wise',
   },
 ];
 
@@ -109,6 +117,7 @@ export default function IntegrationsPage() {
   });
 
   const [activeCategory, setActiveCategory] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [syncingId, setSyncingId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -127,9 +136,14 @@ export default function IntegrationsPage() {
     }, 1200);
   };
 
-  const filtered = activeCategory === 'all' 
-    ? INTEGRATIONS 
-    : INTEGRATIONS.filter(t => t.category.toLowerCase().includes(activeCategory.toLowerCase()));
+  const filtered = INTEGRATIONS.filter(tool => {
+    const matchesCategory = activeCategory === 'all' || tool.category.toLowerCase().includes(activeCategory.toLowerCase());
+    const matchesQuery = !searchQuery.trim() || 
+      tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      tool.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      tool.badge.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesQuery;
+  });
 
   return (
     <div className="min-h-screen flex flex-col bg-[var(--cf-bg)] text-[var(--cf-text)] transition-colors duration-300">
@@ -183,28 +197,41 @@ export default function IntegrationsPage() {
           </p>
         </div>
 
-        {/* ── Category Filter Pills ── */}
-        <div className="flex items-center justify-center gap-2 overflow-x-auto pb-2">
-          {[
-            { id: 'all', label: 'All Tools' },
-            { id: 'payments', label: 'Stripe & PayPal' },
-            { id: 'banking', label: 'Business Banking' },
-            { id: 'freelance', label: 'Upwork & Platforms' },
-            { id: 'accounting', label: 'Accounting / CPA' },
-          ].map(cat => (
-            <button
-              key={cat.id}
-              type="button"
-              onClick={() => setActiveCategory(cat.id)}
-              className={`px-4 py-2 rounded-xl text-xs font-mono transition-all cursor-pointer border ${
-                activeCategory === cat.id
-                  ? 'bg-[var(--cf-surface)] border-[var(--cf-accent)] text-[var(--cf-text)] font-semibold shadow-sm'
-                  : 'bg-[var(--cf-surface-alt)] border-[var(--cf-border-soft)] text-[var(--cf-text-muted)] hover:text-[var(--cf-text)]'
-              }`}
-            >
-              {cat.label}
-            </button>
-          ))}
+        {/* ── Search & Category Filter Pills ── */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+          <div className="relative flex-1 max-w-md">
+            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--cf-text-muted)]" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search gateways, banks, platforms..."
+              className="w-full pl-10 pr-4 py-2 rounded-xl text-xs font-mono bg-[var(--cf-surface)] border border-[var(--cf-border-soft)] text-[var(--cf-text)] placeholder-[var(--cf-text-faint)] focus:outline-none focus:border-[var(--cf-accent)] transition-all"
+            />
+          </div>
+
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 mobile-touch-scroll">
+            {[
+              { id: 'all', label: 'All' },
+              { id: 'payments', label: 'Stripe & PayPal' },
+              { id: 'banking', label: 'Banking' },
+              { id: 'freelance', label: 'Freelance' },
+              { id: 'accounting', label: 'Accounting' },
+            ].map(cat => (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => setActiveCategory(cat.id)}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-mono transition-all cursor-pointer border whitespace-nowrap ${
+                  activeCategory === cat.id
+                    ? 'bg-[var(--cf-surface)] border-[var(--cf-accent)] text-[var(--cf-text)] font-semibold shadow-sm'
+                    : 'bg-[var(--cf-surface-alt)] border-[var(--cf-border-soft)] text-[var(--cf-text-muted)] hover:text-[var(--cf-text)]'
+                }`}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* ── Integrations Grid ── */}
@@ -274,10 +301,23 @@ export default function IntegrationsPage() {
                   </div>
                 </div>
 
-                <div className="pt-6 mt-4 border-t border-[var(--cf-border-soft)] flex items-center justify-between">
-                  <span className="text-[10px] font-mono text-[var(--cf-text-faint)]">
-                    Sync: {tool.syncFrequency}
-                  </span>
+                <div className="pt-6 mt-4 border-t border-[var(--cf-border-soft)] flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-mono text-[var(--cf-text-faint)]">
+                      Sync: {tool.syncFrequency}
+                    </span>
+                    {tool.sampleCsvProvider && (
+                      <button
+                        type="button"
+                        onClick={() => triggerDownloadSampleCsv(tool.sampleCsvProvider!)}
+                        className="inline-flex items-center gap-1 text-[10px] font-mono font-medium text-[var(--cf-accent)] hover:underline"
+                        title="Download sample test CSV for this provider"
+                      >
+                        <Download className="w-2.5 h-2.5" />
+                        <span>Sample CSV</span>
+                      </button>
+                    )}
+                  </div>
 
                   <button
                     type="button"
@@ -315,7 +355,7 @@ export default function IntegrationsPage() {
         </div>
 
         {/* ── Zero-Surveillance Universal File Ingestion Hub ── */}
-        <div className="rounded-3xl border p-6 sm:p-8 bg-gradient-to-br from-[var(--cf-surface)] to-[var(--cf-surface-alt)] border-[var(--cf-border)] relative overflow-hidden space-y-4">
+        <div className="rounded-3xl border p-6 sm:p-8 bg-gradient-to-br from-[var(--cf-surface)] to-[var(--cf-surface-alt)] border-[var(--cf-border)] relative overflow-hidden space-y-5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3.5">
               <div className="w-12 h-12 rounded-2xl bg-[#2F6F62]/10 border border-[#2F6F62]/20 flex items-center justify-center text-[#2F6F62] shrink-0">
@@ -341,16 +381,26 @@ export default function IntegrationsPage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
             {[
-              { label: 'Wise (TransferWise)', desc: 'Multi-Currency Statement' },
-              { label: 'Stripe Invoicing', desc: 'Balance Activity CSV' },
-              { label: 'PayPal Activity', desc: 'Completed Gross/Net CSV' },
-              { label: 'Upwork & Freelance', desc: 'Contract Payouts CSV' },
+              { label: 'Wise (TransferWise)', desc: 'Multi-Currency Statement', provider: 'wise' as const },
+              { label: 'Stripe Invoicing', desc: 'Balance Activity CSV', provider: 'stripe' as const },
+              { label: 'PayPal Activity', desc: 'Completed Gross/Net CSV', provider: 'paypal' as const },
+              { label: 'Upwork & Freelance', desc: 'Contract Payouts CSV', provider: 'upwork' as const },
             ].map(f => (
-              <div key={f.label} className="p-3 rounded-2xl bg-[var(--cf-surface)] border border-[var(--cf-border-soft)]">
-                <span className="text-xs font-semibold text-[var(--cf-text)] block">{f.label}</span>
-                <span className="text-[11px] font-mono text-[var(--cf-text-muted)]">{f.desc}</span>
+              <div key={f.label} className="p-3.5 rounded-2xl bg-[var(--cf-surface)] border border-[var(--cf-border-soft)] flex flex-col justify-between gap-2">
+                <div>
+                  <span className="text-xs font-semibold text-[var(--cf-text)] block">{f.label}</span>
+                  <span className="text-[11px] font-mono text-[var(--cf-text-muted)]">{f.desc}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => triggerDownloadSampleCsv(f.provider)}
+                  className="inline-flex items-center gap-1.5 text-[11px] font-mono font-medium text-[var(--cf-accent)] hover:underline pt-1"
+                >
+                  <Download className="w-3 h-3" />
+                  <span>Download Sample CSV</span>
+                </button>
               </div>
             ))}
           </div>
@@ -400,6 +450,8 @@ export default function IntegrationsPage() {
         </div>
 
       </main>
+
+      <Footer />
     </div>
   );
 }
