@@ -40,9 +40,9 @@ export default function CashFloorLogo({
         className="relative shrink-0 flex items-center justify-center transition-transform duration-300 group-hover:scale-105"
         style={{ width: iconDimensions.box, height: iconDimensions.box }}
       >
-        {/* Subtle ambient halo */}
+        {/* Subtle ambient halo with enhanced hover glow */}
         <div 
-          className="absolute inset-0 rounded-xl bg-gradient-to-tr from-[#2F6F62] to-[#10B981] opacity-25 blur-md group-hover:opacity-45 transition-opacity duration-300"
+          className="absolute inset-0 rounded-xl bg-gradient-to-tr from-[#2F6F62] to-[#10B981] opacity-20 blur-md group-hover:opacity-60 group-hover:blur-lg transition-all duration-300"
         />
 
         {/* Vector SVG Emblem: Architectural Floor + Ascending Runway Trajectory */}
@@ -50,7 +50,7 @@ export default function CashFloorLogo({
           viewBox="0 0 40 40"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          className="w-full h-full relative z-10 drop-shadow-sm"
+          className="w-full h-full relative z-10 drop-shadow-sm transition-transform duration-300 group-hover:scale-105"
         >
           {/* Base rounded squircle container */}
           <rect
@@ -68,6 +68,7 @@ export default function CashFloorLogo({
             rx="9.25"
             stroke="url(#cf-border-grad)"
             strokeWidth="1.5"
+            className="group-hover:stroke-emerald-500/40 transition-colors"
           />
 
           {/* Floor Foundation Line (Capital Safety Datum) */}
@@ -132,17 +133,17 @@ export default function CashFloorLogo({
         <div className="flex flex-col">
           <div className="flex items-center tracking-tight">
             <span 
-              className={`font-serif ${textSize} font-medium tracking-tight text-[var(--cf-text)] group-hover:text-[#2F6F62] transition-colors`}
+              className={`font-serif ${textSize} font-medium tracking-tight text-[var(--cf-text)] group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-200`}
             >
-              Cash<span className="text-[var(--cf-accent)] font-semibold">Floor</span>
+              Cash<span className="text-[var(--cf-accent)] font-semibold group-hover:text-[#10B981] transition-colors">Floor</span>
             </span>
-            <span className="ml-1.5 px-1 py-0.2 rounded text-[9px] font-mono font-bold tracking-widest uppercase bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+            <span className="ml-1.5 px-1.5 py-0.5 rounded text-[9px] font-mono font-bold tracking-widest uppercase bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 group-hover:border-emerald-500/40 group-hover:bg-emerald-500/20 transition-all duration-200">
               PRO
             </span>
           </div>
 
           {showTagline && (
-            <span className="text-[10px] font-mono tracking-wider text-[var(--cf-text-muted)] uppercase -mt-0.5">
+            <span className="text-[10px] font-mono tracking-wider text-[var(--cf-text-muted)] group-hover:text-[var(--cf-text)] uppercase -mt-0.5 transition-colors">
               Runway &amp; Income Equilibrium
             </span>
           )}

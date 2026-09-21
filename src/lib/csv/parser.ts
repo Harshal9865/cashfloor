@@ -23,12 +23,25 @@ const MONTH_NAMES = [
 export interface ParsedCsvResult {
   records: MonthlyRecord[];
   detectedFormat: string;
-  provider: 'stripe' | 'wise' | 'paypal' | 'upwork' | 'wave_quickbooks' | 'spreadsheet' | 'generic';
+  provider: 'stripe' | 'wise' | 'paypal' | 'upwork' | 'wave_quickbooks' | 'bank_statement' | 'spreadsheet' | 'generic';
   transactionCount: number;
   totalIncome: number;
   totalExpenses: number;
   monthsCount: number;
   sampleRowsCount: number;
+  detectedCurrency: string;
+}
+
+/**
+ * Detects currency symbol from raw CSV text.
+ */
+export function detectCurrencySymbol(text: string): string {
+  if (text.includes('€') || text.includes('EUR')) return '€';
+  if (text.includes('£') || text.includes('GBP')) return '£';
+  if (text.includes('₹') || text.includes('INR')) return '₹';
+  if (text.includes('C$') || text.includes('CAD')) return 'C$';
+  if (text.includes('A$') || text.includes('AUD')) return 'A$';
+  return '$';
 }
 
 /**
@@ -90,10 +103,10 @@ function extractMonthKey(dateStr: string): { key: string; label: string } | null
     let monthIdx = -1;
 
     if (p1 <= 12 && p2 > 12) {
-      // MM/DD/YYYY format (US standard e.g. PayPal, Stripe US)
+      // MM/DD/YYYY format (US standard e.g. PayPal, Chase, BoA)
       monthIdx = p1 - 1;
     } else if (p2 <= 12 && p1 > 12) {
-      // DD/MM/YYYY format (European standard e.g. Wise, UK/EU banks)
+      // DD/MM/YYYY format (European standard e.g. Wise, Revolut, Monzo)
       monthIdx = p2 - 1;
     } else if (p1 <= 12) {
       // Default to p1
@@ -108,7 +121,7 @@ function extractMonthKey(dateStr: string): { key: string; label: string } | null
     }
   }
 
-  // Try Textual month: "Jul 15, 2025" or "15 Jul 2025"
+  // Try Textual month: "Jul 15, 2025" or "15 Jul 2025" or "July 2025"
   for (let i = 0; i < MONTH_NAMES.length; i++) {
     const name = MONTH_NAMES[i];
     if (new RegExp(`\\b${name}\\b`, 'i').test(clean)) {
@@ -125,15 +138,18 @@ function extractMonthKey(dateStr: string): { key: string; label: string } | null
 }
 
 /**
- * Universal Intelligent Parser for real freelancer tool exports:
+ * Universal Intelligent Parser for real freelancer & business tool exports:
+ * - Wise (TransferWise) Multi-Currency Balance Statement CSV
  * - Stripe Balance & Payout History CSV
- * - Wise (TransferWise) Balance Statement CSV
  * - PayPal Business Activity CSV
  * - Upwork Transaction History CSV
  * - Wave Accounting / QuickBooks General Ledger CSV
+ * - Generic Business Bank Statements (Mercury, Chase, Revolut, BoA, Relay)
  * - Excel / Google Sheets pasted tables
  */
 export function parseUniversalCsv(text: string): ParsedCsvResult {
+  const detectedCurrency = detectCurrencySymbol(text);
+
   if (!text || text.trim() === '') {
     return {
       records: [],
@@ -144,6 +160,7 @@ export function parseUniversalCsv(text: string): ParsedCsvResult {
       totalExpenses: 0,
       monthsCount: 0,
       sampleRowsCount: 0,
+      detectedCurrency,
     };
   }
 
@@ -162,6 +179,7 @@ export function parseUniversalCsv(text: string): ParsedCsvResult {
       totalExpenses: 0,
       monthsCount: 0,
       sampleRowsCount: 0,
+      detectedCurrency,
     };
   }
 
@@ -191,17 +209,31 @@ export function parseUniversalCsv(text: string): ParsedCsvResult {
     headerLine.includes('upwork') ||
     (headerParts.includes('ref id') && headerParts.includes('agency') && headerParts.includes('freelancer'));
 
-  // 5. Wave / QuickBooks / Xero Accounting Ledger
-  const isAccountingLedger =
-    (headerParts.includes('credit') && headerParts.includes('debit')) ||
-    (headerParts.includes('split') && headerParts.includes('memo'));
+  // 5. Dual-Column Bank / Accounting Statement (Credit/Debit, Deposits/Withdrawals, Paid In/Paid Out, Inflow/Outflow)
+  const creditIdx = headerParts.findIndex((h) =>
+    h === 'credit' || h.includes('credit') || h === 'deposit' || h.includes('deposit') ||
+    h.includes('paid in') || h.includes('money in') || h.includes('inflow')
+  );
+  const debitIdx = headerParts.findIndex((h) =>
+    h === 'debit' || h.includes('debit') || h === 'withdrawal' || h.includes('withdrawal') ||
+    h.includes('paid out') || h.includes('money out') || h.includes('outflow')
+  );
+  const dateIdxGeneral = headerParts.findIndex((h) =>
+    h.includes('date') || h.includes('time') || h.includes('posted') || h.includes('created') || h.includes('period')
+  );
+  const isDualColumnBank = dateIdxGeneral >= 0 && creditIdx >= 0 && debitIdx >= 0;
+
+  // 6. Single Amount Bank Statement (Mercury, Revolut, Chase, BoA: Date, Description, Amount)
+  const amountIdxGeneral = headerParts.findIndex((h) =>
+    h === 'amount' || h.includes('amount') || h === 'net' || h === 'total' || h === 'value'
+  );
+  const isSingleAmountBank = dateIdxGeneral >= 0 && amountIdxGeneral >= 0 && !isStripe && !isWise && !isPayPal && !isUpwork && !isDualColumnBank;
 
   // Multi-transaction aggregation map: Key -> { label, income, expenses, count }
   const monthlyAggregates = new Map<string, { label: string; income: number; expenses: number; count: number }>();
   let totalTxs = 0;
 
   if (isStripe) {
-    // Stripe indices
     const dateIdx = headerParts.findIndex((h) => h.includes('created') || h.includes('date'));
     const netIdx = headerParts.findIndex((h) => h === 'net' || h.includes('net'));
     const feeIdx = headerParts.findIndex((h) => h === 'fee');
@@ -214,7 +246,6 @@ export function parseUniversalCsv(text: string): ParsedCsvResult {
       if (!m) return;
 
       const type = (cols[typeIdx] || '').toLowerCase();
-      // Skip transfers/payouts from counting as double income
       if (type === 'payout' || type === 'transfer') return;
 
       const net = parseCurrency(cols[netIdx >= 0 ? netIdx : 1] || '0');
@@ -232,11 +263,10 @@ export function parseUniversalCsv(text: string): ParsedCsvResult {
       totalTxs++;
     });
 
-    return formatResult(monthlyAggregates, 'Stripe Balance & Payout History', 'stripe', totalTxs);
+    return formatResult(monthlyAggregates, 'Stripe Balance & Payout History', 'stripe', totalTxs, detectedCurrency);
   }
 
   if (isWise) {
-    // Wise indices
     const dateIdx = headerParts.findIndex((h) => h.includes('date'));
     const amountIdx = headerParts.findIndex((h) => h === 'amount');
     const feeIdx = headerParts.findIndex((h) => h.includes('fee'));
@@ -262,11 +292,10 @@ export function parseUniversalCsv(text: string): ParsedCsvResult {
       totalTxs++;
     });
 
-    return formatResult(monthlyAggregates, 'Wise Multi-Currency Statement', 'wise', totalTxs);
+    return formatResult(monthlyAggregates, 'Wise Multi-Currency Statement', 'wise', totalTxs, detectedCurrency);
   }
 
   if (isPayPal) {
-    // PayPal indices
     const dateIdx = headerParts.findIndex((h) => h.includes('date'));
     const netIdx = headerParts.findIndex((h) => h === 'net');
     const grossIdx = headerParts.findIndex((h) => h === 'gross');
@@ -294,11 +323,10 @@ export function parseUniversalCsv(text: string): ParsedCsvResult {
       totalTxs++;
     });
 
-    return formatResult(monthlyAggregates, 'PayPal Business Activity', 'paypal', totalTxs);
+    return formatResult(monthlyAggregates, 'PayPal Business Activity', 'paypal', totalTxs, detectedCurrency);
   }
 
   if (isUpwork) {
-    // Upwork indices
     const dateIdx = headerParts.findIndex((h) => h.includes('date'));
     const amountIdx = headerParts.findIndex((h) => h === 'amount');
     const typeIdx = headerParts.findIndex((h) => h === 'type');
@@ -306,7 +334,7 @@ export function parseUniversalCsv(text: string): ParsedCsvResult {
     lines.slice(1).forEach((line) => {
       const cols = splitCsvLine(line);
       const type = (cols[typeIdx] || '').toLowerCase();
-      if (type.includes('withdrawal')) return; // Skip withdrawals from bank
+      if (type.includes('withdrawal')) return;
 
       const dateVal = cols[dateIdx >= 0 ? dateIdx : 0] || '';
       const m = extractMonthKey(dateVal);
@@ -325,17 +353,13 @@ export function parseUniversalCsv(text: string): ParsedCsvResult {
       totalTxs++;
     });
 
-    return formatResult(monthlyAggregates, 'Upwork Contract Payouts', 'upwork', totalTxs);
+    return formatResult(monthlyAggregates, 'Upwork Contract Payouts', 'upwork', totalTxs, detectedCurrency);
   }
 
-  if (isAccountingLedger) {
-    const dateIdx = headerParts.findIndex((h) => h.includes('date'));
-    const creditIdx = headerParts.findIndex((h) => h.includes('credit'));
-    const debitIdx = headerParts.findIndex((h) => h.includes('debit'));
-
+  if (isDualColumnBank) {
     lines.slice(1).forEach((line) => {
       const cols = splitCsvLine(line);
-      const dateVal = cols[dateIdx >= 0 ? dateIdx : 0] || '';
+      const dateVal = cols[dateIdxGeneral] || '';
       const m = extractMonthKey(dateVal);
       if (!m) return;
 
@@ -350,7 +374,30 @@ export function parseUniversalCsv(text: string): ParsedCsvResult {
       totalTxs++;
     });
 
-    return formatResult(monthlyAggregates, 'Wave / QuickBooks General Ledger', 'wave_quickbooks', totalTxs);
+    return formatResult(monthlyAggregates, 'Dual-Column Bank / Accounting Ledger', 'bank_statement', totalTxs, detectedCurrency);
+  }
+
+  if (isSingleAmountBank) {
+    lines.slice(1).forEach((line) => {
+      const cols = splitCsvLine(line);
+      const dateVal = cols[dateIdxGeneral] || '';
+      const m = extractMonthKey(dateVal);
+      if (!m) return;
+
+      const val = parseCurrency(cols[amountIdxGeneral] || '0');
+      const entry = monthlyAggregates.get(m.key) || { label: m.label, income: 0, expenses: 0, count: 0 };
+
+      if (val > 0) {
+        entry.income += val;
+      } else if (val < 0) {
+        entry.expenses += Math.abs(val);
+      }
+      entry.count += 1;
+      monthlyAggregates.set(m.key, entry);
+      totalTxs++;
+    });
+
+    return formatResult(monthlyAggregates, 'Bank Statement (Date + Amount Export)', 'bank_statement', totalTxs, detectedCurrency);
   }
 
   // Fallback: Standard Spreadsheets / Paste table (Month, Income, Expenses)
@@ -367,6 +414,7 @@ export function parseUniversalCsv(text: string): ParsedCsvResult {
     totalExpenses: Math.round(totalExp),
     monthsCount: legacyRecords.length,
     sampleRowsCount: lines.length,
+    detectedCurrency,
   };
 }
 
@@ -377,7 +425,8 @@ function formatResult(
   aggregates: Map<string, { label: string; income: number; expenses: number; count: number }>,
   detectedFormat: string,
   provider: ParsedCsvResult['provider'],
-  totalTxs: number
+  totalTxs: number,
+  detectedCurrency: string
 ): ParsedCsvResult {
   const sortedKeys = Array.from(aggregates.keys()).sort();
   const records: MonthlyRecord[] = sortedKeys.map((key, idx) => {
@@ -422,6 +471,7 @@ function formatResult(
     totalExpenses,
     monthsCount: finalRecords.length,
     sampleRowsCount: totalTxs,
+    detectedCurrency,
   };
 }
 
@@ -463,8 +513,24 @@ export function parsePastedData(text: string): MonthlyRecord[] {
       income = Math.max(0, firstAsNum);
       expenses = Math.max(0, parseCurrency(parts[1] || '0'));
     } else {
-      income = Math.max(0, parseCurrency(parts[1] || '0'));
-      expenses = Math.max(0, parseCurrency(parts[2] || '0'));
+      // Check if parts[1] is a description text rather than income
+      const p1Num = parseCurrency(parts[1] || '0');
+      const p2Num = parseCurrency(parts[2] || '0');
+
+      if (p1Num > 0 && p2Num >= 0) {
+        income = p1Num;
+        expenses = p2Num;
+      } else if (p1Num === 0 && p2Num !== 0) {
+        // parts[1] was a text description e.g. "Acme Corp Wire" and parts[2] was the amount
+        if (p2Num > 0) {
+          income = p2Num;
+        } else {
+          expenses = Math.abs(p2Num);
+        }
+      } else {
+        income = Math.max(0, p1Num);
+        expenses = Math.max(0, p2Num);
+      }
     }
 
     if (income > 0 || expenses > 0) {

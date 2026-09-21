@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseCurrency, parsePastedData, parseUniversalCsv } from './parser';
+import { parseCurrency, parsePastedData, parseUniversalCsv, detectCurrencySymbol } from './parser';
 
 describe('CSV / TSV Clipboard Parser', () => {
   it('parses currency strings with symbols, commas, and negative signs', () => {
@@ -72,4 +72,40 @@ TR_102,20-01-2025,-300.00,USD,Software Tool,CARD,11700.00,0.00`;
     expect(result.provider).toBe('paypal');
     expect(result.records[0].income).toBe(3395);
   });
+
+  it('auto-detects and aggregates Mercury single-amount bank statement CSV', () => {
+    const mercuryCsv = `Date,Description,Amount,Gl Code
+2025-01-14,Acme Retainer Wire,5200.00,4000
+2025-01-20,Google Workspace & AWS,-180.00,6000
+2025-02-12,Studio Sprint Deposit,4800.00,4000`;
+
+    const result = parseUniversalCsv(mercuryCsv);
+    expect(result.provider).toBe('bank_statement');
+    expect(result.records[0].income).toBe(5200);
+    expect(result.records[0].expenses).toBe(180);
+    expect(result.records[1].income).toBe(4800);
+  });
+
+  it('auto-detects dual-column bank statements (Deposit and Withdrawal)', () => {
+    const bankCsv = `Date,Description,Withdrawal,Deposit
+2025-01-10,Client Inflow,,4500.00
+2025-01-18,Office Rent,800.00,
+2025-02-05,Client Sprint,,3200.00`;
+
+    const result = parseUniversalCsv(bankCsv);
+    expect(result.provider).toBe('bank_statement');
+    expect(result.records[0].income).toBe(4500);
+    expect(result.records[0].expenses).toBe(800);
+    expect(result.records[1].income).toBe(3200);
+  });
+
+  it('detects currency symbol correctly from text', () => {
+    expect(detectCurrencySymbol('Amount in EUR €4500')).toBe('€');
+    expect(detectCurrencySymbol('Paid in GBP £2000')).toBe('£');
+    expect(detectCurrencySymbol('Total INR ₹150000')).toBe('₹');
+    expect(detectCurrencySymbol('CAD C$5000')).toBe('C$');
+    expect(detectCurrencySymbol('AUD A$3200')).toBe('A$');
+    expect(detectCurrencySymbol('$4,500.00 USD')).toBe('$');
+  });
 });
+

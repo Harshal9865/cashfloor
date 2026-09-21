@@ -20,11 +20,25 @@ import {
 interface CsvPasteModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onApply: (records: MonthlyRecord[]) => void;
+  onApply: (records: MonthlyRecord[], detectedCurrency?: string) => void;
   currencySymbol?: string;
 }
 
 const SAMPLE_TEMPLATES: { label: string; provider: string; data: string }[] = [
+  {
+    label: 'Mercury / Checking CSV',
+    provider: 'bank_statement',
+    data: `Date,Description,Amount,Gl Code
+2025-01-14,Acme Retainer Wire,5200.00,4000
+2025-01-20,Google Workspace & AWS,-180.00,6000
+2025-02-12,Studio Sprint Deposit,4800.00,4000
+2025-02-24,Co-Working Desk Rent,-450.00,6010
+2025-03-15,Bolt Inc Retainer,4100.00,4000
+2025-03-28,Adobe CC Software,-65.00,6000
+2025-04-18,Apex Design Project,6700.00,4000
+2025-05-14,Acme Retainer Wire,5100.00,4000
+2025-06-12,Direct Client Retainer,4900.00,4000`,
+  },
   {
     label: 'Wise (TransferWise)',
     provider: 'wise',
@@ -133,7 +147,7 @@ export const CsvPasteModal: React.FC<CsvPasteModalProps> = ({
       );
       return;
     }
-    onApply(result.records);
+    onApply(result.records, result.detectedCurrency);
     onClose();
   };
 

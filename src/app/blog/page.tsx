@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Header from '@/components/Header';
+import MarketingNav from '@/components/MarketingNav';
 import Footer from '@/components/marketing/Footer';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
@@ -39,7 +39,7 @@ export default function BlogPage() {
     return () => { active = false; };
   }, []);
 
-  const categories = ['All', 'Methodology', 'Cross-Border', 'Cash Management', 'Freelance'];
+  const categories = ['All', 'Methodology', 'Cash Management', 'Cross-Border', 'Taxes & Compliance', 'Invoicing & DSO'];
 
   const filteredPosts = posts.filter((post) => {
     const matchesSearch = 
@@ -57,7 +57,7 @@ export default function BlogPage() {
 
   return (
     <div className="min-h-screen bg-[var(--cf-bg)] flex flex-col font-sans transition-colors duration-300">
-      <Header />
+      <MarketingNav />
       
       <main className="flex-1 flex flex-col items-center justify-start pt-28 pb-24 px-4 sm:px-6 md:px-8 relative z-10 overflow-hidden">
         {/* Ambient background glow */}
@@ -72,7 +72,7 @@ export default function BlogPage() {
           <div className="text-center space-y-4 max-w-3xl mx-auto">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-medium text-emerald-600 bg-emerald-500/10 border border-emerald-500/20">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Free Public API Streamed Insights</span>
+              <span>Independent Financial Engineering</span>
             </div>
 
             <motion.h1 
@@ -89,7 +89,7 @@ export default function BlogPage() {
               transition={{ delay: 0.05 }}
               className="text-base sm:text-lg text-[var(--cf-text-muted)] leading-relaxed"
             >
-              Financial engineering, tax escrow models, and real-world strategies for independent consultants, contractors, and global freelancers.
+              Deterministic runway math, 5-pillar cash partitioning, and stress-tested volatility survival guides for consultants, contractors, and global freelancers.
             </motion.p>
           </div>
 
@@ -128,23 +128,21 @@ export default function BlogPage() {
             </div>
           </div>
 
-          {/* Educational Free API Banner */}
+          {/* Editorial Standard Notice */}
           <div className="p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
             <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300">
-              <Globe className="w-4 h-4 shrink-0 text-emerald-600" />
+              <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-600" />
               <span>
-                <strong>Zero-Cost Real-Time API:</strong> Articles are loaded live via the open-access <strong>Dev.to Public Articles REST API</strong> (free, zero API key required), blended with our proprietary mathematical modeling research.
+                <strong>Field-Tested Quantitative Research:</strong> Every journal entry contains reproducible mathematical equations, worked numerical tables, and actionable CashFloor ledger protocols.
               </span>
             </div>
-            <a
-              href="https://dev.to/t/freelance"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/dashboard"
               className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-semibold hover:underline shrink-0"
             >
-              <span>Explore Dev.to Feed</span>
-              <ExternalLink className="w-3 h-3" />
-            </a>
+              <span>Test In Dashboard</span>
+              <ArrowRight className="w-3 h-3" />
+            </Link>
           </div>
 
           {/* Posts Grid */}

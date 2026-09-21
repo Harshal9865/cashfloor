@@ -249,8 +249,17 @@ export default function CashFloorDashboard() {
     }));
   };
 
-  const handleApplyPastedRecords = (pasted: MonthlyRecord[]) => {
+  const [ingestionToast, setIngestionToast] = useState<string | null>(null);
+
+  const handleApplyPastedRecords = (pasted: MonthlyRecord[], detectedCurrency?: string) => {
     setRecords(pasted);
+    if (detectedCurrency && detectedCurrency !== currencySymbol) {
+      setCurrencySymbol(detectedCurrency);
+    }
+    setIngestionToast(`✓ Successfully ingested ${pasted.length} monthly records! Live runway model updated.`);
+    setTimeout(() => {
+      setIngestionToast(null);
+    }, 5000);
   };
 
   const handleExportCsv = () => {
@@ -301,6 +310,30 @@ export default function CashFloorDashboard() {
 
       {/* 3. Main Canvas */}
       <div className="flex-1 max-w-7xl mx-auto w-full px-4 md:px-8 py-8 space-y-6">
+        {/* Real-time Ingestion Toast Banner */}
+        <AnimatePresence>
+          {ingestionToast && (
+            <motion.div
+              initial={{ opacity: 0, y: -10, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.98 }}
+              className="p-3.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 text-xs font-mono flex items-center justify-between shadow-lg"
+            >
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <span>{ingestionToast}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIngestionToast(null)}
+                className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer ml-4"
+              >
+                Dismiss
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* ── Real Data Launchpad & Sample Status Banner ── */}
         {!isDataLoaded ? (
           <div className="h-16 rounded-2xl bg-[var(--cf-surface-alt)]/40 border border-[var(--cf-border-soft)] animate-pulse" />
@@ -428,6 +461,7 @@ export default function CashFloorDashboard() {
           currencySymbol={currencySymbol}
           inflationAdjusted={calculation.inflationAdjusted}
           primaryInsight={calculation.primaryInsight}
+          sustainablePaycheck={calculation.sustainablePaycheck}
         />
 
         {/* BENTO BOX GRID */}

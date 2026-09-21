@@ -18,6 +18,7 @@ interface HeroRunwayProps {
   currencySymbol?: string;
   inflationAdjusted?: InflationAdjustedRunway;
   primaryInsight?: string;
+  sustainablePaycheck?: number;
 }
 
 export const HeroRunway: React.FC<HeroRunwayProps> = ({
@@ -34,6 +35,7 @@ export const HeroRunway: React.FC<HeroRunwayProps> = ({
   currencySymbol = '$',
   inflationAdjusted,
   primaryInsight,
+  sustainablePaycheck = 0,
 }) => {
   const [displayValue, setDisplayValue] = useState<number>(0);
   const [showInflationTooltip, setShowInflationTooltip] = useState(false);
@@ -251,6 +253,20 @@ export const HeroRunway: React.FC<HeroRunwayProps> = ({
           >
             Burn: {currencySymbol}{dailyBurnVelocity.toFixed(2)}/day
           </span>
+          {sustainablePaycheck > 0 && (
+            <span
+              className="px-3 py-1 rounded-full border flex items-center gap-1 font-semibold"
+              style={{
+                background: 'rgba(16,185,129,0.08)',
+                borderColor: 'rgba(16,185,129,0.3)',
+                color: '#10B981',
+              }}
+              title={`Calculated as ((Income Floor - Tax Reserve) - Monthly Buffer Allocation) / 4.33 weeks`}
+            >
+              <span>Safe Weekly Draw:</span>
+              <strong>{currencySymbol}{Math.round(sustainablePaycheck / 4.33).toLocaleString()}/wk</strong>
+            </span>
+          )}
         </div>
       </div>
     </section>

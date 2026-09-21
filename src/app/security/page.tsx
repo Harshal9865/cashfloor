@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import Header from '@/components/Header';
+import MarketingNav from '@/components/MarketingNav';
 import Footer from '@/components/marketing/Footer';
 import { Shield, Lock, Server, CheckCircle, Key } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -9,7 +9,7 @@ import { motion } from 'framer-motion';
 export default function SecurityPage() {
   return (
     <div className="min-h-screen bg-[var(--cf-bg)] flex flex-col font-sans">
-      <Header />
+      <MarketingNav />
       
       <main className="flex-1 flex flex-col items-center justify-start pt-32 pb-24 px-6 relative z-10 overflow-hidden">
         {/* Background glow */}
