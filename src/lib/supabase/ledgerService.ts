@@ -87,7 +87,7 @@ export async function loadUserLedger(
       .from('ledgers')
       .select('id, currency_symbol, updated_at')
       .eq('user_id', userId)
-      .single();
+      .maybeSingle();
 
     if (ledgerError || !ledger) {
       // If user has no ledger in cloud yet, fallback to local if available
@@ -120,7 +120,7 @@ export async function loadUserLedger(
       .from('ledger_assumptions')
       .select('*')
       .eq('ledger_id', ledger.id)
-      .single();
+      .maybeSingle();
 
     const records: MonthlyRecord[] = (recordsData || []).map((r: any) => ({
       id: r.id,
