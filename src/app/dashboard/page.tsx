@@ -21,6 +21,7 @@ import { TaxDeadlineReminders } from '@/components/TaxDeadlineReminders';
 import { InvoiceAgingPanel } from '@/components/InvoiceAgingPanel';
 import { DeductionOptimizer } from '@/components/DeductionOptimizer';
 import { MonteCarloRiskLab } from '@/components/MonteCarloRiskLab';
+import { GuidedTour } from '@/components/GuidedTour';
 import { loadUserLedger, saveUserLedger, SyncStatus } from '@/lib/supabase/ledgerService';
 import { useAuth } from '@/lib/auth/AuthContext';
 import { useEffect, useRef } from 'react';
@@ -64,6 +65,7 @@ export default function Home() {
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isWizardOpen, setIsWizardOpen] = useState(false);
   const [showPhilosophy, setShowPhilosophy] = useState(false);
+  const [isTourOpen, setIsTourOpen] = useState(false);
 
   const isViewingSample = useMemo(() => {
     if (records.length !== REALISTIC_SAMPLE_RECORDS.length) return false;
@@ -500,6 +502,16 @@ export default function Home() {
           <div className="flex flex-wrap items-center justify-center sm:justify-end gap-2.5 w-full sm:w-auto">
             <button
               type="button"
+              onClick={() => setIsTourOpen(true)}
+              className="flex-1 sm:flex-initial justify-center flex items-center gap-1.5 text-xs px-3 py-2 rounded-lg transition-colors cursor-pointer font-mono whitespace-nowrap border"
+              style={{ color: 'var(--cf-accent)', borderColor: 'var(--cf-accent)', background: 'var(--cf-accent-bg)' }}
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Interactive Tour</span>
+            </button>
+
+            <button
+              type="button"
               onClick={handleExportCsv}
               className="flex-1 sm:flex-initial justify-center flex items-center gap-1.5 text-xs px-3 py-2 rounded-lg transition-colors cursor-pointer font-mono whitespace-nowrap border"
               style={{ color: 'var(--cf-text-muted)', borderColor: 'var(--cf-border)', background: 'var(--cf-surface)' }}
@@ -592,6 +604,11 @@ export default function Home() {
         onApplyRealData={handleApplyWizardData}
         currencySymbol={currencySymbol}
         onOpenCsvModal={() => setIsPasteModalOpen(true)}
+      />
+
+      <GuidedTour 
+        isOpen={isTourOpen} 
+        onClose={() => setIsTourOpen(false)} 
       />
 
       {/* Safe-harbor Legal Notice */}

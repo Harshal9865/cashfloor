@@ -36,6 +36,7 @@ const CustomMonthlyTooltip = ({
   const netFlow = income - expenses;
   const isLean = income < floorIncome;
   const isSurplus = balance > bufferTarget;
+  const floorDelta = income - floorIncome;
 
   return (
     <div
@@ -86,11 +87,20 @@ const CustomMonthlyTooltip = ({
             {currencySymbol}{Math.round(balance).toLocaleString()}
           </span>
         </div>
-        {isLean && (
-          <div className="text-[10px] pt-1" style={{ color: 'var(--cf-caution)' }}>
-            ⚠ Below income floor ({currencySymbol}{Math.round(floorIncome).toLocaleString()})
+        
+        <div className="pt-2 border-t mt-2 border-[var(--cf-border-soft)]">
+          <div className="flex justify-between items-center text-[11px]">
+            <span style={{ color: 'var(--cf-text-faint)' }}>Vs. Survival Floor:</span>
+            <span className={`font-mono font-bold ${floorDelta >= 0 ? 'text-[var(--cf-accent)]' : 'text-[var(--cf-caution)]'}`}>
+              {floorDelta >= 0 ? '+' : ''}{currencySymbol}{Math.round(floorDelta).toLocaleString()}
+            </span>
           </div>
-        )}
+          {isLean && (
+            <div className="text-[10px] pt-1" style={{ color: 'var(--cf-caution)' }}>
+              ⚠ Below income floor ({currencySymbol}{Math.round(floorIncome).toLocaleString()})
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

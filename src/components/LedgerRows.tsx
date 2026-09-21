@@ -25,25 +25,25 @@ export const LedgerRows: React.FC<LedgerRowsProps> = ({
   const pillars = result.pillarBreakdown || [];
 
   return (
-    <section className="bg-white hairline-all transition-colors" id="partitions">
+    <section className="transition-colors rounded-2xl border" style={{ background: 'var(--cf-surface)', borderColor: 'var(--cf-border)' }} id="partitions">
       {/* Section Header */}
-      <div className="p-5 md:px-8 hairline-b flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-[#FBFDFB]">
+      <div className="p-5 md:px-8 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-2" style={{ borderColor: 'var(--cf-border)' }}>
         <div>
-          <h2 className="font-serif text-xl sm:text-2xl text-[#16232B] tracking-tight font-normal">
+          <h2 className="font-serif text-xl sm:text-2xl tracking-tight font-normal" style={{ color: 'var(--cf-text)' }}>
             Capital Partitioning &amp; Reserve Pillars
           </h2>
-          <p className="font-sans text-xs text-[#5C6D77] mt-0.5">
+          <p className="font-sans text-xs mt-0.5" style={{ color: 'var(--cf-text-muted)' }}>
             Strict double-entry allocation ensuring core freelancer survival before elective distributions.
           </p>
         </div>
-        <div className="font-mono text-xs text-[#5C6D77] flex items-center space-x-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#2F6F62]"></span>
+        <div className="font-mono text-xs flex items-center space-x-2" style={{ color: 'var(--cf-text-muted)' }}>
+          <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: 'var(--cf-accent)' }}></span>
           <span>AUDIT STATUS: BALANCED</span>
         </div>
       </div>
 
       {/* Ledger Table Header (Desktop lg+) */}
-      <div className="hidden lg:grid grid-cols-12 px-8 py-3 bg-[#E8EDE9] font-mono text-[10px] text-[#5C6D77] uppercase tracking-wider hairline-b">
+      <div className="hidden lg:grid grid-cols-12 px-8 py-3 font-mono text-[10px] uppercase tracking-wider border-b" style={{ background: 'var(--cf-surface-alt)', color: 'var(--cf-text-muted)', borderColor: 'var(--cf-border)' }}>
         <div className="col-span-4">Pillar &amp; Objective</div>
         <div className="col-span-2 text-right">Monthly Quota</div>
         <div className="col-span-2 text-right">Methodology</div>
@@ -52,15 +52,20 @@ export const LedgerRows: React.FC<LedgerRowsProps> = ({
       </div>
 
       {/* Stacked Pillar Rows */}
-      <div className="divide-y divide-[#16232B]/10">
+      <div className="divide-y" style={{ borderColor: 'var(--cf-border)' }}>
         {pillars.map((pillar) => {
-          let badgeStyle = 'border-[#2F6F62]/30 bg-[#2F6F62]/10 text-[#2F6F62]';
+          let badgeStyle = 'border-[var(--cf-accent)] bg-[var(--cf-accent-bg)] text-[var(--cf-accent)]';
+          let borderOpacity = '33';
+          
           if (pillar.solvencyType === 'safe') {
-            badgeStyle = 'border-[#C98A3E]/40 bg-[#C98A3E]/10 text-[#875205]';
+            badgeStyle = 'bg-[rgba(201,138,62,0.1)] text-[#C98A3E]';
+            borderOpacity = '40';
           } else if (pillar.solvencyType === 'warning') {
-            badgeStyle = 'border-[#B4573F]/30 bg-[#B4573F]/10 text-[#B4573F]';
+            badgeStyle = 'bg-[rgba(180,87,63,0.1)] text-[#B4573F]';
+            borderOpacity = '30';
           } else if (pillar.solvencyType === 'surplus') {
-            badgeStyle = 'border-[#C98A3E]/40 bg-[#C98A3E]/10 text-[#875205]';
+            badgeStyle = 'bg-[rgba(201,138,62,0.1)] text-[#C98A3E]';
+            borderOpacity = '40';
           }
 
           const isTotalRow = pillar.id === 'liquid';
@@ -68,17 +73,19 @@ export const LedgerRows: React.FC<LedgerRowsProps> = ({
           return (
             <div
               key={pillar.id}
-              className={`p-5 lg:px-8 lg:py-4 hover:bg-[#2F6F62]/[0.02] transition-colors ${
-                isTotalRow ? 'bg-[#F1F4F2]/50 font-medium' : ''
-              }`}
+              className="p-5 lg:px-8 lg:py-4 transition-colors"
+              style={{
+                background: isTotalRow ? 'var(--cf-surface-alt)' : 'transparent',
+                fontWeight: isTotalRow ? 500 : 400
+              }}
             >
               {/* Desktop View (lg+) */}
               <div className="hidden lg:grid grid-cols-12 items-center">
                 {/* Column 1: Pillar & Objective */}
                 <div className="col-span-4 pr-4">
-                  <div className="text-sm text-[#16232B] font-semibold flex items-center space-x-2">
+                  <div className="text-sm font-semibold flex items-center space-x-2" style={{ color: 'var(--cf-text)' }}>
                     <span
-                      className="w-2 h-2 inline-block shrink-0"
+                      className="w-2 h-2 inline-block shrink-0 rounded-sm"
                       style={{ backgroundColor: pillar.indicatorColor }}
                     ></span>
                     <span>{pillar.name}</span>
@@ -86,42 +93,48 @@ export const LedgerRows: React.FC<LedgerRowsProps> = ({
                       type="button"
                       aria-label={`Inspect ${pillar.name}`}
                       onClick={() => setActiveTooltip(activeTooltip === pillar.id ? null : pillar.id)}
-                      className="text-[#8E9EA7] hover:text-[#2F6F62] transition-colors p-0.5 cursor-pointer"
+                      className="transition-colors p-0.5 cursor-pointer"
+                      style={{ color: 'var(--cf-text-faint)' }}
+                      onMouseEnter={e => e.currentTarget.style.color = 'var(--cf-accent)'}
+                      onMouseLeave={e => e.currentTarget.style.color = 'var(--cf-text-faint)'}
                     >
                       <HelpCircle className="w-3.5 h-3.5" />
                     </button>
                   </div>
-                  <p className="font-sans text-xs text-[#5C6D77] mt-0.5 leading-relaxed">
+                  <p className="font-sans text-xs mt-0.5 leading-relaxed" style={{ color: 'var(--cf-text-muted)' }}>
                     {pillar.objective}
                   </p>
                   {activeTooltip === pillar.id && (
-                    <div className="mt-2 p-2 bg-[#E8EDE9] text-[11px] font-mono text-[#16232B] border border-[#16232B]/10">
+                    <div className="mt-2 p-2 text-[11px] font-mono border rounded" style={{ background: 'var(--cf-surface-alt)', color: 'var(--cf-text)', borderColor: 'var(--cf-border)' }}>
                       Formula: {pillar.formula} • Solvency: {pillar.solvencyStatus}
                     </div>
                   )}
                 </div>
 
                 {/* Column 2: Monthly Quota */}
-                <div className="col-span-2 text-right font-mono text-sm text-[#16232B] font-semibold tabular-nums">
+                <div className="col-span-2 text-right font-mono text-sm font-semibold tabular-nums" style={{ color: 'var(--cf-text)' }}>
                   {currencySymbol}
                   {Math.round(pillar.monthlyQuota).toLocaleString()}
-                  <span className="text-[10px] font-normal text-[#5C6D77] ml-0.5">/mo</span>
+                  <span className="text-[10px] font-normal ml-0.5" style={{ color: 'var(--cf-text-muted)' }}>/mo</span>
                 </div>
 
                 {/* Column 3: Methodology / Formula */}
-                <div className="col-span-2 text-right font-mono text-xs text-[#5C6D77] truncate pl-2" title={pillar.formula}>
+                <div className="col-span-2 text-right font-mono text-xs truncate pl-2" title={pillar.formula} style={{ color: 'var(--cf-text-muted)' }}>
                   {pillar.formula}
                 </div>
 
                 {/* Column 4: Funded Balance */}
-                <div className="col-span-2 text-right font-mono text-sm font-semibold tabular-nums text-[#0f564a]">
+                <div className="col-span-2 text-right font-mono text-sm font-semibold tabular-nums" style={{ color: pillar.solvencyType === 'warning' ? '#B4573F' : 'var(--cf-accent)' }}>
                   {currencySymbol}
                   {Math.round(pillar.fundedBalance).toLocaleString()}
                 </div>
 
                 {/* Column 5: Solvency Status */}
                 <div className="col-span-2 text-right">
-                  <span className={`inline-block px-2 py-0.5 text-[10px] font-mono tracking-wider uppercase border whitespace-nowrap ${badgeStyle}`}>
+                  <span 
+                    className={`inline-block px-2 py-0.5 text-[10px] font-mono tracking-wider uppercase border rounded whitespace-nowrap ${badgeStyle}`}
+                    style={pillar.solvencyType === 'protected' || pillar.solvencyType === 'automated' || pillar.solvencyType === 'funded' ? { borderColor: 'var(--cf-accent)' + borderOpacity, color: 'var(--cf-accent)' } : { borderColor: 'currentColor' }}
+                  >
                     {pillar.solvencyStatus}
                   </span>
                 </div>
@@ -132,36 +145,39 @@ export const LedgerRows: React.FC<LedgerRowsProps> = ({
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center space-x-2">
                     <span
-                      className="w-2.5 h-2.5 inline-block shrink-0"
+                      className="w-2.5 h-2.5 inline-block shrink-0 rounded-sm"
                       style={{ backgroundColor: pillar.indicatorColor }}
                     ></span>
-                    <span className="text-sm text-[#16232B] font-semibold">{pillar.name}</span>
+                    <span className="text-sm font-semibold" style={{ color: 'var(--cf-text)' }}>{pillar.name}</span>
                   </div>
-                  <span className={`inline-block px-2 py-0.5 text-[10px] font-mono tracking-wider uppercase border whitespace-nowrap ${badgeStyle}`}>
+                  <span 
+                    className={`inline-block px-2 py-0.5 text-[10px] font-mono tracking-wider uppercase border rounded whitespace-nowrap ${badgeStyle}`}
+                    style={pillar.solvencyType === 'protected' || pillar.solvencyType === 'automated' || pillar.solvencyType === 'funded' ? { borderColor: 'var(--cf-accent)' + borderOpacity, color: 'var(--cf-accent)' } : { borderColor: 'currentColor' }}
+                  >
                     {pillar.solvencyStatus}
                   </span>
                 </div>
 
-                <p className="font-sans text-xs text-[#5C6D77] leading-relaxed">
+                <p className="font-sans text-xs leading-relaxed" style={{ color: 'var(--cf-text-muted)' }}>
                   {pillar.objective}
                 </p>
 
-                <div className="grid grid-cols-2 gap-3 pt-2 font-mono text-xs bg-[#F5FAFF]/60 p-3 hairline-all">
+                <div className="grid grid-cols-2 gap-3 pt-2 font-mono text-xs p-3 rounded-lg border" style={{ background: 'var(--cf-surface-alt)', borderColor: 'var(--cf-border)' }}>
                   <div>
-                    <span className="text-[10px] text-[#5C6D77] block uppercase font-sans">Monthly Quota</span>
-                    <span className="font-semibold text-[#16232B] tabular-nums">
+                    <span className="text-[10px] block uppercase font-sans" style={{ color: 'var(--cf-text-muted)' }}>Monthly Quota</span>
+                    <span className="font-semibold tabular-nums" style={{ color: 'var(--cf-text)' }}>
                       {currencySymbol}{Math.round(pillar.monthlyQuota).toLocaleString()}/mo
                     </span>
                   </div>
                   <div className="text-right">
-                    <span className="text-[10px] text-[#5C6D77] block uppercase font-sans">Funded Balance</span>
-                    <span className="font-semibold text-[#0f564a] tabular-nums">
+                    <span className="text-[10px] block uppercase font-sans" style={{ color: 'var(--cf-text-muted)' }}>Funded Balance</span>
+                    <span className="font-semibold tabular-nums" style={{ color: pillar.solvencyType === 'warning' ? '#B4573F' : 'var(--cf-accent)' }}>
                       {currencySymbol}{Math.round(pillar.fundedBalance).toLocaleString()}
                     </span>
                   </div>
-                  <div className="col-span-2 pt-1 border-t border-[#16232B]/10">
-                    <span className="text-[10px] text-[#5C6D77] block uppercase font-sans">Formula</span>
-                    <span className="text-[#5C6D77] text-[11px]">{pillar.formula}</span>
+                  <div className="col-span-2 pt-1 border-t" style={{ borderColor: 'var(--cf-border)' }}>
+                    <span className="text-[10px] block uppercase font-sans" style={{ color: 'var(--cf-text-muted)' }}>Formula</span>
+                    <span className="text-[11px]" style={{ color: 'var(--cf-text-muted)' }}>{pillar.formula}</span>
                   </div>
                 </div>
               </div>
@@ -170,34 +186,34 @@ export const LedgerRows: React.FC<LedgerRowsProps> = ({
         })}
       </div>
 
-      {/* Integrated Buffer Progress Gauge matching Google Stitch */}
-      <div className="p-6 md:px-8 hairline-t bg-[#FBFDFB]">
+      {/* Integrated Buffer Progress Gauge */}
+      <div className="p-6 md:px-8 border-t" style={{ borderColor: 'var(--cf-border)' }}>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs font-mono mb-2 gap-1">
-          <span className="text-[#16232B] tracking-wider uppercase">
+          <span className="tracking-wider uppercase" style={{ color: 'var(--cf-text)' }}>
             RUNWAY MATURITY: {result.isInfiniteRunway ? '∞' : result.runwayMonths.toFixed(1)} OF {maxIdealMonths.toFixed(1)} MONTH GOAL
           </span>
-          <span className="font-semibold text-[#0f564a]">
+          <span className="font-semibold" style={{ color: 'var(--cf-accent)' }}>
             {runwayProgress}% OF 6-MONTH EQUILIBRIUM REACHED
           </span>
         </div>
 
         {/* Progress Bar with Pin Marker */}
-        <div className="w-full h-2.5 bg-[#E8EDE9] relative overflow-hidden">
+        <div className="w-full h-2.5 relative overflow-hidden rounded-full" style={{ background: 'var(--cf-surface-alt)' }}>
           <div
-            className="h-full bg-[#2F6F62] transition-all duration-500"
-            style={{ width: `${runwayProgress}%` }}
+            className="h-full transition-all duration-500"
+            style={{ width: `${runwayProgress}%`, background: 'var(--cf-accent)' }}
           ></div>
           {/* Target Marker Line */}
           <div
-            className="absolute top-0 bottom-0 w-0.5 bg-[#16232B] z-10"
-            style={{ left: `${targetPinPosition}%` }}
+            className="absolute top-0 bottom-0 w-0.5 z-10"
+            style={{ left: `${targetPinPosition}%`, background: 'var(--cf-text)' }}
             title={`Minimum Target: ${bufferMultiplier} Months`}
           ></div>
         </div>
 
-        <div className="flex flex-col sm:flex-row justify-between text-[10px] font-mono text-[#5C6D77] mt-2 gap-1">
+        <div className="flex flex-col sm:flex-row justify-between text-[10px] font-mono mt-2 gap-1" style={{ color: 'var(--cf-text-muted)' }}>
           <span>0.0 Mo ({currencySymbol}0)</span>
-          <span className="text-[#16232B] font-semibold">
+          <span className="font-semibold" style={{ color: 'var(--cf-text)' }}>
             | Min Target: {bufferMultiplier} Mo ({currencySymbol}{result.bufferTarget.toLocaleString()})
           </span>
           <span>

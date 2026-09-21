@@ -19,24 +19,39 @@ interface RiskVolatilityRadarProps {
 const CustomRadarTooltip = ({ active, payload }: any) => {
   if (!active || !payload || !payload.length) return null;
   const item = payload[0];
+
+  let interpretation = '';
+  if (item?.payload?.metric === 'Income Variance') {
+    interpretation = item.value > 50 ? 'Your income is highly unpredictable month-to-month. A larger cash buffer is essential.' : 'Your income is relatively stable.';
+  } else if (item?.payload?.metric === 'Peak/Trough Gap') {
+    interpretation = item.value > 50 ? 'Huge difference between your best and worst months. Beware of lifestyle creep during peaks.' : 'Consistent monthly earnings.';
+  } else if (item?.payload?.metric === 'Client Risk') {
+    interpretation = item.value > 40 ? 'DANGER: Too much revenue tied to one client. If they churn, your cash flow collapses.' : 'Healthy diversification of clients.';
+  } else if (item?.payload?.metric === 'Income Stability') {
+    interpretation = item.value > 50 ? 'Your standard deviation is very high relative to your average income.' : 'Predictable monthly revenue.';
+  } else if (item?.payload?.metric === 'Lean Month Freq') {
+    interpretation = item.value > 0 ? 'You regularly earn less than your required survival floor. You are burning cash.' : 'You consistently beat your survival floor.';
+  }
+
   return (
     <div className="rounded-xl text-xs overflow-hidden"
       style={{
         background: 'var(--cf-surface)',
         border: '1px solid var(--cf-border)',
         boxShadow: 'var(--cf-shadow-lg)',
-        minWidth: 160,
+        minWidth: 180,
+        maxWidth: 240,
       }}>
-      <div className="px-4 py-2.5 font-semibold" style={{ background: 'var(--cf-surface-alt)', borderBottom: '1px solid var(--cf-border)', color: 'var(--cf-text)' }}>
-        {item?.payload?.metric}
+      <div className="px-4 py-2.5 font-semibold flex justify-between items-center" style={{ background: 'var(--cf-surface-alt)', borderBottom: '1px solid var(--cf-border)', color: 'var(--cf-text)' }}>
+        <span>{item?.payload?.metric}</span>
+        <span className="font-mono font-bold" style={{ color: item.value > 50 ? 'var(--cf-caution)' : 'var(--cf-accent)' }}>{item?.value}/100</span>
       </div>
-      <div className="px-4 py-3 space-y-1">
-        <div className="flex justify-between gap-4">
-          <span style={{ color: 'var(--cf-text-muted)' }}>Risk Score</span>
-          <span className="font-mono font-bold" style={{ color: 'var(--cf-accent)' }}>{item?.value}/100</span>
-        </div>
-        <div className="text-[11px] pt-1" style={{ color: 'var(--cf-text-faint)', borderTop: '1px solid var(--cf-border)' }}>
+      <div className="px-4 py-3 space-y-2">
+        <div className="text-[11px]" style={{ color: 'var(--cf-text-muted)' }}>
           {item?.payload?.description}
+        </div>
+        <div className="text-[11px] p-2 rounded" style={{ background: item.value > 50 ? 'var(--cf-caution-bg)' : 'var(--cf-accent-bg)', color: item.value > 50 ? 'var(--cf-caution)' : 'var(--cf-accent)' }}>
+          <strong>AI Insight:</strong> {interpretation}
         </div>
       </div>
     </div>
