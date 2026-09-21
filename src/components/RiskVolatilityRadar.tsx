@@ -152,7 +152,7 @@ export const RiskVolatilityRadar: React.FC<RiskVolatilityRadarProps> = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6">
         {/* Radar chart */}
         <div>
           <div className="text-xs font-mono mb-3 flex items-center justify-between" style={{ color: 'var(--cf-text-muted)' }}>

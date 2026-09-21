@@ -20,14 +20,15 @@ export const TaxDeadlineReminders: React.FC = () => {
   else if (currentMonth >= 8 && currentMonth <= 11) nextIndex = 3;
 
   return (
-    <div className="bg-[#16232B] text-[#F1F4F2] p-4 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 w-full">
+    <div className="p-4 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 w-full rounded-2xl border"
+         style={{ background: 'var(--cf-surface-alt)', borderColor: 'var(--cf-border)', color: 'var(--cf-text)' }}>
       <div className="flex items-center space-x-3">
-        <div className="p-2 bg-[#F1F4F2]/10 rounded-full">
-          <CalendarClock className="w-4 h-4 text-[#C98A3E]" />
+        <div className="p-2 rounded-full" style={{ background: 'var(--cf-accent-bg)' }}>
+          <CalendarClock className="w-4 h-4" style={{ color: 'var(--cf-accent)' }} />
         </div>
         <div>
-          <h3 className="font-[var(--font-fraunces)] tracking-wide">Estimated Tax Deadlines</h3>
-          <p className="text-[10px] font-mono text-[#5C6D77] uppercase tracking-widest mt-0.5">
+          <h3 className="font-serif tracking-wide text-[var(--cf-text)]">Estimated Tax Deadlines</h3>
+          <p className="text-[10px] font-mono uppercase tracking-widest mt-0.5" style={{ color: 'var(--cf-text-muted)' }}>
             Avoid underpayment penalties
           </p>
         </div>
@@ -39,19 +40,21 @@ export const TaxDeadlineReminders: React.FC = () => {
           return (
             <div 
               key={d.period}
-              className={`px-3 py-2 border ${
-                isNext 
-                  ? 'border-[#C98A3E] bg-[#C98A3E]/10' 
-                  : 'border-[rgba(241,244,242,0.1)] bg-transparent opacity-60'
-              }`}
+              className="px-3 py-2 border rounded-xl"
+              style={{
+                borderColor: isNext ? 'var(--cf-accent)' : 'var(--cf-border)',
+                background: isNext ? 'var(--cf-accent-bg)' : 'transparent',
+              }}
             >
               <div className="flex items-center gap-1.5">
-                {isNext && <AlertCircle className="w-3 h-3 text-[#C98A3E]" />}
-                <span className={`text-[10px] font-mono tracking-wider ${isNext ? 'text-[#C98A3E]' : ''}`}>
+                {isNext && <AlertCircle className="w-3 h-3" style={{ color: 'var(--cf-accent)' }} />}
+                <span className="text-[10px] font-mono tracking-wider" 
+                      style={{ color: isNext ? 'var(--cf-accent)' : 'var(--cf-text-muted)' }}>
                   {d.period}
                 </span>
               </div>
-              <div className={`font-semibold text-sm ${isNext ? 'text-white' : ''}`}>
+              <div className="font-semibold text-sm mt-0.5" 
+                   style={{ color: isNext ? 'var(--cf-text)' : 'var(--cf-text-faint)' }}>
                 {d.date}
               </div>
             </div>

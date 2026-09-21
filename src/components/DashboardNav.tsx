@@ -133,15 +133,30 @@ export default function DashboardNav({
           }}
         >
 
-          {/* ── Logo ── */}
-          <Link href="/" className="flex items-center gap-2.5 group shrink-0">
-            <div className="relative w-7 h-7 bg-gradient-to-br from-[#16232B] to-[#2F6F62] rounded-lg flex items-center justify-center shadow-sm group-hover:shadow-[0_0_12px_rgba(47,111,98,0.4)] transition-shadow">
-              <span className="text-white font-serif text-sm font-bold">C</span>
-            </div>
-            <span className="font-serif text-base text-[var(--cf-text)] tracking-tight group-hover:text-[var(--cf-accent)] transition-colors hidden sm:block">
-              CashFloor
-            </span>
-          </Link>
+          {/* ── Mobile Hamburger & Logo ── */}
+          <div className="flex items-center gap-2 shrink-0">
+            {/* Mobile hamburger */}
+            <button
+              type="button"
+              onClick={() => setMobileOpen(!mobileOpen)}
+              className="lg:hidden p-1.5 rounded-lg transition-colors cursor-pointer"
+              style={{ color: 'var(--cf-text-muted)', background: 'transparent' }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'var(--cf-surface)')}
+              onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+            >
+              {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+            </button>
+
+            {/* Logo */}
+            <Link href="/" className="flex items-center gap-2.5 group shrink-0">
+              <div className="relative w-7 h-7 bg-gradient-to-br from-[#16232B] to-[#2F6F62] rounded-lg flex items-center justify-center shadow-sm group-hover:shadow-[0_0_12px_rgba(47,111,98,0.4)] transition-shadow">
+                <span className="text-white font-serif text-sm font-bold">C</span>
+              </div>
+              <span className="font-serif text-base text-[var(--cf-text)] tracking-tight group-hover:text-[var(--cf-accent)] transition-colors hidden sm:block">
+                CashFloor
+              </span>
+            </Link>
+          </div>
 
           {/* ── Center Tab Nav (desktop) ── */}
           <nav className="hidden lg:flex items-center gap-0.5 rounded-xl p-1 border"
@@ -369,17 +384,6 @@ export default function DashboardNav({
               </button>
             )}
 
-            {/* Mobile hamburger */}
-            <button
-              type="button"
-              onClick={() => setMobileOpen(!mobileOpen)}
-              className="lg:hidden p-1.5 rounded-lg transition-colors cursor-pointer"
-              style={{ color: 'var(--cf-text-muted)', background: 'transparent' }}
-              onMouseEnter={e => (e.currentTarget.style.background = 'var(--cf-surface)')}
-              onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-            >
-              {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
-            </button>
           </div>
         </div>
       </header>

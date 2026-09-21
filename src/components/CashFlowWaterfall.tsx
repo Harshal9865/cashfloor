@@ -147,7 +147,7 @@ export const CashFlowWaterfall: React.FC<CashFlowWaterfallProps> = ({
             <YAxis
               type="category"
               dataKey="label"
-              width={120}
+              width={150}
               tick={{ fill: 'var(--cf-text)', fontSize: 11, fontFamily: 'var(--font-sans)', fontWeight: 500 }}
               axisLine={false}
               tickLine={false}
