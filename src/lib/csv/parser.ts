@@ -440,7 +440,7 @@ export function parsePastedData(text: string): MonthlyRecord[] {
   const records: MonthlyRecord[] = [];
 
   lines.forEach((line, index) => {
-    let parts = splitCsvLine(line);
+    const parts = splitCsvLine(line);
 
     // Skip table header lines
     const lowerFirst = parts[0]?.toLowerCase();

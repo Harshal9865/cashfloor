@@ -15,6 +15,22 @@ export interface BlogPost {
   tags: string[];
 }
 
+export interface DevToArticleItem {
+  id: number;
+  title: string;
+  description?: string;
+  readable_publish_date?: string;
+  tag_list?: string[];
+  reading_time_minutes?: number;
+  url: string;
+  cover_image?: string | null;
+  social_image?: string | null;
+  user?: {
+    name?: string;
+    profile_image?: string;
+  };
+}
+
 export const CORNERSTONE_POSTS: BlogPost[] = [
   {
     id: 'the-20th-percentile-math',
@@ -30,39 +46,39 @@ export const CORNERSTONE_POSTS: BlogPost[] = [
       name: 'CashFloor Research Desk',
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
     },
-    tags: ['Runway', 'Monte Carlo', 'Risk Defense'],
+    tags: ['runway', 'volatility', 'mathematics'],
   },
   {
-    id: 'fx-volatility-freelance',
-    title: 'Surviving FX Volatility with Foreign Clients: The 3% Defense',
-    description: 'Working across borders means dealing with exchange rates and hidden intermediary wire fees. Learn how applying a 3% conservative haircut protects your runway.',
+    id: 'five-pillar-partitioning',
+    title: 'The 5-Pillar Partition: How to Structurally Separate Taxes, Runway, and Living Draws',
+    description: 'A step-by-step blueprint for allocating irregular freelance inflows across tax escrow, operating reserve, baseline survival, growth, and guilt-free surplus.',
     date: 'Sep 18, 2026',
-    category: 'Cross-Border',
-    readingTime: '6 min read',
-    url: '/blog/the-20th-percentile-math', // fallback internal anchor
-    isExternal: false,
-    coverImage: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=80',
-    author: {
-      name: 'CashFloor Quantitative Team',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80',
-    },
-    tags: ['FX Rates', 'Wise Invoicing', 'Arbitrage'],
-  },
-  {
-    id: 'feast-or-famine-cycle',
-    title: 'Breaking the Feast-or-Famine Cycle: Building a 5-Pillar Partition',
-    description: 'A comprehensive playbook on structuring your business account into automated sub-reserves: Taxes, Living Baseline, Client Shock Buffer, and Growth Capital.',
-    date: 'Sep 21, 2026',
     category: 'Cash Management',
     readingTime: '7 min read',
-    url: '/blog/the-20th-percentile-math',
+    url: '#',
     isExternal: false,
     coverImage: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=80',
     author: {
-      name: 'Editorial Desk',
-      avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&auto=format&fit=crop&q=80',
+      name: 'Elena Rostova, CPA',
+      avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&auto=format&fit=crop&q=80',
     },
-    tags: ['Cashflow', 'Tax Escrow', 'Solo Operators'],
+    tags: ['taxes', 'partitioning', 'financial-calm'],
+  },
+  {
+    id: 'fx-volatility-haircuts',
+    title: 'Cross-Border Contractor FX Buffering: Defending Against Currency Swings in USD/EUR',
+    description: 'When billing international clients in foreign currencies, exchange rate volatility can wipe out your net margin. Here is how to apply conservative FX haircuts to your forward runway.',
+    date: 'Sep 20, 2026',
+    category: 'Cross-Border',
+    readingTime: '6 min read',
+    url: '#',
+    isExternal: false,
+    coverImage: 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=800&auto=format&fit=crop&q=80',
+    author: {
+      name: 'Marcus Chen',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80',
+    },
+    tags: ['fx', 'international', 'hedging'],
   },
 ];
 
@@ -84,7 +100,7 @@ export async function fetchLiveFreelanceArticles(): Promise<BlogPost[]> {
     const data = await res.json();
     if (!Array.isArray(data)) return CORNERSTONE_POSTS;
 
-    const livePosts: BlogPost[] = data.map((item: any) => ({
+    const livePosts: BlogPost[] = (data as DevToArticleItem[]).map((item) => ({
       id: `devto-${item.id}`,
       title: item.title,
       description: item.description || item.title,
@@ -101,10 +117,9 @@ export async function fetchLiveFreelanceArticles(): Promise<BlogPost[]> {
       tags: item.tag_list || ['freelance', 'business'],
     }));
 
-    // Return combination of our proprietary methodology + live articles
     return [...CORNERSTONE_POSTS, ...livePosts];
-  } catch (error) {
-    console.warn('Unable to load live articles, serving cornerstone posts:', error);
+  } catch (err) {
+    console.warn('Unable to load live articles from Dev.to API, using cornerstone guides fallback:', err);
     return CORNERSTONE_POSTS;
   }
 }

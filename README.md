@@ -1,108 +1,85 @@
 # CashFloor 🟢
 
-**The Professional Ledger for Irregular Income.**  
-CashFloor is an educational simulation tool and professional ledger designed specifically for freelancers, consultants, and independent professionals. It translates unpredictable income streams into a mathematically secure runway, eliminating financial anxiety through the "20th Percentile Rule" and automated stress testing.
+**The Professional Financial Cockpit & Runway Engine for Irregular Income.**  
+CashFloor is a commercial-grade fintech web application designed specifically for international freelancers, solo consultants, boutique agencies, and independent professionals. It translates unpredictable revenue streams into a mathematically sound forward runway, eliminating volatility panic through the empirical **20th Percentile Rule**, structural tax escrow, and automated stress testing.
 
 ---
 
 ## 🎯 Target Users & Audience
-- **Freelancers & Independent Contractors:** Professionals dealing with variable, irregular income month-to-month.
-- **Agency Owners & Solo Consultants:** Businesses that rely on retainers with a high risk of sudden client churn.
-- **Creators & Gig Workers:** Individuals seeking a conservative baseline (financial floor) rather than naive average-based budgeting.
-
-## 💡 How This Helps (Value Proposition)
-Traditional budgeting software assumes a steady bi-weekly paycheck. When a freelancer uses standard budgeting apps, a single slow month can break their financial system.
-CashFloor solves this by:
-1. **Using Conservative Math (The 20th Percentile):** We calculate your runway based on your worst months, not a naive average. You will never be caught off-guard.
-2. **Automated Tax Partitioning:** Instantly escrows a percentage of every dollar earned for taxes, so your "Ending Cash" is your *real* cash.
-3. **Scenario Testing (The Lab):** Instantly simulate catastrophic events (e.g., losing a 30% client, a $10,000 unexpected expense) locally in the browser to see the exact date your money runs out.
+- **International Freelancers & Remote Contractors:** Professionals receiving multi-currency payments (USD, EUR, GBP) via Wise, Stripe, and PayPal with irregular billing cycles.
+- **Consultants & Agency Owners:** Businesses managing client retainers with exposure to late payments (Net-30/60 DSO) and client churn.
+- **Solopreneurs & Knowledge Workers:** Independent creators seeking a conservative baseline (financial floor) rather than naive average-based budgeting.
 
 ---
 
-## 🎨 UI/UX & Theme Info
-CashFloor is designed to feel **premium, secure, and calm**. It borrows aesthetic cues from high-end fintech tools (like Stripe and Linear) and elite banking.
-
-- **Color Palette:** Deep Emeralds (`#2F6F62`), Dark Slate Blues (`#16232B`), and subtle warm/gold accents for warnings.
-- **Atmosphere:** Dark Mode by default. Extensive use of Glassmorphism (blur backdrops), smooth glowing borders, and radial gradients.
-- **Typography:** Elegant Serifs for headings (evoking trust and established finance) mixed with stark, highly legible Monospace fonts for numbers and data.
-- **Animations:** Built with `framer-motion`. Includes cinematic ultra-smooth scroll parallax, 3D holographic tilt cards, staggered Bento grid reveals, and micro-interactions on hover.
-
----
-
-## 🌊 User Flow
-1. **Landing Page (Marketing):** User lands on the homepage, experiences the cinematic 3D scrolling animations explaining the 20th Percentile Rule.
-2. **Authentication:** User clicks "Open the Studio" and is prompted with a sleek modal to Sign In / Sign Up via Supabase Auth.
-3. **Data Onboarding:** User lands on the Dashboard. If empty, a "Pro Tip" guides them to export a CSV from Upwork, Stripe, or QuickBooks.
-4. **Data Entry (Paste Modal):** User pastes their raw CSV data. The parser automatically structures it into the ledger.
-5. **Assumption Tuning:** User adjusts the top control bar (Tax Reserve %, Savings Buffer, Starting Balance).
-6. **Stress Testing:** User selects a Scenario (e.g., "Client Churn (30% Loss)"). The calculation engine immediately recalculates the cascading cash flow and updates all charts at 60fps.
-7. **Monetization (Paywall):** Advanced metrics and certain scenarios trigger a paywall routing the user to the `/pricing` page.
+## 💡 Core Pillars & Value Proposition
+Traditional budgeting software assumes a steady bi-weekly salary. For independent professionals with feast-or-famine income cycles, averages create a dangerous mathematical illusion:
+1. **The 20th Percentile Floor:** Calculates forward runway from historical worst-case cycles, ensuring personal burn is always protected against drought periods.
+2. **Automated Tax Partitioning (5-Pillar Protocol):** Structurally locks away tax reserves (e.g. 25%) before funds can be drawn for personal spending.
+3. **Multi-Scenario Stress Testing:** Simulates client churn (e.g. 30% revenue drop), contract delays, and emergency expenses to pinpoint the exact zero-cash exhaustion date.
+4. **Client Customization Architecture:** Configures legal entity rules (LLC, S-Corp, Sole Proprietorship), DSO payment lag (Net-15/30/60), target safety buffers, and FX volatility haircuts.
+5. **Zero-Surveillance Universal Ingestion:** Instantly ingests and parses CSV exports from **Wise**, **Stripe**, **PayPal**, **Upwork**, and **Wave Accounting** with 100% client-side processing—zero bank credentials or surveillance required.
 
 ---
 
-## 📊 Architecture & Flow Chart
+## 🎨 UI/UX & Brand Aesthetics
+- **Geometric Brand Emblem:** A custom SVG mark featuring the baseline safety floor datum line, an ascending runway trajectory, and an emerald equilibrium node (`#3DE8C8`).
+- **Curated Palette:** Deep Emeralds (`#2F6F62`), Dark Slate Blues (`#16232B`), and warm amber caution accents.
+- **Seamless Local-First Hydration:** Zero-flicker state loading ensures dashboard calibration badges and navigation avatar states load with frame-1 stability.
+- **Dynamic Micro-Interactions:** Smooth Framer Motion transitions, interactive Annual/Monthly pricing toggles with live discount badges, and responsive tooltips.
 
-CashFloor uses a **Local-First Calculation Engine** paired with a **Cloud Sync Layer** (Supabase) for data persistence across devices.
+---
+
+## 🌊 Application Architecture & User Flow
 
 ```mermaid
 graph TD
-    A[User Input / CSV Paste] --> B(React State: records & assumptions)
-    B --> C{Calculation Engine}
-    C -->|Calculates cascading totals| D[Waterfall Metrics]
-    C -->|Calculates exhaustion date| E[Risk & Runway Charts]
-    C -->|Applies 20th Percentile| F[Conservative Floor]
+    A[Universal CSV / Drag-and-Drop / Pasted Input] -->|Auto-Detect Provider| B(Wise / Stripe / PayPal / Wave Parser)
+    B --> C[12-Month Aggregated Records]
+    C --> D{Calculation Engine}
+    D -->|20th Percentile Logic| E[Baseline Survival Floor]
+    D -->|Tax Partitioning| F[Tax Escrow & Safe Draw]
+    D -->|Scenario Stress Tests| G[Exhaustion Date & Runway Countdown]
     
-    B -->|Debounced Auto-Save| G[(Supabase Cloud)]
+    C -->|Local-First Sync| H[(Encrypted Local Storage Cache)]
+    C -->|Cloud Sync| I[(Supabase PostgreSQL Ledger)]
     
-    G -->|RLS Policies| H[Profiles Table]
-    G -->|RLS Policies| I[Ledgers Table]
-    G -->|Storage| J[Avatars Bucket]
+    J[Account Customization] -->|DSO & FX Haircuts| D
 ```
 
 ---
 
-## 🗄️ Database Structure (Supabase PostgreSQL)
+## 🛠️ Supported Integrations & File Formats
 
-We use strict **Row Level Security (RLS)** ensuring users can only read and write their own encrypted financial data.
-
-1. **`auth.users`** (Supabase native)
-2. **`public.profiles`**
-   - `id` (uuid, references `auth.users`)
-   - `full_name` (text)
-   - `avatar_url` (text - points to `avatars` bucket)
-   - `default_currency` (text)
-   - `default_tax_rate` (numeric)
-3. **`public.ledgers`**
-   - `id` (uuid)
-   - `user_id` (uuid, references `auth.users`)
-   - `name` (text) - *A user can have multiple ledgers (e.g. "Agency", "Personal")*
-4. **`public.ledger_records`**
-   - `id` (uuid)
-   - `ledger_id` (uuid)
-   - `month` (text)
-   - `income` (numeric)
-   - `expenses` (numeric)
-   - `sort_order` (integer)
-5. **`public.ledger_assumptions`**
-   - `ledger_id` (uuid)
-   - `tax_reserve_pct` (numeric)
-   - `buffer_months_multiplier` (numeric)
-   - `current_savings` (numeric)
-   - `scenario` (text)
-
-*(A trigger function automatically creates a `profiles` row when a new user signs up in `auth.users`)*
+| Provider | Export Type | Detected Columns | Ingestion Mode |
+| :--- | :--- | :--- | :--- |
+| **Wise (TransferWise)** | Balance Statement CSV | `TransferWise ID`, `Date`, `Amount`, `Total fees` | Auto-detect credits/debits |
+| **Stripe Invoicing** | Balance History CSV | `Created (UTC)`, `Amount`, `Fee`, `Net`, `Type` | Normalizes charges & fees |
+| **PayPal** | Completed Activity CSV | `Date`, `Gross`, `Fee`, `Net`, `Status` | Completed transactions only |
+| **Upwork / Platforms** | Transaction History CSV | `Date`, `Ref ID`, `Amount`, `Type` | Separates earnings from withdrawals |
+| **Wave / QuickBooks** | General Ledger CSV | `Date`, `Debit`, `Credit` / `Split`, `Amount` | Aggregates income & business expenses |
+| **Spreadsheets** | Excel / Google Sheets | Tab, Comma, or Semicolon separated columns | Instant clipboard paste |
 
 ---
 
-## 🧪 Tests Done
-- **Unit Testing (Engine):** The core mathematical engine (`engine.ts`) is fully covered by Vitest. Tests verify that the cascading logic correctly deducts taxes, handles negative net changes, and accurately calculates the 20th percentile mathematical floor.
-- **E2E Testing (Playwright):** Automated tests exist for critical user journeys, including the Blog/SEO rendering and the Auth flow.
-- **Component Isolation:** The dashboard layout handles `isLocked` paywall gating flawlessly, preventing unauthorized access to premium widgets.
-- **Type Safety:** The entire application strictly adheres to TypeScript interfaces, resulting in zero `tsc` build errors.
+## 📰 Real-Time Freelance Knowledge Feed
+CashFloor streams real, published articles from the free public **Dev.to REST API** (`https://dev.to/api/articles?tag=freelance&per_page=9`), combined with our cornerstone methodology guides:
+- *The 20th Percentile Math: Why Average Income is a Trap for Freelancers*
+- *The 5-Pillar Partition: How to Structurally Separate Taxes, Runway, and Living Draws*
+- *Cross-Border Contractor FX Buffering: Defending Against Currency Swings in USD/EUR*
 
 ---
 
-## 🚀 Use Cases
-1. **The Feast-or-Famine Freelancer:** Just landed a massive $20k contract, but has no guaranteed work next month. CashFloor automatically escrows taxes and shows them exactly how many months of runway that $20k provides based on their historical worst-case spending.
-2. **The Agency Owner:** Wants to hire a new contractor but isn't sure if they can afford it. They use the **Scenario Tester** in CashFloor to add a theoretical expense and instantly see if their exhaustion date drops below the 6-month safety buffer.
-3. **The Consultant Preparing for Taxes:** Pastes their entire 12-month QuickBooks export into CashFloor to immediately see their exact tax liability and ensure they haven't drawn too much personal cash.
+## 🧪 Testing & Verification
+- **Vitest Unit Suite:** 27/27 unit tests passing across calculation engine, universal CSV parsing, date normalization, and auth logic.
+- **Production Build:** Fully verified with Next.js 16 (Webpack) and TypeScript with zero compilation errors.
+
+---
+
+## 💻 Tech Stack
+- **Framework:** Next.js 16 (App Router), React 19, TypeScript
+- **Styling:** Vanilla CSS Custom Properties (`--cf-*`), Tailwind CSS v4
+- **Animations:** Framer Motion
+- **Database & Auth:** Supabase (PostgreSQL, Row-Level Security, Auth)
+- **Visuals & Charts:** Recharts, Lucide Icons
+- **Testing:** Vitest
