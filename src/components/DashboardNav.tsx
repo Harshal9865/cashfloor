@@ -92,7 +92,7 @@ export default function DashboardNav({
         className={`fixed top-4 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none transition-all duration-500`}
       >
         <div
-          className="pointer-events-auto flex items-center justify-between w-full max-w-5xl px-3.5 h-13 rounded-2xl border transition-shadow duration-300"
+          className="pointer-events-auto flex items-center justify-between w-full max-w-6xl px-4 h-13 min-h-[52px] max-h-[52px] rounded-2xl border transition-all duration-300"
           style={{
             background: 'var(--cf-nav-bg)',
             backdropFilter: 'blur(20px)',
@@ -121,7 +121,7 @@ export default function DashboardNav({
           </div>
 
           {/* ── Center Route Nav (desktop) ── */}
-          <nav className="hidden lg:flex items-center gap-1 rounded-xl p-1 border"
+          <nav className="hidden lg:flex items-center gap-1 rounded-xl p-1 border shrink-0 whitespace-nowrap"
             style={{ background: 'var(--cf-surface)', borderColor: 'var(--cf-border)' }}>
             {NAV_SECTIONS.map((s) => {
               const isActive = pathname === s.href;
@@ -130,7 +130,7 @@ export default function DashboardNav({
                 <Link
                   key={s.label}
                   href={s.href}
-                  className="relative px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors duration-200"
+                  className="relative px-3.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap shrink-0 transition-colors duration-200"
                   style={{ color: isActive ? 'var(--cf-text)' : 'var(--cf-text-muted)' }}
                 >
                   {isActive && (
@@ -141,18 +141,18 @@ export default function DashboardNav({
                       transition={{ type: 'spring', stiffness: 500, damping: 35 }}
                     />
                   )}
-                  <span className="relative z-10">{s.label}</span>
+                  <span className="relative z-10 whitespace-nowrap select-none">{s.label}</span>
                 </Link>
               );
             })}
           </nav>
 
           {/* ── Right Actions ── */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0 whitespace-nowrap">
             
             {/* Sync Status Badge */}
             <div 
-              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono border"
+              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono border whitespace-nowrap shrink-0"
               style={{ 
                 borderColor: 'var(--cf-border-soft)',
                 background: 'var(--cf-surface-alt)',
@@ -160,14 +160,14 @@ export default function DashboardNav({
               }}
               title={syncStatus === 'synced' ? 'All changes saved to PostgreSQL with RLS' : 'Saved in local browser memory'}
             >
-              <span className="w-1.5 h-1.5 rounded-full" style={{ background: syncColor }} />
-              <span className="font-medium">{syncLabel}</span>
+              <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: syncColor }} />
+              <span className="font-medium whitespace-nowrap">{syncLabel}</span>
             </div>
             
-            <ThemeToggle className="hidden sm:flex" />
+            <ThemeToggle className="hidden sm:flex shrink-0" />
 
             {/* Unified Canonical Profile Dropdown */}
-            <ProfileDropdown align="right" />
+            <ProfileDropdown align="right" className="shrink-0" />
 
           </div>
         </div>

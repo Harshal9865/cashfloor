@@ -1,7 +1,7 @@
 import React from 'react';
 import { Metadata } from 'next';
 import Link from 'next/link';
-import MarketingNav from '@/components/MarketingNav';
+import DashboardNav from '@/components/DashboardNav';
 import Footer from '@/components/marketing/Footer';
 import CashFloorLogo from '@/components/CashFloorLogo';
 import { 
@@ -70,9 +70,9 @@ export default function AboutPage() {
 
   return (
     <div className="min-h-screen bg-[var(--cf-bg)] text-[var(--cf-text)] transition-colors duration-300 font-sans flex flex-col">
-      <MarketingNav />
+      <DashboardNav />
 
-      <main className="flex-1 pt-32 pb-24 px-4 sm:px-6 md:px-8 max-w-6xl mx-auto w-full space-y-24 relative overflow-hidden">
+      <main className="flex-1 pt-6 pb-24 px-4 sm:px-6 md:px-8 max-w-6xl mx-auto w-full space-y-24 relative overflow-hidden">
         {/* Ambient background glow */}
         <div 
           className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[600px] rounded-full blur-[140px] opacity-15 pointer-events-none" 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Metadata } from 'next';
 import Link from 'next/link';
-import MarketingNav from '@/components/MarketingNav';
+import DashboardNav from '@/components/DashboardNav';
 import Footer from '@/components/marketing/Footer';
 import { ShieldCheck, Lock, Database, ArrowLeft, Globe, EyeOff, Server } from 'lucide-react';
 
@@ -13,9 +13,9 @@ export const metadata: Metadata = {
 export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-[var(--cf-bg)] text-[var(--cf-text)] transition-colors duration-300 font-sans flex flex-col">
-      <MarketingNav />
+      <DashboardNav />
       
-      <main className="flex-1 max-w-4xl mx-auto px-4 sm:px-6 md:px-8 pt-28 pb-20 w-full space-y-10">
+      <main className="flex-1 max-w-4xl mx-auto px-4 sm:px-6 md:px-8 pt-6 pb-20 w-full space-y-10">
         {/* Navigation Breadcrumb */}
         <div className="flex items-center justify-between">
           <Link

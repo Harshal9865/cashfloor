@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import MarketingNav from '@/components/MarketingNav';
+import DashboardNav from '@/components/DashboardNav';
 import Footer from '@/components/marketing/Footer';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
@@ -57,9 +57,9 @@ export default function BlogPage() {
 
   return (
     <div className="min-h-screen bg-[var(--cf-bg)] flex flex-col font-sans transition-colors duration-300">
-      <MarketingNav />
+      <DashboardNav />
       
-      <main className="flex-1 flex flex-col items-center justify-start pt-28 pb-24 px-4 sm:px-6 md:px-8 relative z-10 overflow-hidden">
+      <main className="flex-1 flex flex-col items-center justify-start pt-6 pb-24 px-4 sm:px-6 md:px-8 relative z-10 overflow-hidden">
         {/* Ambient background glow */}
         <div 
           className="absolute top-[-20%] left-[50%] -translate-x-1/2 w-[800px] h-[600px] rounded-full blur-[140px] opacity-15 pointer-events-none" 

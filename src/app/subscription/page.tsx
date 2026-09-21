@@ -18,7 +18,7 @@ import {
   Layers,
   ChevronDown
 } from 'lucide-react';
-import MarketingNav from '@/components/MarketingNav';
+import DashboardNav from '@/components/DashboardNav';
 import Footer from '@/components/marketing/Footer';
 import { useAuth } from '@/lib/auth/AuthContext';
 import { usePayment } from '@/lib/payment/PaymentContext';
@@ -65,9 +65,9 @@ export default function SubscriptionPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[var(--cf-bg)] text-[var(--cf-text)] transition-colors duration-300">
-      <MarketingNav />
+      <DashboardNav />
 
-      <main className="flex-1 max-w-6xl mx-auto w-full px-4 sm:px-6 md:px-8 pt-28 pb-20 space-y-16">
+      <main className="flex-1 max-w-6xl mx-auto w-full px-4 sm:px-6 md:px-8 pt-4 pb-20 space-y-16">
         
         {/* Navigation Breadcrumb */}
         <div className="flex items-center justify-between">

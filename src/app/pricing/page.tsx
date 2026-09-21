@@ -20,7 +20,7 @@ import {
   Building,
   UserCheck
 } from 'lucide-react';
-import MarketingNav from '@/components/MarketingNav';
+import DashboardNav from '@/components/DashboardNav';
 import Footer from '@/components/marketing/Footer';
 import { usePayment } from '@/lib/payment/PaymentContext';
 
@@ -129,11 +129,11 @@ export default function PricingPage() {
 
   return (
     <div className="min-h-screen bg-[var(--cf-bg)] text-[var(--cf-text)] flex flex-col font-sans transition-colors duration-300">
-      {/* Global Marketing Navigation Bar with full menu & user dropdown */}
-      <MarketingNav />
+      {/* Global Application Navigation Bar (Image 1 Pill) */}
+      <DashboardNav />
 
       {/* Main Content */}
-      <main className="flex-1 max-w-6xl mx-auto px-4 sm:px-6 md:px-8 pt-10 pb-24 space-y-16">
+      <main className="flex-1 max-w-6xl mx-auto px-4 sm:px-6 md:px-8 pt-4 pb-24 space-y-16">
         
         {/* Breadcrumb & Quick Return */}
         <div className="flex items-center justify-between pt-4">

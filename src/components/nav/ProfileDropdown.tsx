@@ -73,12 +73,12 @@ export default function ProfileDropdown({ align = 'right', className = '' }: Pro
   const initials = getInitials(user.name || user.email || '');
 
   return (
-    <div ref={dropdownRef} className={`relative ${className}`}>
+    <div ref={dropdownRef} className={`relative shrink-0 ${className}`}>
       {/* Trigger Button */}
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 pl-1.5 pr-2.5 py-1 rounded-full text-xs font-medium transition-all border cursor-pointer group select-none"
+        className="flex items-center gap-2 pl-1.5 pr-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap shrink-0 transition-all border cursor-pointer group select-none"
         style={{
           background: isOpen ? 'var(--cf-surface-alt)' : 'var(--cf-surface)',
           borderColor: isOpen ? 'var(--cf-accent)' : 'var(--cf-border)',
@@ -89,7 +89,7 @@ export default function ProfileDropdown({ align = 'right', className = '' }: Pro
         aria-expanded={isOpen}
       >
         {/* Avatar circle with image / initials + online radar dot */}
-        <div className="relative">
+        <div className="relative shrink-0">
           <div
             className="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center text-[11px] font-bold text-white shrink-0 shadow-sm"
             style={{ background: 'linear-gradient(135deg, #2F6F62, #1a4f45)' }}
@@ -106,16 +106,16 @@ export default function ProfileDropdown({ align = 'right', className = '' }: Pro
           />
         </div>
 
-        <span className="hidden sm:inline max-w-[110px] truncate text-xs font-semibold">
+        <span className="hidden sm:inline max-w-[110px] truncate text-xs font-semibold whitespace-nowrap">
           {displayName}
         </span>
 
-        <span className="hidden md:inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-mono font-bold tracking-wider uppercase text-emerald-600 bg-emerald-500/10 border border-emerald-500/20">
+        <span className="hidden md:inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-mono font-bold tracking-wider uppercase text-emerald-600 bg-emerald-500/10 border border-emerald-500/20 whitespace-nowrap shrink-0">
           PRO
         </span>
 
         <ChevronDown
-          className="w-3.5 h-3.5 transition-transform duration-200"
+          className="w-3.5 h-3.5 transition-transform duration-200 shrink-0"
           style={{
             transform: isOpen ? 'rotate(180deg)' : 'none',
             color: 'var(--cf-text-muted)',

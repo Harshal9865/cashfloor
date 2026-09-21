@@ -25,6 +25,7 @@ import {
 import Link from 'next/link';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import CashFloorLogo from '@/components/CashFloorLogo';
+import DashboardNav from '@/components/DashboardNav';
 import Footer from '@/components/marketing/Footer';
 
 export default function AccountPage() {
@@ -270,39 +271,20 @@ export default function AccountPage() {
 
   return (
     <div className="min-h-screen bg-[var(--cf-bg)] text-[var(--cf-text)] pb-24 transition-colors duration-300 flex flex-col justify-between">
-      {/* Nav */}
-      <header className="h-16 flex items-center justify-between px-6 border-b border-[var(--cf-nav-border)] bg-[var(--cf-nav-bg)] backdrop-blur-md sticky top-0 z-50">
-        <div className="flex items-center gap-4">
-          <Link href="/dashboard" className="p-2 rounded-lg hover:bg-[var(--cf-surface-alt)] transition-colors" title="Back to Dashboard">
-            <ArrowLeft className="w-5 h-5 text-[var(--cf-text-muted)]" />
-          </Link>
-          <div className="flex items-center gap-3">
-             <CashFloorLogo size="sm" showWordmark={true} />
-             <span className="text-[var(--cf-border)]">/</span>
-             <span className="font-serif text-base tracking-tight text-[var(--cf-text)]">Vault Settings</span>
-          </div>
-        </div>
-        <div className="flex items-center gap-4">
-          <ThemeToggle />
-          {user ? (
-            <button onClick={() => signOut()} className="p-2 rounded-lg hover:bg-[var(--cf-caution-bg)] hover:text-[var(--cf-caution)] transition-colors text-[var(--cf-text-muted)] flex items-center gap-2 text-sm font-medium">
-              <LogOut className="w-4 h-4" />
-              <span className="hidden sm:inline">Sign Out</span>
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => openAuthModal()}
-              className="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-white transition-all shadow-sm hover:opacity-95 cursor-pointer"
-              style={{ background: 'linear-gradient(135deg, #2F6F62 0%, #1a4f45 100%)' }}
-            >
-              Sign In to Sync
-            </button>
-          )}
-        </div>
-      </header>
+      <DashboardNav />
 
-      <main className="max-w-2xl mx-auto mt-8 px-4 w-full space-y-6 flex-1">
+      <main className="max-w-2xl mx-auto px-4 w-full space-y-6 flex-1 pt-2">
+        {/* Breadcrumb back to Dashboard */}
+        <div className="flex items-center justify-between">
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] transition-colors"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Back to Dashboard</span>
+          </Link>
+          <span className="text-xs font-mono text-[var(--cf-text-faint)]">Vault Settings &amp; Rules</span>
+        </div>
         
         {/* Local Sovereign Mode Notification */}
         {!user && (

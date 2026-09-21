@@ -11,7 +11,7 @@ import {
   FileSpreadsheet,
   CheckCircle2
 } from 'lucide-react';
-import MarketingNav from '@/components/MarketingNav';
+import DashboardNav from '@/components/DashboardNav';
 
 export const metadata: Metadata = {
   title: 'The 20th Percentile Rule: Why Averages Kill Freelance Businesses',
@@ -75,8 +75,7 @@ export default function BlogPostPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdArticle) }}
       />
 
-      <MarketingNav />
-      <div className="h-16" /> {/* Spacer for fixed MarketingNav */}
+      <DashboardNav />
 
       {/* Main Editorial Body */}
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-12 md:py-16">
