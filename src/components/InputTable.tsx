@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { MonthlyRecord } from '../lib/calculator/types';
-import { Plus, ClipboardPaste, Trash2, Lock, FileSpreadsheet } from 'lucide-react';
+import { Plus, ClipboardPaste, Trash2, Lock, FileSpreadsheet, Globe } from 'lucide-react';
 
 interface InputTableProps {
   records: MonthlyRecord[];
@@ -268,7 +268,15 @@ export const InputTable: React.FC<InputTableProps> = ({
 
                   {/* Gross Income Input */}
                   <td className="py-2.5 px-4 text-right">
-                    <div className="inline-flex items-center justify-end">
+                    <div className="inline-flex items-center justify-end group">
+                      <button
+                        type="button"
+                        onClick={() => handleRecordChange(index, 'isForeignCurrency', !row.isForeignCurrency)}
+                        title="Toggle Foreign Currency (Applies 3% FX volatility haircut)"
+                        className={`mr-2 p-1 rounded transition-colors ${row.isForeignCurrency ? 'bg-[var(--cf-accent)]/20 text-[var(--cf-accent)]' : 'text-[var(--cf-text-faint)] hover:text-[var(--cf-text-muted)] hover:bg-[var(--cf-surface-alt)]'}`}
+                      >
+                        <Globe className="w-3.5 h-3.5" />
+                      </button>
                       <span className="text-xs mr-1" style={{ color: 'var(--cf-text-muted)' }}>{currencySymbol}</span>
                       <input
                         type="number"

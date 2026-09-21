@@ -9,6 +9,7 @@ import {
   DSOMetrics,
   AgingBucket,
   InflationAdjustedRunway,
+  PendingInvoice,
 } from './types';
 
 // ─── Financial Calendar Constants ───────────────────────────────────────────
@@ -433,8 +434,13 @@ export function getPrimaryInsight(
 export function computeFullLedger(
   records: MonthlyRecord[],
   assumptions: CalculatorAssumptions,
+  pendingInvoices: PendingInvoice[] = [],
 ): CalculationResult {
-  const rawIncomes = records.map((r) => Math.max(0, Number(r.income) || 0));
+  // Apply a 3% Volatility Haircut to any foreign currency income
+  const rawIncomes = records.map((r) => {
+    const raw = Math.max(0, Number(r.income) || 0);
+    return r.isForeignCurrency ? raw * 0.97 : raw;
+  });
   const expenses = records.map((r) => Math.max(0, Number(r.expenses) || 0));
 
   const retainerProbability = Math.min(
@@ -540,6 +546,22 @@ export function computeFullLedger(
     currentSavings,
     avgMonthlyExpenses,
   );
+
+  // --- EDGE FEATURES ---
+  // Safe To Spend: Liquid cash minus Buffer Target and assumed Tax Reserve
+  const safeToSpend = Math.max(0, currentSavings - bufferTarget - taxReserve);
+
+  // Risk-Adjusted Runway (A/R Probability)
+  let totalPendingValue = 0;
+  pendingInvoices.forEach((inv) => {
+    const fxAdjusted = inv.isForeignCurrency ? inv.amount * 0.97 : inv.amount;
+    totalPendingValue += fxAdjusted * inv.probabilityScore;
+  });
+  
+  const totalAvailableForRunway = currentSavings + totalPendingValue;
+  const rawAdjusted = totalAvailableForRunway / (avgMonthlyExpenses || 1);
+  const riskAdjustedRunwayMonths = avgMonthlyExpenses <= 0 ? 999 : Math.round(rawAdjusted * 10) / 10;
+  // ---------------------
 
   const monthlyFloorSurplusDeficit = netFloor - avgMonthlyExpenses;
   const hasDeficitAtFloor = monthlyFloorSurplusDeficit < 0;
@@ -713,8 +735,12 @@ export function computeFullLedger(
   const partialResult = {
     floorIncome: floor, taxReserve, bufferTarget, currentSavings, bufferGap,
     monthlyBufferContribution, sustainablePaycheck, avgMonthlyIncome,
-    avgMonthlyExpenses, totalAnnualIncome, totalAnnualExpenses, runwayMonths,
-    isInfiniteRunway, isBufferComplete, hasDeficitAtFloor, monthlyFloorSurplusDeficit,
+    avgMonthlyExpenses, totalAnnualIncome,    totalAnnualExpenses,
+    runwayMonths,
+    riskAdjustedRunwayMonths,
+    safeToSpend,
+    isInfiniteRunway,
+    isBufferComplete, hasDeficitAtFloor, monthlyFloorSurplusDeficit,
     monthsToBufferTarget, bufferFundingPercentage, exhaustionDate, dailyBurnVelocity,
     surplusMargin, sensitivityDaysPer150, pillarBreakdown, volatility,
     clientConcentrations, windfallAllocation, waterfallSteps, scenarioImpactDescription,

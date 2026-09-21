@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
-import { MonthlyRecord, CalculatorAssumptions } from '@/lib/calculator/types';
+import { MonthlyRecord, CalculatorAssumptions, PendingInvoice } from '@/lib/calculator/types';
 import { computeFullLedger } from '@/lib/calculator/engine';
 import { exportLedgerToCsv } from '@/lib/export/csvExport';
 import DashboardNav from '@/components/DashboardNav';
@@ -19,6 +19,7 @@ import { AssumptionControls } from '@/components/AssumptionControls';
 import { InputTable } from '@/components/InputTable';
 import { CsvPasteModal } from '@/components/CsvPasteModal';
 import { PinterestCardModal } from '@/components/PinterestCardModal';
+import { PendingInvoices } from '@/components/PendingInvoices';
 import { TaxDeadlineReminders } from '@/components/TaxDeadlineReminders';
 import { InvoiceAgingPanel } from '@/components/InvoiceAgingPanel';
 import { DeductionOptimizer } from '@/components/DeductionOptimizer';
@@ -52,6 +53,7 @@ export default function CashFloorDashboard() {
   const router = useRouter();
   
   const [records, setRecords] = useState<MonthlyRecord[]>(REALISTIC_SAMPLE_RECORDS);
+  const [pendingInvoices, setPendingInvoices] = useState<PendingInvoice[]>([]);
   const [currencySymbol, setCurrencySymbol] = useState('$');
 
   const [assumptions, setAssumptions] = useState<CalculatorAssumptions>({
@@ -169,8 +171,8 @@ export default function CashFloorDashboard() {
 
   // Pure reactive calculation
   const calculation = useMemo(() => {
-    return computeFullLedger(records, assumptions);
-  }, [records, assumptions]);
+    return computeFullLedger(records, assumptions, pendingInvoices);
+  }, [records, assumptions, pendingInvoices]);
 
   const handleResetData = () => {
     const blank = Array.from({ length: 12 }, (_, i) => {
@@ -398,8 +400,25 @@ export default function CashFloorDashboard() {
           {/* LEFT COLUMN: Charts & Ledgers (2/3 width) */}
           <div className="lg:col-span-2 space-y-6 min-w-0">
             
+            {/* Safe To Spend Banner */}
+            <motion.div variants={itemVariants} className="w-full bg-[var(--cf-surface)] border border-[var(--cf-border)] rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-[var(--cf-steady)]/5 to-transparent pointer-events-none" />
+              <div>
+                <h3 className="font-serif text-[var(--cf-text)] font-semibold text-lg flex items-center gap-2">
+                  <ShieldCheck className="w-5 h-5 text-[var(--cf-steady)]" />
+                  Safe To Spend Today
+                </h3>
+                <p className="text-[11px] text-[var(--cf-text-muted)] mt-1 max-w-sm">
+                  Mathematically safe liquid cash after deducting your strict {assumptions.bufferMonthsMultiplier}x minimum safety buffer and full tax liability.
+                </p>
+              </div>
+              <div className="text-3xl md:text-4xl font-serif font-bold text-[var(--cf-steady)] tracking-tight">
+                {currencySymbol}{calculation.safeToSpend.toLocaleString()}
+              </div>
+            </motion.div>
+
             {/* Timeline Chart */}
-            <motion.section variants={itemVariants} id="cash-flow" className="dash-card p-6">
+            <motion.div variants={itemVariants} className="w-full h-[400px] bg-[var(--cf-surface)] border border-[var(--cf-border)] rounded-2xl p-6 flex flex-col shadow-sm relative overflow-hidden group">
               <CashFlowChart
                 records={records}
                 floorIncome={calculation.floorIncome}
@@ -409,7 +428,7 @@ export default function CashFloorDashboard() {
                 taxReservePct={assumptions.taxReservePct}
                 currencySymbol={currencySymbol}
               />
-            </motion.section>
+            </motion.div>
 
             {/* Invoice Aging & DSO Tracker — Phase 1 */}
             <motion.div variants={itemVariants}>
@@ -433,8 +452,8 @@ export default function CashFloorDashboard() {
               />
             </motion.section>
 
-            {/* Ledger Archive */}
-            <motion.section variants={itemVariants} id="ledger-archive" className="dash-card p-6">
+            {/* Input Table (Editable) */}
+            <motion.div variants={itemVariants} id="ledger-data-entry">
               <InputTable
                 records={records}
                 onChange={setRecords}
@@ -444,10 +463,17 @@ export default function CashFloorDashboard() {
                 initialSavings={calculation.currentSavings}
                 floorIncome={calculation.floorIncome}
                 currencySymbol={currencySymbol}
-                isLocked={!isAuthenticated}
-                onUnlockRequest={() => handleUnlockRequest('12-Month Ledger')}
+                isLocked={false}
               />
-            </motion.section>
+
+              {/* Pending Invoices (A/R) */}
+              <PendingInvoices 
+                invoices={pendingInvoices}
+                onChange={setPendingInvoices}
+                currencySymbol={currencySymbol}
+                isLocked={false}
+              />
+            </motion.div>
           </div>
 
           {/* RIGHT COLUMN: Controls & Risk (1/3 width, sticky) */}

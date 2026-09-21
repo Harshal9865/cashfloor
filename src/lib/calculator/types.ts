@@ -11,11 +11,21 @@ export interface MonthlyRecord {
   expenses: number;
   clientTag?: string;
   category?: string;
+  isForeignCurrency?: boolean; // Toggles FX volatility haircut
   // Phase 1: Invoice Aging / DSO
   invoicedDate?: string;  // ISO date when invoice was sent
   paidDate?: string;      // ISO date when it was actually paid
   invoiceStatus?: 'paid' | 'pending' | 'overdue' | 'partial';
   invoiceAmount?: number; // could differ from income if partial payment
+}
+
+export interface PendingInvoice {
+  id: string;
+  expectedDate: string; // ISO date
+  amount: number;
+  clientName: string;
+  probabilityScore: number; // e.g. 0.9 for 90% confidence
+  isForeignCurrency?: boolean;
 }
 
 export type ScenarioMode = 'base' | 'conservative' | 'client_loss' | 'dry_spell' | 'windfall' | 'late_invoice';
@@ -153,6 +163,8 @@ export interface CalculationResult {
   totalAnnualIncome: number;
   totalAnnualExpenses: number;
   runwayMonths: number;
+  riskAdjustedRunwayMonths: number; // Includes probability-weighted A/R
+  safeToSpend: number; // currentSavings - taxReserve - bufferTarget
   isInfiniteRunway: boolean;
   isBufferComplete: boolean;
   hasDeficitAtFloor: boolean;
