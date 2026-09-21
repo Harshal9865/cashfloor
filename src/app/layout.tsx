@@ -5,6 +5,8 @@ import { ThemeProvider } from '@/lib/theme/ThemeContext';
 import { AuthProvider } from '@/lib/auth/AuthContext';
 import { AuthModal } from '@/components/auth/AuthModal';
 import { WorkspaceLoader } from '@/components/WorkspaceLoader';
+import { PaymentProvider } from '@/lib/payment/PaymentContext';
+import MockCheckoutModal from '@/components/payment/MockCheckoutModal';
 
 const fraunces = Fraunces({
   subsets: ['latin'],
@@ -127,9 +129,12 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col font-sans selection:bg-[var(--cf-accent)] selection:text-white transition-colors duration-300">
         <ThemeProvider>
           <AuthProvider>
-            <AuthModal />
-            <WorkspaceLoader />
-            {children}
+            <PaymentProvider>
+              <AuthModal />
+              <MockCheckoutModal />
+              <WorkspaceLoader />
+              {children}
+            </PaymentProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

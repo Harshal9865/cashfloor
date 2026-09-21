@@ -22,10 +22,12 @@ import {
 } from 'lucide-react';
 import MarketingNav from '@/components/MarketingNav';
 import Footer from '@/components/marketing/Footer';
+import { usePayment } from '@/lib/payment/PaymentContext';
 
 export default function PricingPage() {
   const [billingCycle, setBillingCycle] = useState<'annual' | 'monthly'>('annual');
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const { openCheckout, isProSubscriber, activePlan } = usePayment();
 
   const isAnnual = billingCycle === 'annual';
 
@@ -277,17 +279,33 @@ export default function PricingPage() {
 
               {/* CTA Button */}
               <div className="pt-8">
-                <Link
-                  href={plan.href}
-                  className={`w-full py-3 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-sm ${
-                    plan.highlight
-                      ? 'bg-[var(--cf-accent)] hover:bg-[#23584e] text-white shadow-md hover:shadow-xl hover:scale-[1.02]'
-                      : 'bg-[var(--cf-surface-alt)] hover:bg-[var(--cf-border)] text-[var(--cf-text)] border border-[var(--cf-border)]'
-                  }`}
-                >
-                  <span>{plan.cta}</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
+                {plan.id === 'free' ? (
+                  <Link
+                    href={plan.href}
+                    className="w-full py-3 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-sm bg-[var(--cf-surface-alt)] hover:bg-[var(--cf-border)] text-[var(--cf-text)] border border-[var(--cf-border)] cursor-pointer"
+                  >
+                    <span>{plan.cta}</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => openCheckout(plan.id as 'pro' | 'studio', billingCycle)}
+                    className={`w-full py-3 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer ${
+                      plan.highlight
+                        ? 'bg-[var(--cf-accent)] hover:bg-[#23584e] text-white shadow-md hover:shadow-xl hover:scale-[1.02]'
+                        : 'bg-[var(--cf-surface-alt)] hover:bg-[var(--cf-border)] text-[var(--cf-text)] border border-[var(--cf-border)]'
+                    }`}
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-emerald-300" />
+                    <span>
+                      {isProSubscriber && activePlan?.toLowerCase().includes(plan.id)
+                        ? 'Manage Active Plan'
+                        : plan.cta}
+                    </span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                )}
               </div>
             </motion.div>
           ))}

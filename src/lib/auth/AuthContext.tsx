@@ -429,8 +429,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     persistProfile(null);
   }, [persistProfile]);
 
+  const [hasLocalPro, setHasLocalPro] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const checkLocalPro = () => {
+      try {
+        const stored = localStorage.getItem('cf_simulated_pro_subscription');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (parsed?.isActive) {
+            setHasLocalPro(true);
+            return;
+          }
+        }
+        setHasLocalPro(false);
+      } catch {
+        setHasLocalPro(false);
+      }
+    };
+    checkLocalPro();
+    window.addEventListener('storage', checkLocalPro);
+    return () => window.removeEventListener('storage', checkLocalPro);
+  }, []);
+
   const isAuthenticated = !!user;
-  const isPro = !!user; // Any signed in user gets full pro capabilities
+  const isPro = !!user || hasLocalPro;
 
   return (
     <AuthContext.Provider

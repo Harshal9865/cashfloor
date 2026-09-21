@@ -27,6 +27,7 @@ import { MonteCarloRiskLab } from '@/components/MonteCarloRiskLab';
 import { GuidedTour } from '@/components/GuidedTour';
 import { loadUserLedger, saveUserLedger, getLocalLedgerState, SyncStatus } from '@/lib/supabase/ledgerService';
 import { useAuth } from '@/lib/auth/AuthContext';
+import { usePayment } from '@/lib/payment/PaymentContext';
 import { useEffect, useRef } from 'react';
 import { RealDataWizardModal } from '@/components/RealDataWizardModal';
 import { DailyPaymentLog } from '@/components/DailyPaymentLog';
@@ -85,6 +86,7 @@ export default function CashFloorDashboard() {
   
   // Auth & Cloud Sync State
   const { user, isAuthenticated, openAuthModal } = useAuth();
+  const { openCheckout } = usePayment();
   const userId = user?.id;
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('offline');
   const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
@@ -168,7 +170,7 @@ export default function CashFloorDashboard() {
   }, [records, assumptions, currencySymbol, userId]);
 
   const handleUnlockRequest = (featureName: string) => {
-    router.push('/pricing');
+    openCheckout('pro', 'annual');
   };
 
   const handleCurrencyChange = async (newSymbol: string) => {

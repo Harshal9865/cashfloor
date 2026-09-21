@@ -20,24 +20,23 @@ import {
 } from 'lucide-react';
 import MarketingNav from '@/components/MarketingNav';
 import { useAuth } from '@/lib/auth/AuthContext';
+import { usePayment } from '@/lib/payment/PaymentContext';
 
 export default function SubscriptionPage() {
   const [billingCycle, setBillingCycle] = useState<'annual' | 'monthly'>('annual');
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [upgradeSuccess, setUpgradeSuccess] = useState(false);
 
   const { user, isAuthenticated, isPro, openAuthModal } = useAuth();
+  const { 
+    openCheckout, 
+    isProSubscriber, 
+    activePlan, 
+    subscriptionRenewalDate, 
+    cancelSubscription 
+  } = usePayment();
 
-  const handleUpgrade = (tier: string) => {
-    if (!isAuthenticated) {
-      openAuthModal();
-      return;
-    }
-    // Simulate successful upgrade
-    setUpgradeSuccess(true);
-    setTimeout(() => {
-      setUpgradeSuccess(false);
-    }, 4000);
+  const handleUpgrade = (tier: 'pro' | 'studio') => {
+    openCheckout(tier, billingCycle);
   };
 
   const FAQS = [
@@ -144,13 +143,40 @@ export default function SubscriptionPage() {
             </div>
           </div>
 
-          {upgradeSuccess && (
+          {isProSubscriber && (
             <motion.div
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
-              className="p-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 text-xs font-mono font-semibold"
+              className="p-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-left flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs"
             >
-              ✓ Subscription updated successfully! Your Pro features are fully activated.
+              <div className="space-y-0.5">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                    Active Sandbox License: {activePlan || 'Pro Sentinel'}
+                  </span>
+                </div>
+                <p className="text-[11px] text-[var(--cf-text-muted)] font-mono">
+                  Renews: {subscriptionRenewalDate || 'September 2027'} · Zero Bank Surveillance Mode
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => openCheckout('studio', billingCycle)}
+                  className="px-3 py-1.5 rounded-lg bg-[var(--cf-surface)] border border-[var(--cf-border)] text-xs font-mono text-[var(--cf-text)] hover:border-[var(--cf-accent)] cursor-pointer transition-colors"
+                >
+                  Switch Tier
+                </button>
+                <button
+                  type="button"
+                  onClick={cancelSubscription}
+                  className="px-3 py-1.5 rounded-lg text-xs font-mono text-red-500 hover:bg-red-500/10 cursor-pointer transition-colors"
+                >
+                  Revoke License
+                </button>
+              </div>
             </motion.div>
           )}
         </div>
@@ -308,7 +334,11 @@ export default function SubscriptionPage() {
                 }}
               >
                 <Sparkles className="w-4 h-4" />
-                <span>{isPro ? 'Manage Active Pro Plan' : 'Activate Freelance Pro'}</span>
+                <span>
+                  {isProSubscriber && activePlan?.toLowerCase().includes('pro')
+                    ? 'Active Plan (Re-authorize / Test)'
+                    : 'Activate Freelance Pro'}
+                </span>
               </button>
             </div>
           </div>
@@ -376,14 +406,18 @@ export default function SubscriptionPage() {
               <button
                 type="button"
                 onClick={() => handleUpgrade('studio')}
-                className="w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-semibold border transition-all cursor-pointer"
+                className="w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-semibold border transition-all cursor-pointer hover:border-[var(--cf-accent)]"
                 style={{
                   borderColor: 'var(--cf-border)',
                   background: 'var(--cf-surface-alt)',
                   color: 'var(--cf-text)',
                 }}
               >
-                <span>Contact / Upgrade Studio</span>
+                <span>
+                  {isProSubscriber && activePlan?.toLowerCase().includes('studio')
+                    ? 'Active Plan (Re-authorize / Test)'
+                    : 'Upgrade to Studio'}
+                </span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>

@@ -338,6 +338,10 @@ export default function DashboardNav({
                           className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors cursor-pointer">
                           <User className="w-3.5 h-3.5 text-[#2F6F62]" /> Account &amp; Security
                         </Link>
+                        <Link href="/subscription" onClick={() => setAvatarOpen(false)}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors cursor-pointer">
+                          <Sparkles className="w-3.5 h-3.5 text-emerald-500" /> Subscription &amp; Billing
+                        </Link>
                         
                         <div className="my-1 border-t" style={{ borderColor: 'var(--cf-border)' }}></div>
 
