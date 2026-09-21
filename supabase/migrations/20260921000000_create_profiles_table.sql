@@ -39,6 +39,12 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
 
+-- Backfill profiles for existing users who registered before this trigger
+insert into public.profiles (id, full_name, avatar_url)
+select id, raw_user_meta_data->>'full_name', raw_user_meta_data->>'avatar_url'
+from auth.users
+on conflict (id) do nothing;
+
 -- Set up Storage!
 insert into storage.buckets (id, name, public) 
 values ('avatars', 'avatars', true)

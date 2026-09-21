@@ -39,7 +39,7 @@ export default function AccountPage() {
           .from('profiles')
           .select('full_name, avatar_url, default_currency, default_tax_rate')
           .eq('id', user.id)
-          .single();
+          .maybeSingle();
           
         if (data) {
           setFullName(data.full_name || '');
@@ -97,7 +97,7 @@ export default function AccountPage() {
       
       const { error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(filePath, file);
+        .upload(filePath, file, { upsert: true });
         
       if (uploadError) {
         throw uploadError;

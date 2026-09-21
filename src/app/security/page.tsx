@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Header from '@/components/Header';
-import { Footer } from '@/components/Footer';
+import Footer from '@/components/marketing/Footer';
 import { Shield, Lock, Server, CheckCircle, Key } from 'lucide-react';
 import { motion } from 'framer-motion';
 
