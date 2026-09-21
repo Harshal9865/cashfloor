@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Download, Database, RotateCcw, Cloud, User, RefreshCw,
-  ChevronDown, LogOut, Share2, Check, Menu, X, Shield, ShieldCheck, Sparkles
+  ChevronDown, LogOut, Share2, Check, Menu, X, Shield, ShieldCheck, Sparkles, FileText
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/lib/auth/AuthContext';
@@ -20,6 +20,7 @@ interface DashboardNavProps {
   onOpenAuthModal?: () => void;
   onOpenSolvencyModal?: () => void;
   onOpenCalibrationWizard?: () => void;
+  onOpenInvoiceModal?: () => void;
   syncStatus?: 'offline' | 'saving' | 'synced' | 'error';
   lastSavedAt?: string | null;
 }
@@ -39,6 +40,7 @@ export default function DashboardNav({
   onOpenAuthModal,
   onOpenSolvencyModal,
   onOpenCalibrationWizard,
+  onOpenInvoiceModal,
   syncStatus = 'offline',
   lastSavedAt,
 }: DashboardNavProps) {
@@ -240,6 +242,18 @@ export default function DashboardNav({
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
                   <span>Audit PDF</span>
                 </button>
+                {onOpenInvoiceModal && (
+                  <button
+                    type="button"
+                    onClick={onOpenInvoiceModal}
+                    title="Client Invoice Studio (PDF)"
+                    className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer border border-[var(--cf-border)] hover:border-[var(--cf-accent)]"
+                    style={{ color: 'var(--cf-text-muted)', background: 'var(--cf-surface)' }}
+                  >
+                    <FileText className="w-3.5 h-3.5 text-[var(--cf-accent)]" />
+                    <span>Invoice PDF</span>
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={onOpenShareModal}
@@ -360,6 +374,12 @@ export default function DashboardNav({
                           className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors cursor-pointer text-left">
                           <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" /> CPA &amp; Lease Solvency Audit (PDF)
                         </button>
+                        {onOpenInvoiceModal && (
+                          <button onClick={() => { setAvatarOpen(false); onOpenInvoiceModal(); }}
+                            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors cursor-pointer text-left">
+                            <FileText className="w-3.5 h-3.5 text-[var(--cf-accent)]" /> Client Invoice Studio (PDF)
+                          </button>
+                        )}
                         <button onClick={() => { setAvatarOpen(false); onOpenCalibrationWizard?.(); }}
                           className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors cursor-pointer text-left">
                           <Sparkles className="w-3.5 h-3.5 text-amber-500" /> 60s Calibration Wizard
@@ -493,17 +513,26 @@ export default function DashboardNav({
                   <User className="w-3.5 h-3.5" /> Sign In to Pro Suite
                 </button>
               )}
-              <div className="border-t mt-2 pt-2 flex gap-2" style={{ borderColor: 'var(--cf-border)' }}>
-                <button onClick={() => { onExportCsv?.(); setMobileOpen(false); }}
-                  className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs cursor-pointer border"
-                  style={{ color: 'var(--cf-text-muted)', borderColor: 'var(--cf-border)', background: 'var(--cf-surface)' }}>
-                  <Download className="w-3.5 h-3.5" /> Export
-                </button>
-                <button onClick={() => { onLoadSample?.(); setMobileOpen(false); }}
-                  className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs cursor-pointer border"
-                  style={{ color: 'var(--cf-text-muted)', borderColor: 'var(--cf-border)', background: 'var(--cf-surface)' }}>
-                  <Database className="w-3.5 h-3.5" /> Sample
-                </button>
+              <div className="border-t mt-2 pt-2 flex flex-col gap-2" style={{ borderColor: 'var(--cf-border)' }}>
+                {onOpenInvoiceModal && (
+                  <button onClick={() => { onOpenInvoiceModal(); setMobileOpen(false); }}
+                    className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold cursor-pointer border"
+                    style={{ color: 'var(--cf-accent)', borderColor: 'var(--cf-accent)', background: 'var(--cf-accent-bg)' }}>
+                    <FileText className="w-3.5 h-3.5" /> Client Invoice Studio (PDF)
+                  </button>
+                )}
+                <div className="flex gap-2">
+                  <button onClick={() => { onExportCsv?.(); setMobileOpen(false); }}
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs cursor-pointer border"
+                    style={{ color: 'var(--cf-text-muted)', borderColor: 'var(--cf-border)', background: 'var(--cf-surface)' }}>
+                    <Download className="w-3.5 h-3.5" /> Export
+                  </button>
+                  <button onClick={() => { onLoadSample?.(); setMobileOpen(false); }}
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs cursor-pointer border"
+                    style={{ color: 'var(--cf-text-muted)', borderColor: 'var(--cf-border)', background: 'var(--cf-surface)' }}>
+                    <Database className="w-3.5 h-3.5" /> Sample
+                  </button>
+                </div>
               </div>
             </div>
           </motion.div>

@@ -7,6 +7,7 @@ import { AuthModal } from '@/components/auth/AuthModal';
 import { WorkspaceLoader } from '@/components/WorkspaceLoader';
 import { PaymentProvider } from '@/lib/payment/PaymentContext';
 import MockCheckoutModal from '@/components/payment/MockCheckoutModal';
+import { PwaRegister } from '@/components/pwa/PwaRegister';
 
 const fraunces = Fraunces({
   subsets: ['latin'],
@@ -130,6 +131,7 @@ export default function RootLayout({
         <ThemeProvider>
           <AuthProvider>
             <PaymentProvider>
+              <PwaRegister />
               <AuthModal />
               <MockCheckoutModal />
               <WorkspaceLoader />

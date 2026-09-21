@@ -31,6 +31,8 @@ import { usePayment } from '@/lib/payment/PaymentContext';
 import { useEffect, useRef } from 'react';
 import { RealDataWizardModal } from '@/components/RealDataWizardModal';
 import { SolvencyReportModal } from '@/components/SolvencyReportModal';
+import { InvoiceGeneratorModal } from '@/components/InvoiceGeneratorModal';
+import { fetchLiveExchangeRates, calculateFxConversionMultiplier } from '@/lib/currency/fxService';
 import { DailyPaymentLog } from '@/components/DailyPaymentLog';
 import { LegalDisclaimer } from '@/components/LegalDisclaimer';
 import { Share2, BookOpen, Download, Printer, Sparkles, ShieldCheck, HelpCircle, AlertTriangle, Upload, Activity, TrendingDown } from 'lucide-react';
@@ -73,6 +75,7 @@ export default function CashFloorDashboard() {
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isWizardOpen, setIsWizardOpen] = useState(false);
   const [isSolvencyModalOpen, setIsSolvencyModalOpen] = useState(false);
+  const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
   const [showPhilosophy, setShowPhilosophy] = useState(false);
   const [isTourOpen, setIsTourOpen] = useState(false);
 
@@ -176,25 +179,20 @@ export default function CashFloorDashboard() {
   };
 
   const handleCurrencyChange = async (newSymbol: string) => {
+    if (newSymbol === currencySymbol) return;
     try {
-      const res = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
-      const data = await res.json();
-      
-      const symbolToCode: Record<string, string> = {
-        '$': 'USD', '€': 'EUR', '£': 'GBP', '₹': 'INR', 'C$': 'CAD', 'A$': 'AUD'
-      };
-      
-      const oldCode = symbolToCode[currencySymbol] || 'USD';
-      const newCode = symbolToCode[newSymbol] || 'USD';
-      
-      const oldRate = data.rates[oldCode] || 1;
-      const newRate = data.rates[newCode] || 1;
-      const multiplier = newRate / oldRate;
+      const { rates, isLive } = await fetchLiveExchangeRates();
+      const { multiplier, rateDescription } = calculateFxConversionMultiplier(currencySymbol, newSymbol, rates);
       
       setRecords(prev => prev.map(r => ({
         ...r,
         income: Math.round(r.income * multiplier),
         expenses: Math.round(r.expenses * multiplier)
+      })));
+
+      setPendingInvoices(prev => prev.map(inv => ({
+        ...inv,
+        amount: Math.round(inv.amount * multiplier)
       })));
       
       setAssumptions(prev => ({
@@ -204,8 +202,10 @@ export default function CashFloorDashboard() {
       }));
       
       setCurrencySymbol(newSymbol);
+      setIngestionToast(`✓ Converted workspace to ${newSymbol} (${rateDescription}) ${isLive ? 'via live FX rates' : '(offline reference rate)'}`);
+      setTimeout(() => setIngestionToast(null), 5000);
     } catch (e) {
-      console.error('Failed to fetch rates', e);
+      console.error('Failed to convert currency', e);
       setCurrencySymbol(newSymbol);
     }
   };
@@ -266,6 +266,14 @@ export default function CashFloorDashboard() {
     }, 5000);
   };
 
+  const handleSaveInvoiceToReceivables = (pending: PendingInvoice) => {
+    setPendingInvoices(prev => [pending, ...prev]);
+    setIngestionToast(`✓ Invoice for ${pending.clientName} (${currencySymbol}${pending.amount.toLocaleString()}) added to Accounts Receivable.`);
+    setTimeout(() => {
+      setIngestionToast(null);
+    }, 5000);
+  };
+
   const handleExportCsv = () => {
     exportLedgerToCsv(records, calculation, assumptions, currencySymbol);
   };
@@ -300,6 +308,7 @@ export default function CashFloorDashboard() {
         onOpenAuthModal={() => openAuthModal()}
         onOpenSolvencyModal={() => setIsSolvencyModalOpen(true)}
         onOpenCalibrationWizard={() => setIsWizardOpen(true)}
+        onOpenInvoiceModal={() => setIsInvoiceModalOpen(true)}
         syncStatus={syncStatus}
         lastSavedAt={lastSavedAt}
       />
@@ -553,6 +562,7 @@ export default function CashFloorDashboard() {
                 onChange={setPendingInvoices}
                 currencySymbol={currencySymbol}
                 isLocked={false}
+                onOpenInvoiceGenerator={() => setIsInvoiceModalOpen(true)}
               />
             </motion.div>
           </div>
@@ -777,6 +787,13 @@ export default function CashFloorDashboard() {
         assumptions={assumptions}
         records={records}
         currencySymbol={currencySymbol}
+      />
+
+      <InvoiceGeneratorModal
+        isOpen={isInvoiceModalOpen}
+        onClose={() => setIsInvoiceModalOpen(false)}
+        currencySymbol={currencySymbol}
+        onSaveToReceivables={handleSaveInvoiceToReceivables}
       />
 
       <GuidedTour 
