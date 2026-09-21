@@ -81,11 +81,25 @@ function extractMonthKey(dateStr: string): { key: string; label: string } | null
     }
   }
 
-  // Try European format: DD-MM-YYYY or DD/MM/YYYY
-  const euMatch = clean.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})/);
-  if (euMatch) {
-    const year = parseInt(euMatch[3], 10);
-    const monthIdx = parseInt(euMatch[2], 10) - 1;
+  // Try DD-MM-YYYY or MM-DD-YYYY or DD/MM/YYYY or MM/DD/YYYY
+  const slashMatch = clean.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})/);
+  if (slashMatch) {
+    const year = parseInt(slashMatch[3], 10);
+    const p1 = parseInt(slashMatch[1], 10);
+    const p2 = parseInt(slashMatch[2], 10);
+    let monthIdx = -1;
+
+    if (p1 <= 12 && p2 > 12) {
+      // MM/DD/YYYY format (US standard e.g. PayPal, Stripe US)
+      monthIdx = p1 - 1;
+    } else if (p2 <= 12 && p1 > 12) {
+      // DD/MM/YYYY format (European standard e.g. Wise, UK/EU banks)
+      monthIdx = p2 - 1;
+    } else if (p1 <= 12) {
+      // Default to p1
+      monthIdx = p1 - 1;
+    }
+
     if (monthIdx >= 0 && monthIdx < 12) {
       return {
         key: `${year}-${String(monthIdx + 1).padStart(2, '0')}`,
