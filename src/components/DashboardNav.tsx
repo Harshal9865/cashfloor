@@ -38,7 +38,7 @@ export default function DashboardNav({
   syncStatus = 'offline',
   lastSavedAt,
 }: DashboardNavProps) {
-  const { user, signOut, openAuthModal } = useAuth();
+  const { user, loading: authLoading, signOut, openAuthModal } = useAuth();
   const isAuthenticated = !!user;
 
   const handleAuthTrigger = () => {
@@ -250,7 +250,12 @@ export default function DashboardNav({
             <ThemeToggle className="hidden sm:flex" />
 
             {/* Auth / Avatar */}
-            {isAuthenticated ? (
+            {authLoading ? (
+              <div
+                className="flex items-center gap-2 pl-1.5 pr-2.5 py-1 rounded-full border border-[var(--cf-border-soft)] bg-[var(--cf-surface-alt)]/40 animate-pulse"
+                style={{ width: '84px', height: '32px' }}
+              />
+            ) : isAuthenticated ? (
               <div ref={avatarRef} className="relative">
                 <button
                   type="button"
