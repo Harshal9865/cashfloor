@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
 export default function AccountPage() {
-  const { user, signOut } = useAuth();
+  const { user, signOut, refreshProfile, updateProfileData } = useAuth();
   const router = useRouter();
   const supabase = createClient();
   
@@ -74,6 +74,8 @@ export default function AccountPage() {
 
       const { error } = await supabase.from('profiles').upsert(updates);
       if (error) throw error;
+      updateProfileData({ name: fullName, avatar: avatarUrl });
+      await refreshProfile();
       alert('Profile updated securely in the vault.');
     } catch (error: any) {
       alert(error.message);
@@ -105,6 +107,17 @@ export default function AccountPage() {
       
       const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);
       setAvatarUrl(data.publicUrl);
+      
+      // Instantly propagate new avatar across the entire website
+      updateProfileData({ avatar: data.publicUrl });
+      if (user?.id) {
+        await supabase.from('profiles').upsert({
+          id: user.id,
+          avatar_url: data.publicUrl,
+          updated_at: new Date().toISOString(),
+        });
+        await refreshProfile();
+      }
     } catch (error: any) {
       alert(error.message);
     } finally {

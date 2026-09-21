@@ -3,6 +3,7 @@
 import React from 'react';
 import { SlidersHorizontal, RotateCcw, Database, Download, Share2, ArrowRight, Cloud, User, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
+import { useAuth } from '@/lib/auth/AuthContext';
 
 interface HeaderProps {
   isMarketingPage?: boolean;
@@ -27,6 +28,8 @@ export default function Header({
   syncStatus = 'offline',
   lastSavedAt,
 }: HeaderProps) {
+  const { user, isAuthenticated: authIsAuthenticated, openAuthModal } = useAuth();
+  const effectiveAuth = isAuthenticated || authIsAuthenticated;
   return (
     <header className="w-full bg-[#F1F4F2] hairline-b sticky top-0 z-40 transition-colors">
       <div className="max-w-7xl mx-auto px-4 md:px-12 flex justify-between items-center w-full h-16">
@@ -144,24 +147,39 @@ export default function Header({
               </button>
 
               {/* Cloud Sync & Auth Button */}
-              {isAuthenticated ? (
-                <div 
-                  className="flex items-center space-x-1.5 px-2.5 py-1.5 bg-[#2F6F62]/10 border border-[#2F6F62]/30 text-[#0f564a] font-mono text-[11px]"
-                  title={lastSavedAt ? `Cloud Synced at ${lastSavedAt}` : 'Saved to Supabase Cloud'}
-                >
-                  {syncStatus === 'saving' ? (
-                    <RefreshCw className="w-3 h-3 animate-spin text-[#875205]" />
-                  ) : (
-                    <Cloud className="w-3.5 h-3.5 text-[#2F6F62]" />
-                  )}
-                  <span className="hidden lg:inline font-semibold">
-                    {syncStatus === 'saving' ? 'Saving...' : 'Cloud Synced'}
-                  </span>
+              {effectiveAuth ? (
+                <div className="flex items-center space-x-2">
+                  <div 
+                    className="flex items-center space-x-1.5 px-2.5 py-1.5 bg-[#2F6F62]/10 border border-[#2F6F62]/30 text-[#0f564a] font-mono text-[11px]"
+                    title={lastSavedAt ? `Cloud Synced at ${lastSavedAt}` : 'Saved to Supabase Cloud'}
+                  >
+                    {syncStatus === 'saving' ? (
+                      <RefreshCw className="w-3 h-3 animate-spin text-[#875205]" />
+                    ) : (
+                      <Cloud className="w-3.5 h-3.5 text-[#2F6F62]" />
+                    )}
+                    <span className="hidden lg:inline font-semibold">
+                      {syncStatus === 'saving' ? 'Saving...' : 'Cloud Synced'}
+                    </span>
+                  </div>
+                  <Link
+                    href="/account"
+                    className="flex items-center gap-1.5 p-0.5 rounded-full hover:ring-2 hover:ring-[#2F6F62]/30 transition-all cursor-pointer"
+                    title="Vault & Profile Settings"
+                  >
+                    <div className="w-7 h-7 rounded-full overflow-hidden bg-[#16232B] flex items-center justify-center text-white text-[11px] font-bold shadow-sm">
+                      {user?.avatar ? (
+                        <img src={user.avatar} alt={user.name || 'User'} className="w-full h-full object-cover" />
+                      ) : (
+                        user?.name ? user.name.charAt(0).toUpperCase() : 'U'
+                      )}
+                    </div>
+                  </Link>
                 </div>
               ) : (
                 <button
                   type="button"
-                  onClick={onOpenAuthModal}
+                  onClick={onOpenAuthModal || (() => openAuthModal())}
                   className="border border-[#16232B]/20 hover:border-[#2F6F62] bg-white text-[#16232B] hover:text-[#2F6F62] px-2.5 py-2 text-[11px] font-mono uppercase tracking-wider transition-colors flex items-center space-x-1.5 cursor-pointer"
                   title="Sign in to save ledger to cloud"
                 >

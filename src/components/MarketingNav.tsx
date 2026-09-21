@@ -175,13 +175,17 @@ export default function MarketingNav() {
                     }}
                     aria-label="User account menu"
                   >
-                    {/* Avatar circle with initials + online indicator */}
+                    {/* Avatar circle with image / initials + online indicator */}
                     <div className="relative">
                       <div
-                        className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold text-white shrink-0 shadow-sm"
+                        className="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center text-[11px] font-bold text-white shrink-0 shadow-sm"
                         style={{ background: 'linear-gradient(135deg, #2F6F62, #1a4f45)' }}
                       >
-                        {initials}
+                        {user.avatar ? (
+                          <img src={user.avatar} alt={displayName} className="w-full h-full object-cover" />
+                        ) : (
+                          initials
+                        )}
                       </div>
                       <span
                         className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-[var(--cf-surface)] bg-emerald-500"
@@ -230,10 +234,14 @@ export default function MarketingNav() {
                         >
                           <div className="flex items-center gap-3">
                             <div
-                              className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0 shadow-md"
+                              className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center text-sm font-bold text-white shrink-0 shadow-md"
                               style={{ background: 'linear-gradient(135deg, #2F6F62, #1a4f45)' }}
                             >
-                              {initials}
+                              {user.avatar ? (
+                                <img src={user.avatar} alt={displayName} className="w-full h-full object-cover" />
+                              ) : (
+                                initials
+                              )}
                             </div>
                             <div className="min-w-0 flex-1">
                               <div className="flex items-center gap-1.5">
@@ -424,10 +432,14 @@ export default function MarketingNav() {
                 >
                   <div className="flex items-center gap-3">
                     <div
-                      className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0 shadow-sm"
+                      className="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center text-xs font-bold text-white shrink-0 shadow-sm"
                       style={{ background: 'linear-gradient(135deg, #2F6F62, #1a4f45)' }}
                     >
-                      {initials}
+                      {user.avatar ? (
+                        <img src={user.avatar} alt={displayName} className="w-full h-full object-cover" />
+                      ) : (
+                        initials
+                      )}
                     </div>
                     <div className="min-w-0">
                       <p className="text-xs font-semibold truncate" style={{ color: 'var(--cf-text)' }}>

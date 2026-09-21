@@ -69,6 +69,8 @@ interface AuthContextValue {
   authModalDefaultTab: 'signin' | 'signup' | 'demo';
   openAuthModal: (message?: string, defaultTab?: 'signin' | 'signup' | 'demo') => void;
   closeAuthModal: () => void;
+  refreshProfile: () => Promise<void>;
+  updateProfileData: (updates: { name?: string; avatar?: string }) => void;
   signInWithEmail: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   signUpWithEmail: (email: string, password: string, name?: string) => Promise<{ success: boolean; error?: string; autoConfirmed?: boolean }>;
   signInWithDemo: (personaKey?: DemoPersonaKey) => void;
@@ -87,6 +89,8 @@ const AuthContext = createContext<AuthContextValue>({
   authModalDefaultTab: 'signin',
   openAuthModal: () => {},
   closeAuthModal: () => {},
+  refreshProfile: async () => {},
+  updateProfileData: () => {},
   signInWithEmail: async () => ({ success: false }),
   signUpWithEmail: async () => ({ success: false }),
   signInWithDemo: () => {},
@@ -138,20 +142,63 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setAuthModalMessage(undefined);
   }, []);
 
+  // Helper to fetch profile from DB
+  const fetchDbProfile = useCallback(async (userId: string) => {
+    try {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from('profiles')
+        .select('full_name, avatar_url')
+        .eq('id', userId)
+        .maybeSingle();
+      return data;
+    } catch {
+      return null;
+    }
+  }, []);
+
   // Map Supabase user to UserProfile
-  const mapSupabaseUser = useCallback((sbUser: User): UserProfile => {
+  const mapSupabaseUser = useCallback((sbUser: User, dbProfile?: { full_name?: string | null; avatar_url?: string | null } | null): UserProfile => {
     const meta = sbUser.user_metadata || {};
     const email = sbUser.email || '';
-    const name = meta.full_name || meta.name || email.split('@')[0] || 'Independent Pro';
+    const name = dbProfile?.full_name || meta.full_name || meta.name || email.split('@')[0] || 'Independent Pro';
+    const avatar = dbProfile?.avatar_url || meta.avatar_url || meta.picture || undefined;
     return {
       id: sbUser.id,
       email,
       name,
       role: meta.role || 'Consultant / Freelancer',
       tier: 'pro', // Authenticated users get full Pro access
+      avatar,
       isDemo: false,
     };
   }, []);
+
+  // Refresh profile from database
+  const refreshProfile = useCallback(async () => {
+    const supabase = createClient();
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) {
+      const dbProfile = await fetchDbProfile(session.user.id);
+      const profile = mapSupabaseUser(session.user, dbProfile);
+      setUser(profile);
+      persistProfile(profile);
+    }
+  }, [fetchDbProfile, mapSupabaseUser, persistProfile]);
+
+  // Direct optimistic update of profile data
+  const updateProfileData = useCallback((updates: { name?: string; avatar?: string }) => {
+    setUser(prev => {
+      if (!prev) return null;
+      const next = {
+        ...prev,
+        ...(updates.name !== undefined ? { name: updates.name } : {}),
+        ...(updates.avatar !== undefined ? { avatar: updates.avatar } : {}),
+      };
+      persistProfile(next);
+      return next;
+    });
+  }, [persistProfile]);
 
   // 1. Initial Load & Session Tracking
   useEffect(() => {
@@ -172,14 +219,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
+    // Helper to sync user with db
+    const syncUserSession = async (sbUser: User) => {
+      const initialProfile = mapSupabaseUser(sbUser);
+      setUser(initialProfile);
+      persistProfile(initialProfile);
+
+      const dbProfile = await fetchDbProfile(sbUser.id);
+      if (dbProfile) {
+        const enrichedProfile = mapSupabaseUser(sbUser, dbProfile);
+        setUser(enrichedProfile);
+        persistProfile(enrichedProfile);
+      }
+    };
+
     // Check real Supabase session
     supabase.auth.getSession().then(({ data: { session } }) => {
       startTransition(() => {
         setSession(session);
         if (session?.user) {
-          const profile = mapSupabaseUser(session.user);
-          setUser(profile);
-          persistProfile(profile);
+          syncUserSession(session.user);
         }
         setLoading(false);
       });
@@ -193,9 +252,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         startTransition(() => {
           setSession(session);
           if (session?.user) {
-            const profile = mapSupabaseUser(session.user);
-            setUser(profile);
-            persistProfile(profile);
+            syncUserSession(session.user);
           } else {
             // Check if there was an active demo user before wiping
             const stored = typeof window !== 'undefined' ? localStorage.getItem(LOCAL_STORAGE_USER_KEY) : null;
@@ -216,6 +273,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     );
 
+    // Listen for realtime updates to public.profiles table
+    const profileChannel = supabase
+      .channel('realtime:profiles')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'profiles' },
+        (payload) => {
+          if (payload.new && typeof payload.new === 'object') {
+            const newRow = payload.new as any;
+            setUser((current) => {
+              if (current && current.id === newRow.id) {
+                const updated = {
+                  ...current,
+                  name: newRow.full_name || current.name,
+                  avatar: newRow.avatar_url || current.avatar,
+                };
+                persistProfile(updated);
+                return updated;
+              }
+              return current;
+            });
+          }
+        }
+      )
+      .subscribe();
+
     // Cross-tab synchronization
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === LOCAL_STORAGE_USER_KEY) {
@@ -232,9 +315,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     return () => {
       subscription.unsubscribe();
+      profileChannel.unsubscribe();
       window.removeEventListener('storage', handleStorageChange);
     };
-  }, [mapSupabaseUser, persistProfile]);
+  }, [fetchDbProfile, mapSupabaseUser, persistProfile]);
 
   // Demo Sign In
   const signInWithDemo = useCallback((personaKey: DemoPersonaKey = 'consultant') => {
@@ -361,6 +445,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         authModalDefaultTab,
         openAuthModal,
         closeAuthModal,
+        refreshProfile,
+        updateProfileData,
         signInWithEmail,
         signUpWithEmail,
         signInWithDemo,

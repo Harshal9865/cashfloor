@@ -269,8 +269,12 @@ export default function DashboardNav({
                   title="Account"
                 >
                   <div className="relative">
-                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#2F6F62] to-[#0f564a] flex items-center justify-center shadow-sm text-white text-[11px] font-bold shrink-0">
-                      {initials}
+                    <div className="w-7 h-7 rounded-full overflow-hidden bg-gradient-to-br from-[#2F6F62] to-[#0f564a] flex items-center justify-center shadow-sm text-white text-[11px] font-bold shrink-0">
+                      {user?.avatar ? (
+                        <img src={user.avatar} alt={displayName} className="w-full h-full object-cover" />
+                      ) : (
+                        initials
+                      )}
                     </div>
                     <span
                       className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-[var(--cf-surface)] bg-emerald-500"
@@ -302,8 +306,12 @@ export default function DashboardNav({
                     >
                       <div className="px-4 py-3 border-b" style={{ borderColor: 'var(--cf-border)', background: 'var(--cf-surface-alt)' }}>
                         <div className="flex items-center gap-2.5">
-                          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#2F6F62] to-[#0f564a] flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-sm">
-                            {initials}
+                          <div className="w-9 h-9 rounded-full overflow-hidden bg-gradient-to-br from-[#2F6F62] to-[#0f564a] flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-sm">
+                            {user?.avatar ? (
+                              <img src={user.avatar} alt={displayName} className="w-full h-full object-cover" />
+                            ) : (
+                              initials
+                            )}
                           </div>
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-1.5">
@@ -429,9 +437,18 @@ export default function DashboardNav({
               {isAuthenticated && user ? (
                 <div className="p-3 rounded-xl border mt-2 flex items-center justify-between"
                   style={{ background: 'var(--cf-surface)', borderColor: 'var(--cf-border)' }}>
-                  <div className="min-w-0">
-                    <p className="text-xs font-semibold truncate" style={{ color: 'var(--cf-text)' }}>{displayName}</p>
-                    <p className="text-[11px] truncate" style={{ color: 'var(--cf-text-faint)' }}>{user.email}</p>
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-br from-[#2F6F62] to-[#0f564a] flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-sm">
+                      {user?.avatar ? (
+                        <img src={user.avatar} alt={displayName} className="w-full h-full object-cover" />
+                      ) : (
+                        initials
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold truncate" style={{ color: 'var(--cf-text)' }}>{displayName}</p>
+                      <p className="text-[11px] truncate" style={{ color: 'var(--cf-text-faint)' }}>{user.email}</p>
+                    </div>
                   </div>
                   <button
                     onClick={async () => { setMobileOpen(false); await signOut(); }}
