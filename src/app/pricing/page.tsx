@@ -476,29 +476,68 @@ export default function PricingPage() {
           </div>
         </section>
 
-        {/* Final CTA Banner */}
-        <section className="p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-[#16232B] to-[#2F6F62] text-white text-center space-y-6 shadow-2xl relative overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.2),transparent)]" />
-          <div className="relative z-10 max-w-2xl mx-auto space-y-4">
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold tracking-tight">
-              Ready to eliminate the Feast-or-Famine anxiety?
+        {/* Final CTA Banner - High-Conversion Aurora Mesh Design */}
+        <section className="relative p-8 sm:p-14 rounded-3xl overflow-hidden border border-emerald-500/30 shadow-[0_20px_80px_-15px_rgba(16,185,129,0.3)] text-white text-center space-y-6">
+          {/* Layered Aurora Mesh & Radial Glows */}
+          <div className="absolute inset-0 bg-gradient-to-br from-[#04100E] via-[#0A2621] to-[#06151D]" />
+          <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[550px] h-[300px] bg-emerald-500/20 rounded-full blur-[90px] pointer-events-none" />
+          <div className="absolute -bottom-20 -right-20 w-[350px] h-[350px] bg-teal-500/15 rounded-full blur-[80px] pointer-events-none" />
+          <div className="absolute top-1/2 -left-20 w-[300px] h-[300px] bg-cyan-500/10 rounded-full blur-[80px] pointer-events-none" />
+          
+          {/* Subtle Grid Texture */}
+          <div 
+            className="absolute inset-0 opacity-[0.07] pointer-events-none"
+            style={{
+              backgroundImage: 'linear-gradient(rgba(255,255,255,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.2) 1px, transparent 1px)',
+              backgroundSize: '32px 32px'
+            }}
+          />
+
+          <div className="relative z-10 max-w-2xl mx-auto space-y-5">
+            {/* Top pill badge */}
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] font-mono font-medium border border-emerald-400/30 bg-emerald-500/15 text-emerald-300 shadow-sm backdrop-blur-md">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span>Sovereign Financial Freedom • 20th Percentile Solvency</span>
+            </div>
+
+            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white leading-tight">
+              Ready to eliminate the <br className="hidden sm:inline" />
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-300 via-teal-200 to-cyan-300">
+                Feast-or-Famine anxiety?
+              </span>
             </h2>
-            <p className="text-xs sm:text-sm text-emerald-100/80 leading-relaxed">
-              Join thousands of consultants, designers, and software engineers who make confident spending decisions powered by CashFloor.
+
+            <p className="text-xs sm:text-sm md:text-base text-emerald-100/80 leading-relaxed max-w-xl mx-auto font-sans">
+              Join thousands of solo founders, consultants, and software engineers who run stress-free cash flow with mathematically guaranteed runway safety.
             </p>
-            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
+
+            <div className="pt-3 flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
                 href="/dashboard"
-                className="w-full sm:w-auto px-6 py-3 rounded-xl bg-white text-[#16232B] font-semibold text-xs hover:bg-emerald-50 transition-all shadow-lg hover:scale-105"
+                className="w-full sm:w-auto px-7 py-3.5 rounded-xl font-semibold text-xs sm:text-sm text-[#06151D] bg-gradient-to-r from-emerald-300 via-teal-200 to-emerald-200 hover:from-white hover:to-emerald-100 transition-all shadow-[0_4px_25px_rgba(52,211,153,0.4)] hover:shadow-[0_6px_35px_rgba(52,211,153,0.6)] hover:scale-105 duration-200 flex items-center justify-center gap-2 group cursor-pointer"
               >
-                Launch Your Runway Free
+                <span>Launch Your Runway Free</span>
+                <span className="group-hover:translate-x-0.5 transition-transform">→</span>
               </Link>
               <Link
                 href="/#faq"
-                className="w-full sm:w-auto px-6 py-3 rounded-xl border border-white/30 text-white font-semibold text-xs hover:bg-white/10 transition-colors"
+                className="w-full sm:w-auto px-6 py-3.5 rounded-xl border border-white/20 bg-white/5 hover:bg-white/10 text-white font-medium text-xs sm:text-sm transition-all backdrop-blur-sm hover:border-emerald-400/40 cursor-pointer"
               >
                 Read Methodology Whitepaper
               </Link>
+            </div>
+
+            {/* Bottom trust badges */}
+            <div className="pt-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[11px] font-mono text-emerald-200/60">
+              <span className="flex items-center gap-1.5">
+                <span className="text-emerald-400">✓</span> No credit card required
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="text-emerald-400">✓</span> Local-first encryption
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="text-emerald-400">✓</span> Instant setup in 2 minutes
+              </span>
             </div>
           </div>
         </section>

@@ -12,25 +12,29 @@ export default function ScrollAnimationSection() {
     offset: ['start end', 'end start'],
   });
 
-  // Ultra-smooth physics for luxurious parallax
-  const smoothProgress = useSpring(scrollYProgress, { stiffness: 40, damping: 25, restDelta: 0.001 });
+  // Ultra-smooth physics for luxurious 60fps parallax
+  const smoothProgress = useSpring(scrollYProgress, { stiffness: 70, damping: 30, restDelta: 0.0005 });
 
   // Parallax transforms constrained to card container bounds to prevent text collision
-  const y1 = useTransform(smoothProgress, [0, 1], [40, -80]);
-  const y2 = useTransform(smoothProgress, [0, 1], [60, -90]);
-  const y3 = useTransform(smoothProgress, [0, 1], [20, -70]);
-  const y4 = useTransform(smoothProgress, [0, 1], [50, -85]);
+  const y1 = useTransform(smoothProgress, [0, 1], [30, -60]);
+  const y2 = useTransform(smoothProgress, [0, 1], [45, -75]);
+  const y3 = useTransform(smoothProgress, [0, 1], [15, -50]);
+  const y4 = useTransform(smoothProgress, [0, 1], [35, -65]);
   
   // Subtle scaling and opacity for the center card to give a "breathing" effect
-  const scaleCenter = useTransform(smoothProgress, [0.2, 0.5, 0.8], [0.96, 1.02, 0.96]);
+  const scaleCenter = useTransform(smoothProgress, [0.2, 0.5, 0.8], [0.97, 1.02, 0.97]);
   
   // Mouse tilt effect physics
-  const mouseX = useSpring(0, { stiffness: 150, damping: 20 });
-  const mouseY = useSpring(0, { stiffness: 150, damping: 20 });
+  const mouseX = useSpring(0, { stiffness: 140, damping: 24 });
+  const mouseY = useSpring(0, { stiffness: 140, damping: 24 });
   
   const [glarePosition, setGlarePosition] = useState({ x: 50, y: 50 });
 
   const handleMouseMove = (e: React.MouseEvent) => {
+    // Only execute tilt on devices that support hover
+    if (typeof window !== 'undefined' && window.matchMedia('(hover: none)').matches) {
+      return;
+    }
     const { clientX, clientY, currentTarget } = e;
     const { left, top, width, height } = currentTarget.getBoundingClientRect();
     
@@ -38,9 +42,9 @@ export default function ScrollAnimationSection() {
     const relX = (clientX - left) / width;
     const relY = (clientY - top) / height;
     
-    // Set 3D rotation (max 15 degrees)
-    mouseX.set((relY - 0.5) * -15);
-    mouseY.set((relX - 0.5) * 15);
+    // Set 3D rotation (constrained to 12 degrees for refined feel)
+    mouseX.set((relY - 0.5) * -12);
+    mouseY.set((relX - 0.5) * 12);
     
     // Set glare position for holographic effect
     setGlarePosition({ x: relX * 100, y: relY * 100 });
@@ -53,9 +57,17 @@ export default function ScrollAnimationSection() {
   };
 
   return (
-    <section ref={containerRef} className="relative py-32 md:py-44 overflow-hidden bg-[var(--cf-bg)] border-y border-[var(--cf-border)]">
-      {/* Background Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[var(--cf-accent)]/10 rounded-full blur-[120px] pointer-events-none" />
+    <section ref={containerRef} className="relative py-28 md:py-40 overflow-hidden bg-[var(--cf-bg)] border-y border-[var(--cf-border)]">
+      {/* Background Multi-layer Glow & Mathematical Invariant Watermark */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] bg-[var(--cf-accent)]/10 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute top-1/3 left-1/4 w-[400px] h-[400px] bg-teal-500/10 rounded-full blur-[100px] pointer-events-none" />
+      
+      {/* Subtle Mathematical Watermark */}
+      <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] dark:opacity-[0.05] pointer-events-none select-none overflow-hidden">
+        <span className="font-mono text-8xl md:text-9xl font-bold tracking-widest whitespace-nowrap">
+          P20(X) = inf {'{'} x : F(x) ≥ 0.20 {'}'}
+        </span>
+      </div>
 
       <div className="max-w-7xl mx-auto px-4 md:px-8 relative z-10 flex flex-col items-center">
         
@@ -217,8 +229,13 @@ export default function ScrollAnimationSection() {
         </div>
 
         <div className="mt-16 text-center">
-          <Link href="/dashboard" className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-white font-medium shadow-xl hover:shadow-2xl transition-all" style={{ background: 'linear-gradient(135deg, var(--cf-accent) 0%, #1a4f45 100%)' }}>
-            Open the Studio <ArrowRight className="w-5 h-5" />
+          <Link 
+            href="/dashboard" 
+            className="inline-flex items-center justify-center gap-2.5 px-8 py-4 min-h-[48px] rounded-full text-white font-semibold text-sm sm:text-base shadow-[0_10px_30px_rgba(47,111,98,0.3)] hover:shadow-[0_15px_40px_rgba(47,111,98,0.5)] hover:scale-105 transition-all duration-200 cursor-pointer" 
+            style={{ background: 'linear-gradient(135deg, var(--cf-accent) 0%, #1a4f45 100%)' }}
+          >
+            <span>Open Studio Dashboard</span>
+            <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
 

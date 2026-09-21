@@ -364,3 +364,14 @@ input:focus-visible, button:focus-visible, select:focus-visible {
 .animate-shimmer { background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent); background-size:200% 100%; animation:shimmer 2.5s linear infinite; }
 .animate-glow-ring { animation: glow-ring 3s ease-in-out infinite; }
 .animate-fade-in-up { animation: fade-in-up 0.5s ease-out forwards; }
+
+/* Global Selection & Touch Ergonomics */
+::selection {
+  background: rgba(47, 111, 98, 0.35);
+  color: inherit;
+}
+[data-theme="dark"] ::selection {
+  background: rgba(61, 232, 200, 0.35);
+  color: inherit;
+}
+

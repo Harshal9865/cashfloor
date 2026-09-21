@@ -6,12 +6,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   User,
   LayoutDashboard,
-  Layers,
-  Sparkles,
   LogOut,
-  ChevronDown,
-  Moon,
-  Sun
+  ChevronDown
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth/AuthContext';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -180,30 +176,12 @@ export default function ProfileDropdown({ align = 'right', className = '' }: Pro
               </Link>
 
               <Link
-                href="/studio"
-                onClick={() => setIsOpen(false)}
-                className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors"
-              >
-                <Layers className="w-3.5 h-3.5 text-blue-500" />
-                <span>Runway Studio</span>
-              </Link>
-
-              <Link
                 href="/account"
                 onClick={() => setIsOpen(false)}
                 className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors"
               >
                 <User className="w-3.5 h-3.5 text-purple-500" />
-                <span>Account Settings</span>
-              </Link>
-
-              <Link
-                href="/subscription"
-                onClick={() => setIsOpen(false)}
-                className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                <span>Billing &amp; Plan</span>
+                <span>Account &amp; Settings</span>
               </Link>
             </div>
 
