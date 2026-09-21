@@ -1,7 +1,9 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
+
 import React, { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { MonthlyRecord, CalculatorAssumptions } from '@/lib/calculator/types';
 import { computeFullLedger } from '@/lib/calculator/engine';
 import { exportLedgerToCsv } from '@/lib/export/csvExport';
@@ -28,7 +30,7 @@ import { useEffect, useRef } from 'react';
 import { RealDataWizardModal } from '@/components/RealDataWizardModal';
 import { DailyPaymentLog } from '@/components/DailyPaymentLog';
 import { LegalDisclaimer } from '@/components/LegalDisclaimer';
-import { Share2, BookOpen, Download, Printer, Sparkles, ShieldCheck, HelpCircle, AlertTriangle, Upload } from 'lucide-react';
+import { Share2, BookOpen, Download, Printer, Sparkles, ShieldCheck, HelpCircle, AlertTriangle, Upload, Activity, TrendingDown } from 'lucide-react';
 
 // ... (keep REALISTIC_SAMPLE_RECORDS)
 const REALISTIC_SAMPLE_RECORDS: MonthlyRecord[] = [
@@ -46,7 +48,9 @@ const REALISTIC_SAMPLE_RECORDS: MonthlyRecord[] = [
   { id: '12', month: 'Jun 2026', income: 4600, expenses: 2250, clientTag: 'Acme Retainer' },
 ];
 
-export default function Home() {
+export default function CashFloorDashboard() {
+  const router = useRouter();
+  
   const [records, setRecords] = useState<MonthlyRecord[]>(REALISTIC_SAMPLE_RECORDS);
   const [currencySymbol, setCurrencySymbol] = useState('$');
 
@@ -125,7 +129,7 @@ export default function Home() {
   }, [records, assumptions, currencySymbol, userId]);
 
   const handleUnlockRequest = (featureName: string) => {
-    openAuthModal(`Unlock ${featureName} with free Pro access.`);
+    router.push('/pricing');
   };
 
   const handleCurrencyChange = async (newSymbol: string) => {
@@ -217,6 +221,21 @@ export default function Home() {
   const handlePrintPdf = () => {
     window.print();
   };
+
+  const containerVariants: Variants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 }
+    }
+  };
+
+  const itemVariants: Variants = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } }
+  };
+
+  const hasEnoughData = records.length >= 3;
 
   return (
     <main className="min-h-screen flex flex-col bg-[var(--cf-bg)] text-[var(--cf-text)] transition-colors duration-300">
@@ -369,13 +388,18 @@ export default function Home() {
         />
 
         {/* BENTO BOX GRID */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          animate="show"
+          className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+        >
           
           {/* LEFT COLUMN: Charts & Ledgers (2/3 width) */}
           <div className="lg:col-span-2 space-y-6 min-w-0">
             
             {/* Timeline Chart */}
-            <section id="cash-flow" className="dash-card p-6">
+            <motion.section variants={itemVariants} id="cash-flow" className="dash-card p-6">
               <CashFlowChart
                 records={records}
                 floorIncome={calculation.floorIncome}
@@ -385,30 +409,32 @@ export default function Home() {
                 taxReservePct={assumptions.taxReservePct}
                 currencySymbol={currencySymbol}
               />
-            </section>
+            </motion.section>
 
             {/* Invoice Aging & DSO Tracker — Phase 1 */}
-            <InvoiceAgingPanel
-              dso={calculation.dso}
-              currencySymbol={currencySymbol}
-            />
+            <motion.div variants={itemVariants}>
+              <InvoiceAgingPanel
+                dso={calculation.dso}
+                currencySymbol={currencySymbol}
+              />
+            </motion.div>
 
             {/* Daily Payment Feed & Cash Stream */}
-            <section id="daily-log" className="dash-card p-6">
+            <motion.section variants={itemVariants} id="daily-log" className="dash-card p-6">
               <DailyPaymentLog currencySymbol={currencySymbol} />
-            </section>
+            </motion.section>
 
             {/* Capital Partitioning */}
-            <section id="partitions" className="dash-card p-6">
+            <motion.section variants={itemVariants} id="partitions" className="dash-card p-6">
               <LedgerRows
                 result={calculation}
                 assumptions={assumptions}
                 currencySymbol={currencySymbol}
               />
-            </section>
+            </motion.section>
 
             {/* Ledger Archive */}
-            <section id="ledger-archive" className="dash-card p-6">
+            <motion.section variants={itemVariants} id="ledger-archive" className="dash-card p-6">
               <InputTable
                 records={records}
                 onChange={setRecords}
@@ -421,16 +447,18 @@ export default function Home() {
                 isLocked={!isAuthenticated}
                 onUnlockRequest={() => handleUnlockRequest('12-Month Ledger')}
               />
-            </section>
+            </motion.section>
           </div>
 
           {/* RIGHT COLUMN: Controls & Risk (1/3 width, sticky) */}
           <div className="space-y-6 lg:sticky lg:top-24 self-start min-w-0">
             
-            <TaxDeadlineReminders />
+            <motion.div variants={itemVariants}>
+              <TaxDeadlineReminders />
+            </motion.div>
 
             {/* Levers */}
-            <section id="assumptions" className="dash-card p-5">
+            <motion.section variants={itemVariants} id="assumptions" className="dash-card p-5">
               <AssumptionControls
                 assumptions={assumptions}
                 onChange={setAssumptions}
@@ -440,50 +468,74 @@ export default function Home() {
                 sensitivityDaysPer150={calculation.sensitivityDaysPer150}
                 onRevertDefaults={handleRevertDefaults}
               />
-            </section>
+            </motion.section>
 
             {/* Risk Radar */}
-            <section className="dash-card p-5">
-              <RiskVolatilityRadar
-                volatility={calculation.volatility}
-                clientConcentrations={calculation.clientConcentrations}
-                currencySymbol={currencySymbol}
-                isLocked={!isAuthenticated}
-                onUnlockRequest={() => handleUnlockRequest('Client Concentration Radar')}
-              />
-            </section>
+            <motion.section variants={itemVariants} className="dash-card p-5">
+              {!hasEnoughData ? (
+                <div className="flex flex-col items-center justify-center p-8 text-center space-y-3">
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-[var(--cf-surface-alt)] border border-[var(--cf-border)]">
+                    <Activity className="w-6 h-6 text-[var(--cf-text-faint)]" />
+                  </div>
+                  <h3 className="font-serif text-lg text-[var(--cf-text)]">Not Enough Data</h3>
+                  <p className="text-xs text-[var(--cf-text-muted)]">Add at least 3 months of ledger data to unlock the Volatility Radar.</p>
+                </div>
+              ) : (
+                <RiskVolatilityRadar
+                  volatility={calculation.volatility}
+                  clientConcentrations={calculation.clientConcentrations}
+                  currencySymbol={currencySymbol}
+                  isLocked={!isAuthenticated}
+                  onUnlockRequest={() => handleUnlockRequest('Risk Radar')}
+                />
+              )}
+            </motion.section>
 
             {/* Waterfall */}
-            <section className="dash-card p-5">
+            <motion.section variants={itemVariants} className="dash-card p-5">
               <CashFlowWaterfall
                 steps={calculation.waterfallSteps}
                 currencySymbol={currencySymbol}
               />
-            </section>
+            </motion.section>
 
             {/* Deduction Optimizer — Phase 3 */}
-            <DeductionOptimizer
-              grossAnnualIncome={calculation.totalAnnualIncome}
-              nominalTaxRate={assumptions.taxReservePct}
-              monthlyExpenses={calculation.avgMonthlyExpenses}
-              runwayMonths={calculation.runwayMonths}
-              currencySymbol={currencySymbol}
-              onOptimizedRateChange={(newRate) =>
-                setAssumptions((prev) => ({ ...prev, taxReservePct: newRate }))
-              }
-            />
+            <motion.div variants={itemVariants}>
+              <DeductionOptimizer
+                grossAnnualIncome={calculation.totalAnnualIncome}
+                nominalTaxRate={assumptions.taxReservePct}
+                monthlyExpenses={calculation.avgMonthlyExpenses}
+                runwayMonths={calculation.runwayMonths}
+                currencySymbol={currencySymbol}
+                onOptimizedRateChange={(newRate) =>
+                  setAssumptions((prev) => ({ ...prev, taxReservePct: newRate }))
+                }
+              />
+            </motion.div>
 
-            {/* Monte Carlo Risk Lab — Phase 4 */}
-            <MonteCarloRiskLab
-              volatility={calculation.volatility}
-              monthlyExpenses={calculation.avgMonthlyExpenses}
-              currentSavings={calculation.currentSavings}
-              currencySymbol={currencySymbol}
-              isLocked={!isAuthenticated}
-              onUnlockRequest={() => handleUnlockRequest('Monte Carlo Risk Lab')}
-            />
+            {/* Monte Carlo Lab */}
+            <motion.section variants={itemVariants} id="monte-carlo" className="dash-card p-5">
+              {!hasEnoughData ? (
+                <div className="flex flex-col items-center justify-center p-8 text-center space-y-3">
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-[var(--cf-surface-alt)] border border-[var(--cf-border)]">
+                    <TrendingDown className="w-6 h-6 text-[var(--cf-text-faint)]" />
+                  </div>
+                  <h3 className="font-serif text-lg text-[var(--cf-text)]">Simulations Locked</h3>
+                  <p className="text-xs text-[var(--cf-text-muted)]">Add at least 3 months of ledger data to unlock Monte Carlo risk modeling.</p>
+                </div>
+              ) : (
+                <MonteCarloRiskLab
+                  volatility={calculation.volatility}
+                  monthlyExpenses={calculation.avgMonthlyExpenses}
+                  currentSavings={calculation.currentSavings}
+                  currencySymbol={currencySymbol}
+                  isLocked={!isAuthenticated}
+                  onUnlockRequest={() => handleUnlockRequest('Monte Carlo Lab')}
+                />
+              )}
+            </motion.section>
           </div>
-        </div>
+        </motion.div>
 
         {/* Philosophy Drawer & Action Bar */}
         <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 hairline-t">

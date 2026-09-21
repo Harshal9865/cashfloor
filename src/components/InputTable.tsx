@@ -218,7 +218,10 @@ export const InputTable: React.FC<InputTableProps> = ({
             </div>
           </div>
         ) : (
-          <table className="w-full text-left border-collapse">
+          <>
+            {/* Desktop Table View */}
+            <div className="hidden md:block w-full">
+              <table className="w-full text-left border-collapse">
             <thead>
               <tr className="font-mono text-[10px] tracking-wider uppercase border-b" style={{ background: 'var(--cf-surface-alt)', color: 'var(--cf-text-muted)', borderColor: 'var(--cf-border)' }}>
                 <th className="py-3 px-4 font-semibold">Month</th>
@@ -355,6 +358,97 @@ export const InputTable: React.FC<InputTableProps> = ({
               </tr>
             </tfoot>
           </table>
+          </div>
+
+          {/* Mobile Card View */}
+          <div className="md:hidden flex flex-col divide-y" style={{ borderColor: 'var(--cf-border)' }}>
+            {rowsWithAccounting.map((row, index) => (
+              <div 
+                key={row.id || index}
+                className="p-4 space-y-3"
+                style={{ background: row.isLean ? 'rgba(180,87,63,0.03)' : 'transparent' }}
+              >
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center space-x-2">
+                    {row.isLean && <span className="w-1.5 h-1.5 rounded-full bg-[#B4573F]"></span>}
+                    <input
+                      type="text"
+                      value={row.month}
+                      onChange={(e) => handleRecordChange(index, 'month', e.target.value)}
+                      className="w-24 bg-transparent border-b border-transparent hover:border-[var(--cf-border)] focus:border-[var(--cf-accent)] py-0.5 text-sm font-semibold focus:outline-none"
+                      style={{ color: 'var(--cf-text)' }}
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    aria-label={`Remove ${row.month}`}
+                    onClick={() => handleRemoveRow(index)}
+                    className="p-2 transition-colors cursor-pointer"
+                    style={{ color: 'var(--cf-text-faint)' }}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4 text-sm font-mono">
+                  <div className="space-y-1">
+                    <span className="text-[10px] uppercase tracking-wider block" style={{ color: 'var(--cf-text-muted)' }}>Income</span>
+                    <div className="flex items-center">
+                      <span className="mr-1" style={{ color: 'var(--cf-text-muted)' }}>{currencySymbol}</span>
+                      <input
+                        type="number"
+                        value={row.income || ''}
+                        onChange={(e) => handleRecordChange(index, 'income', e.target.value)}
+                        className="w-full bg-transparent border-b py-0.5 focus:outline-none"
+                        style={{ color: 'var(--cf-text)', borderColor: 'var(--cf-border)' }}
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-[10px] uppercase tracking-wider block" style={{ color: 'var(--cf-text-muted)' }}>Draw</span>
+                    <div className="flex items-center">
+                      <span className="mr-1" style={{ color: 'var(--cf-text-muted)' }}>{currencySymbol}</span>
+                      <input
+                        type="number"
+                        value={row.expenses || ''}
+                        onChange={(e) => handleRecordChange(index, 'expenses', e.target.value)}
+                        className="w-full bg-transparent border-b py-0.5 focus:outline-none"
+                        style={{ color: 'var(--cf-text)', borderColor: 'var(--cf-border)' }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-center text-xs font-mono pt-2 border-t" style={{ borderColor: 'var(--cf-border-soft)' }}>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] text-[#875205]">Tax (-{Math.round(taxReservePct * 100)}%)</span>
+                    <span className="text-[#875205]">-{currencySymbol}{row.taxEscrow.toLocaleString()}</span>
+                  </div>
+                  <div className="flex flex-col items-end">
+                    <span className="text-[10px]" style={{ color: 'var(--cf-text-muted)' }}>Ending Cash</span>
+                    <span className="font-bold" style={{ color: 'var(--cf-accent)' }}>{currencySymbol}{Math.round(row.endingCash).toLocaleString()}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+            
+            <div className="p-4 font-mono text-sm space-y-2" style={{ background: 'var(--cf-surface-alt)' }}>
+              <div className="font-sans font-bold border-b pb-2 mb-2" style={{ color: 'var(--cf-text)', borderColor: 'var(--cf-border)' }}>Total ({records.length} mo)</div>
+              <div className="flex justify-between">
+                <span style={{ color: 'var(--cf-text-muted)' }}>Gross:</span>
+                <span>{currencySymbol}{totalGross.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span style={{ color: 'var(--cf-text-muted)' }}>Tax:</span>
+                <span className="text-[#875205]">-{currencySymbol}{totalTaxEscrow.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between font-bold pt-2 border-t" style={{ borderColor: 'var(--cf-border-soft)', color: totalNetChange >= 0 ? 'var(--cf-accent)' : '#84331e' }}>
+                <span>Net:</span>
+                <span>{totalNetChange >= 0 ? '+' : '-'}{currencySymbol}{Math.abs(totalNetChange).toLocaleString()}</span>
+              </div>
+            </div>
+          </div>
+          </>
         )}
       </div>
 
