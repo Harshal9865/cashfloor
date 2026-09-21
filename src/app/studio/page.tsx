@@ -32,8 +32,8 @@ import { RealDataWizardModal } from '@/components/RealDataWizardModal';
 import { SolvencyReportModal } from '@/components/SolvencyReportModal';
 import { InvoiceGeneratorModal } from '@/components/InvoiceGeneratorModal';
 import { fetchLiveExchangeRates, calculateFxConversionMultiplier } from '@/lib/currency/fxService';
-import { DailyPaymentLog } from '@/components/DailyPaymentLog';
 import { LegalDisclaimer } from '@/components/LegalDisclaimer';
+import { RunwayAiCopilot } from '@/components/ai/RunwayAiCopilot';
 import { Share2, BookOpen, Download, ShieldCheck, Upload, Activity, TrendingDown, Sparkles, AlertTriangle, ArrowLeft } from 'lucide-react';
 
 const REALISTIC_SAMPLE_RECORDS: MonthlyRecord[] = [
@@ -507,9 +507,23 @@ export default function StudioEnginePage() {
               />
             </motion.div>
 
-            {/* Daily Payment Feed */}
-            <motion.section variants={itemVariants} id="daily-log" className="dash-card p-6">
-              <DailyPaymentLog currencySymbol={currencySymbol} />
+            {/* Dedicated Daily Cash Flow Link */}
+            <motion.section variants={itemVariants} className="dash-card p-5 border border-[var(--cf-border-soft)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-[var(--cf-surface-alt)]/30">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 shrink-0">
+                  <Activity className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-xs font-bold text-[var(--cf-text)]">Looking for Day-by-Day Cash Tracking?</h3>
+                  <p className="text-[11px] text-[var(--cf-text-muted)]">Analyze invoice payout lags, Stripe/Wise payouts, and day-to-day liquidity reserves in the dedicated daily stream.</p>
+                </div>
+              </div>
+              <Link
+                href="/daily"
+                className="shrink-0 px-3.5 py-1.5 rounded-xl text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/15 border border-emerald-500/20 transition-all cursor-pointer"
+              >
+                Open Daily Cash Flow &rarr;
+              </Link>
             </motion.section>
 
             {/* Capital Partitioning */}
@@ -764,6 +778,17 @@ export default function StudioEnginePage() {
       <GuidedTour 
         isOpen={isTourOpen} 
         onClose={() => setIsTourOpen(false)} 
+      />
+
+      {/* Real-time Client-side AI Runway Advisor Copilot */}
+      <RunwayAiCopilot
+        records={records}
+        assumptions={assumptions}
+        currencySymbol={currencySymbol}
+        floorIncome={calculation.floorIncome}
+        sustainablePaycheck={calculation.sustainablePaycheck}
+        currentSavings={calculation.currentSavings}
+        runwayMonths={calculation.runwayMonths}
       />
 
       <LegalDisclaimer />

@@ -18,70 +18,55 @@ import {
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/lib/auth/AuthContext';
+import ProfileDropdown from '@/components/nav/ProfileDropdown';
 import CashFloorLogo from '@/components/CashFloorLogo';
 
 const navLinks = [
   {
     label: 'Product',
     items: [
-      { label: 'Executive Dashboard', href: '/dashboard', desc: 'Daily solvency briefing & action center' },
-      { label: 'Studio Calculation Engine', href: '/studio', desc: 'Interactive ledger, P20 floor & stress tests' },
-      { label: 'Daily Cash Stream', href: '/daily', desc: 'Day-by-day cash flow & lag model' },
-      { label: 'Integrations & CSV Ingestion', href: '/integrations', desc: 'Connect payment feeds & files' },
-      { label: 'Platform Features', href: '/#features', desc: 'Core risk & cash flow tools' }
+      { label: 'Financial Dashboard', href: '/dashboard', desc: 'Daily solvency briefing & action center' },
+      { label: 'Runway Studio', href: '/studio', desc: 'Interactive ledger, P20 floor & stress tests' },
+      { label: 'Daily Cash Flow', href: '/daily', desc: 'Day-by-day cash flow & lag model' },
+      { label: 'Connected Accounts', href: '/integrations', desc: 'Connect payment feeds & files' },
+      { label: 'Core Features', href: '/#features', desc: 'Core risk & cash flow tools' }
     ]
   },
   { label: 'Pricing', href: '/pricing' },
   {
     label: 'Resources',
     items: [
-      { label: 'About & Manifesto', href: '/about', desc: 'The Sovereign Freelancer Manifesto' },
-      { label: 'Methodology', href: '/blog/the-20th-percentile-math', desc: '20th-percentile math & 5 pillars' },
-      { label: 'Security & Privacy', href: '/security', desc: 'Zero-bank-surveillance architecture' },
-      { label: 'Articles & Guides', href: '/blog', desc: 'Freelance financial playbooks' },
-      { label: 'Product Tour', href: '/#how-it-works', desc: 'Step-by-step operating guide' }
+      { label: 'Why CashFloor', href: '/about', desc: 'The Sovereign Freelancer Manifesto' },
+      { label: 'Calculation Math', href: '/blog/the-20th-percentile-math', desc: '20th-percentile math & 5 pillars' },
+      { label: 'Data Privacy & Security', href: '/security', desc: 'Zero-bank-surveillance architecture' },
+      { label: 'Financial Guides', href: '/blog', desc: 'Freelance financial playbooks' },
+      { label: 'How It Works', href: '/#how-it-works', desc: 'Step-by-step operating guide' }
     ]
   }
 ];
 
-function getInitials(nameOrEmail: string): string {
-  if (!nameOrEmail) return 'CF';
-  const clean = nameOrEmail.includes('@') ? nameOrEmail.split('@')[0] : nameOrEmail;
-  const parts = clean.split(/[._\s-]+/).filter(Boolean);
-  if (parts.length >= 2) {
-    return (parts[0][0] + parts[1][0]).toUpperCase();
-  }
-  return clean.slice(0, 2).toUpperCase();
-}
-
 export default function MarketingNav() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [avatarOpen, setAvatarOpen] = useState(false);
-  const avatarRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
 
   const { user, isAuthenticated, loading, openAuthModal, signOut } = useAuth();
+
+  const displayName = user?.name || user?.email?.split('@')[0] || 'Independent Pro';
+  const getInitials = (nameOrEmail?: string) => {
+    if (!nameOrEmail) return 'CF';
+    const clean = nameOrEmail.includes('@') ? nameOrEmail.split('@')[0] : nameOrEmail;
+    const parts = clean.split(/[._\s-]+/).filter(Boolean);
+    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+    return clean.slice(0, 2).toUpperCase();
+  };
+  const initials = getInitials(user?.name || user?.email);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
-
-  // Close avatar dropdown on outside click
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (avatarRef.current && !avatarRef.current.contains(e.target as Node)) {
-        setAvatarOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
-
-  const displayName = user?.name || user?.email?.split('@')[0] || 'Independent Pro';
-  const initials = getInitials(user?.name || user?.email || '');
 
   return (
     <motion.header
@@ -156,207 +141,44 @@ export default function MarketingNav() {
           <ThemeToggle className="hidden sm:flex" />
 
           {isAuthenticated && user ? (
-                /* ── SIGNED IN: Responsive Avatar & Status Pill ── */
-                <div className="relative" ref={avatarRef}>
-                  <button
-                    type="button"
-                    onClick={() => setAvatarOpen(!avatarOpen)}
-                    className="flex items-center gap-2 pl-1.5 pr-2.5 py-1 rounded-full text-xs font-medium transition-all border cursor-pointer group"
-                    style={{
-                      background: avatarOpen ? 'var(--cf-surface-alt)' : 'var(--cf-surface)',
-                      borderColor: avatarOpen ? 'var(--cf-accent)' : 'var(--cf-border)',
-                      color: 'var(--cf-text)',
-                      boxShadow: 'var(--cf-shadow-sm)',
-                    }}
-                    aria-label="User account menu"
-                  >
-                    {/* Avatar circle with image / initials + online indicator */}
-                    <div className="relative">
-                      <div
-                        className="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center text-[11px] font-bold text-white shrink-0 shadow-sm"
-                        style={{ background: 'linear-gradient(135deg, #2F6F62, #1a4f45)' }}
-                      >
-                        {user.avatar ? (
-                          <img src={user.avatar} alt={displayName} className="w-full h-full object-cover" />
-                        ) : (
-                          initials
-                        )}
-                      </div>
-                      <span
-                        className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-[var(--cf-surface)] bg-emerald-500"
-                        title="Active Session"
-                      />
-                    </div>
+            <ProfileDropdown align="right" />
+          ) : (
+            /* ── SIGNED OUT: Sleek Sign In + Try Free CTA ── */
+            <div className="hidden sm:flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => openAuthModal()}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-full transition-all border cursor-pointer"
+                style={{
+                  background: 'var(--cf-surface)',
+                  borderColor: 'var(--cf-border)',
+                  color: 'var(--cf-text)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--cf-accent)';
+                  e.currentTarget.style.background = 'var(--cf-surface-alt)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--cf-border)';
+                  e.currentTarget.style.background = 'var(--cf-surface)';
+                }}
+              >
+                <User className="w-3.5 h-3.5" style={{ color: 'var(--cf-accent)' }} />
+                <span>Sign In</span>
+              </button>
 
-                    <span className="hidden sm:inline max-w-[110px] truncate text-xs font-semibold">
-                      {displayName}
-                    </span>
-
-                    <span
-                      className="hidden md:inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-bold tracking-wider uppercase text-emerald-600 bg-emerald-500/10 border border-emerald-500/20"
-                    >
-                      PRO
-                    </span>
-
-                    <ChevronDown
-                      className="w-3.5 h-3.5 transition-transform duration-200"
-                      style={{
-                        transform: avatarOpen ? 'rotate(180deg)' : 'none',
-                        color: 'var(--cf-text-muted)',
-                      }}
-                    />
-                  </button>
-
-                  {/* Profile Dropdown */}
-                  <AnimatePresence>
-                    {avatarOpen && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 6, scale: 0.96 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 6, scale: 0.96 }}
-                        transition={{ duration: 0.15, ease: 'easeOut' }}
-                        className="absolute right-0 top-full mt-2 w-64 rounded-2xl overflow-hidden z-50"
-                        style={{
-                          background: 'var(--cf-surface)',
-                          border: '1px solid var(--cf-border)',
-                          boxShadow: 'var(--cf-shadow-xl)',
-                        }}
-                      >
-                        {/* User Header */}
-                        <div
-                          className="p-4 border-b"
-                          style={{ borderColor: 'var(--cf-border)', background: 'var(--cf-surface-alt)' }}
-                        >
-                          <div className="flex items-center gap-3">
-                            <div
-                              className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center text-sm font-bold text-white shrink-0 shadow-md"
-                              style={{ background: 'linear-gradient(135deg, #2F6F62, #1a4f45)' }}
-                            >
-                              {user.avatar ? (
-                                <img src={user.avatar} alt={displayName} className="w-full h-full object-cover" />
-                              ) : (
-                                initials
-                              )}
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center gap-1.5">
-                                <p className="text-xs font-bold truncate" style={{ color: 'var(--cf-text)' }}>
-                                  {displayName}
-                                </p>
-                                <span className="text-[10px] font-mono px-1 py-0.2 rounded bg-emerald-500/10 text-emerald-600 font-bold border border-emerald-500/20">
-                                  PRO
-                                </span>
-                              </div>
-                              <p className="text-[11px] truncate mt-0.5" style={{ color: 'var(--cf-text-muted)' }}>
-                                {user.email}
-                              </p>
-                              <p className="text-[10px] font-mono truncate mt-0.5 text-[#2F6F62]">
-                                {user.role || 'Senior Independent'}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Menu Actions */}
-                        <div className="p-2 space-y-1">
-                          <Link
-                            href="/dashboard"
-                            onClick={() => setAvatarOpen(false)}
-                            className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-colors"
-                            style={{ color: 'var(--cf-text)' }}
-                            onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--cf-surface-alt)')}
-                            onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-                          >
-                            <LayoutDashboard className="w-4 h-4 text-[#2F6F62]" />
-                            <span>Launch Studio Dashboard</span>
-                          </Link>
-
-                          <Link
-                            href="/account"
-                            onClick={() => setAvatarOpen(false)}
-                            className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-colors"
-                            style={{ color: 'var(--cf-text)' }}
-                            onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--cf-surface-alt)')}
-                            onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-                          >
-                            <User className="w-4 h-4" style={{ color: 'var(--cf-text-muted)' }} />
-                            <span>Account &amp; Security</span>
-                          </Link>
-
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setAvatarOpen(false);
-                              openAuthModal('Switching to another freelance persona or account', 'demo');
-                            }}
-                            className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-colors cursor-pointer text-left"
-                            style={{ color: 'var(--cf-text)' }}
-                            onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--cf-surface-alt)')}
-                            onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-                          >
-                            <Zap className="w-4 h-4 text-amber-500" />
-                            <span>Switch Demo Persona</span>
-                          </button>
-                        </div>
-
-                        {/* Sign Out Section */}
-                        <div className="p-2 border-t" style={{ borderColor: 'var(--cf-border)' }}>
-                          <button
-                            type="button"
-                            onClick={async () => {
-                              setAvatarOpen(false);
-                              await signOut();
-                            }}
-                            className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-colors cursor-pointer"
-                            style={{ color: 'var(--cf-caution)' }}
-                            onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--cf-caution-bg)')}
-                            onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-                          >
-                            <LogOut className="w-4 h-4" />
-                            <span>Sign Out</span>
-                          </button>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              ) : (
-                /* ── SIGNED OUT: Sleek Sign In + Try Free CTA ── */
-                <div className="hidden sm:flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => openAuthModal()}
-                    className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-full transition-all border cursor-pointer"
-                    style={{
-                      background: 'var(--cf-surface)',
-                      borderColor: 'var(--cf-border)',
-                      color: 'var(--cf-text)',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = 'var(--cf-accent)';
-                      e.currentTarget.style.background = 'var(--cf-surface-alt)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.borderColor = 'var(--cf-border)';
-                      e.currentTarget.style.background = 'var(--cf-surface)';
-                    }}
-                  >
-                    <User className="w-3.5 h-3.5" style={{ color: 'var(--cf-accent)' }} />
-                    <span>Sign In</span>
-                  </button>
-
-                  <Link
-                    href="/dashboard"
-                    className="relative inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold overflow-hidden group text-white shadow-md transition-all hover:shadow-lg"
-                    style={{
-                      background: 'linear-gradient(135deg, #2F6F62, #1a4f45)',
-                    }}
-                  >
-                    <span>Try Free</span>
-                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                  </Link>
-                </div>
-              )}
+              <Link
+                href="/dashboard"
+                className="relative inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold overflow-hidden group text-white shadow-md transition-all hover:shadow-lg"
+                style={{
+                  background: 'linear-gradient(135deg, #2F6F62, #1a4f45)',
+                }}
+              >
+                <span>Try Free</span>
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+            </div>
+          )}
 
           {/* Mobile hamburger */}
           <button

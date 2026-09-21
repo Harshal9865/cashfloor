@@ -38,6 +38,7 @@ import { InvoiceGeneratorModal } from '@/components/InvoiceGeneratorModal';
 import { RealDataWizardModal } from '@/components/RealDataWizardModal';
 import { CsvPasteModal } from '@/components/CsvPasteModal';
 import { LegalDisclaimer } from '@/components/LegalDisclaimer';
+import { RunwayAiCopilot } from '@/components/ai/RunwayAiCopilot';
 
 const DEFAULT_RECORDS: MonthlyRecord[] = [
   { id: '1', month: 'Jul', income: 4050, expenses: 2100, clientTag: 'Acme Retainer' },
@@ -630,6 +631,17 @@ export default function ExecutiveDashboard() {
           setRecords(pasted);
         }}
         currencySymbol={currencySymbol}
+      />
+
+      {/* Real-time Client-side AI Runway Advisor Copilot */}
+      <RunwayAiCopilot
+        records={records}
+        assumptions={assumptions}
+        currencySymbol={currencySymbol}
+        floorIncome={calculation.floorIncome}
+        sustainablePaycheck={calculation.sustainablePaycheck}
+        currentSavings={calculation.currentSavings}
+        runwayMonths={calculation.runwayMonths}
       />
 
       <LegalDisclaimer />

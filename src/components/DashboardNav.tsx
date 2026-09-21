@@ -11,6 +11,7 @@ import {
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/lib/auth/AuthContext';
 import CashFloorLogo from '@/components/CashFloorLogo';
+import ProfileDropdown from '@/components/nav/ProfileDropdown';
 
 interface DashboardNavProps {
   onResetData?: () => void;
@@ -26,10 +27,10 @@ interface DashboardNavProps {
 }
 
 const NAV_SECTIONS = [
-  { label: 'Dashboard', href: '/dashboard' },
-  { label: 'Studio Engine', href: '/studio' },
-  { label: 'Daily Stream', href: '/daily' },
-  { label: 'Integrations', href: '/integrations' },
+  { label: 'Financial Dashboard', href: '/dashboard' },
+  { label: 'Runway Studio', href: '/studio' },
+  { label: 'Daily Cash Flow', href: '/daily' },
+  { label: 'Connected Accounts', href: '/integrations' },
 ];
 
 export default function DashboardNav({
@@ -52,7 +53,7 @@ export default function DashboardNav({
     else openAuthModal();
   };
 
-  // Get initials from email or name
+  // Get initials from email or name for mobile drawer
   const getInitials = (nameOrEmail: string) => {
     if (!nameOrEmail) return 'U';
     const clean = nameOrEmail.includes('@') ? nameOrEmail.split('@')[0] : nameOrEmail;
@@ -64,10 +65,8 @@ export default function DashboardNav({
   const displayName = user?.name || user?.email?.split('@')[0] || 'Independent Pro';
   const initials = getInitials(user?.name || user?.email || '');
 
-  const [avatarOpen, setAvatarOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const avatarRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -75,36 +74,6 @@ export default function DashboardNav({
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
-
-  // Close avatar dropdown on outside click
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (avatarRef.current && !avatarRef.current.contains(e.target as Node)) {
-        setAvatarOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
-
-  const handleDownloadVaultJson = () => {
-    if (typeof window === 'undefined') return;
-    const backupData = {
-      version: 'cashfloor_vault_v1',
-      exportedAt: new Date().toISOString(),
-      ledger: localStorage.getItem('calm_ledger_local_state_v1'),
-      rules: localStorage.getItem('cf_client_rules'),
-      integrations: localStorage.getItem('cf_connected_integrations'),
-    };
-    const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `cashfloor-vault-backup-${new Date().toISOString().slice(0, 10)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    setAvatarOpen(false);
-  };
 
   const syncColor =
     syncStatus === 'synced' ? 'var(--cf-accent)' :
@@ -197,180 +166,8 @@ export default function DashboardNav({
             
             <ThemeToggle className="hidden sm:flex" />
 
-            {/* Auth / Avatar */}
-            {authLoading ? (
-              <div
-                className="flex items-center gap-2 pl-1.5 pr-2.5 py-1 rounded-full border border-[var(--cf-border-soft)] bg-[var(--cf-surface-alt)]/40 animate-pulse"
-                style={{ width: '84px', height: '32px' }}
-              />
-            ) : isAuthenticated ? (
-              <div ref={avatarRef} className="relative">
-                <button
-                  type="button"
-                  onClick={() => setAvatarOpen(!avatarOpen)}
-                  className="flex items-center gap-2 pl-1.5 pr-2.5 py-1 rounded-full transition-all cursor-pointer border"
-                  style={{
-                    border: '1px solid var(--cf-border)',
-                    background: avatarOpen ? 'var(--cf-surface-alt)' : 'transparent',
-                  }}
-                  title="Account"
-                >
-                  <div className="relative">
-                    <div className="w-7 h-7 rounded-full overflow-hidden bg-gradient-to-br from-[#2F6F62] to-[#0f564a] flex items-center justify-center shadow-sm text-white text-[11px] font-bold shrink-0">
-                      {user?.avatar ? (
-                        <img src={user.avatar} alt={displayName} className="w-full h-full object-cover" />
-                      ) : (
-                        initials
-                      )}
-                    </div>
-                    <span
-                      className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-[var(--cf-surface)] bg-emerald-500"
-                      title="Online"
-                    />
-                  </div>
-                  <span className="text-xs font-semibold hidden md:block max-w-[100px] truncate" style={{ color: 'var(--cf-text)' }}>
-                    {displayName}
-                  </span>
-                  <span className="hidden md:inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-mono font-bold uppercase text-emerald-600 bg-emerald-500/10 border border-emerald-500/20">
-                    PRO
-                  </span>
-                  <ChevronDown className="w-3.5 h-3.5 text-[var(--cf-text-muted)] transition-transform" style={{ transform: avatarOpen ? 'rotate(180deg)' : 'none' }} />
-                </button>
-
-                {/* Refined Tier-1 Professional Profile Menu */}
-                <AnimatePresence>
-                  {avatarOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.95, y: -4 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.95, y: -4 }}
-                      transition={{ duration: 0.15 }}
-                      className="absolute right-0 top-11 w-64 rounded-2xl overflow-hidden z-50 shadow-2xl border"
-                      style={{
-                        background: 'var(--cf-surface)',
-                        borderColor: 'var(--cf-border)',
-                      }}
-                    >
-                      {/* Identity Card */}
-                      <div className="p-4 border-b space-y-2.5" style={{ borderColor: 'var(--cf-border-soft)', background: 'var(--cf-surface-alt)' }}>
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-[#2F6F62] to-[#0f564a] flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-md">
-                            {user?.avatar ? (
-                              <img src={user.avatar} alt={displayName} className="w-full h-full object-cover" />
-                            ) : (
-                              initials
-                            )}
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-center gap-1.5">
-                              <p className="text-xs font-bold truncate text-[var(--cf-text)]">{displayName}</p>
-                              <span className="text-[9px] font-mono font-bold text-emerald-600 bg-emerald-500/15 px-1 py-0.5 rounded border border-emerald-500/20">
-                                PRO
-                              </span>
-                            </div>
-                            <p className="text-[11px] truncate text-[var(--cf-text-faint)] font-mono">{user?.email}</p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center justify-between pt-1 text-[10px] font-mono border-t border-[var(--cf-border-soft)]">
-                          <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
-                            <ShieldCheck className="w-3 h-3" />
-                            Enclave Sovereign
-                          </span>
-                          <span className="text-[var(--cf-text-faint)]">{lastSavedAt ? `Sync ${lastSavedAt}` : 'Local-First'}</span>
-                        </div>
-                      </div>
-
-                      {/* Primary Workspace Links */}
-                      <div className="p-1.5 space-y-0.5">
-                        <div className="px-2.5 py-1 text-[9px] font-mono uppercase tracking-wider text-[var(--cf-text-faint)]">
-                          Workspace &amp; Settings
-                        </div>
-                        <Link 
-                          href="/account" 
-                          onClick={() => setAvatarOpen(false)}
-                          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors"
-                        >
-                          <User className="w-3.5 h-3.5 text-[var(--cf-accent)]" /> 
-                          <span>Account Settings</span>
-                        </Link>
-                        <Link 
-                          href="/security" 
-                          onClick={() => setAvatarOpen(false)}
-                          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors"
-                        >
-                          <Shield className="w-3.5 h-3.5 text-emerald-500" /> 
-                          <span>Security &amp; Storage Vault</span>
-                        </Link>
-                        <Link 
-                          href="/subscription" 
-                          onClick={() => setAvatarOpen(false)}
-                          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors"
-                        >
-                          <Sparkles className="w-3.5 h-3.5 text-amber-500" /> 
-                          <span>Pro Plan &amp; Billing</span>
-                        </Link>
-                      </div>
-
-                      {/* Data Portability Section */}
-                      <div className="p-1.5 border-t border-[var(--cf-border-soft)] space-y-0.5">
-                        <div className="px-2.5 py-1 text-[9px] font-mono uppercase tracking-wider text-[var(--cf-text-faint)]">
-                          Data Portability
-                        </div>
-                        <button
-                          onClick={handleDownloadVaultJson}
-                          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors cursor-pointer text-left"
-                        >
-                          <Download className="w-3.5 h-3.5 text-blue-500" />
-                          <span>Export Vault Backup (.json)</span>
-                        </button>
-                        {onExportCsv && (
-                          <button
-                            onClick={() => { onExportCsv(); setAvatarOpen(false); }}
-                            className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors cursor-pointer text-left"
-                          >
-                            <Database className="w-3.5 h-3.5 text-emerald-500" />
-                            <span>Export Ledger (.csv)</span>
-                          </button>
-                        )}
-                      </div>
-
-                      {/* Danger / Session Zone */}
-                      <div className="p-1.5 border-t border-[var(--cf-border-soft)] space-y-0.5">
-                        {onResetData && (
-                          <button 
-                            onClick={() => { onResetData(); setAvatarOpen(false); }}
-                            className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-xl text-xs text-[var(--cf-text-muted)] hover:text-amber-600 hover:bg-amber-500/10 transition-colors cursor-pointer text-left"
-                          >
-                            <RotateCcw className="w-3.5 h-3.5" /> 
-                            <span>Reset Local Workspace</span>
-                          </button>
-                        )}
-                        <button
-                          onClick={async () => { setAvatarOpen(false); await signOut(); }}
-                          className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-xl text-xs text-rose-600 hover:bg-rose-500/10 transition-colors cursor-pointer text-left"
-                        >
-                          <LogOut className="w-3.5 h-3.5" /> 
-                          <span>Sign Out</span>
-                        </button>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={handleAuthTrigger}
-                className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold text-white transition-all cursor-pointer shadow-sm hover:shadow"
-                style={{
-                  background: 'linear-gradient(135deg, #2F6F62, #1a4f45)',
-                }}
-              >
-                <User className="w-3.5 h-3.5" />
-                Sign In
-              </button>
-            )}
+            {/* Unified Canonical Profile Dropdown */}
+            <ProfileDropdown align="right" />
 
           </div>
         </div>
