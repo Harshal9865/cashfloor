@@ -104,6 +104,28 @@ export default function CashFloorDashboard() {
           if (payload.updatedAt) {
             setLastSavedAt(new Date(payload.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
           }
+
+          // Apply client customization rules if present
+          if (typeof window !== 'undefined') {
+            const storedRules = localStorage.getItem('cf_client_rules');
+            if (storedRules) {
+              try {
+                const parsed = JSON.parse(storedRules);
+                if (parsed.targetSafetyMonths) {
+                  setAssumptions(prev => ({
+                    ...prev,
+                    bufferMonthsMultiplier: parsed.targetSafetyMonths,
+                    entityType: parsed.entityType,
+                    paymentTerms: parsed.paymentTerms,
+                    fxHaircutPct: parsed.fxHaircutPct,
+                  }));
+                }
+                if (parsed.defaultCurrency) {
+                  setCurrencySymbol(parsed.defaultCurrency);
+                }
+              } catch {}
+            }
+          }
         }
       } catch (e) {
         if (active) setSyncStatus('offline');

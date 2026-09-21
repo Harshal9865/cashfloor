@@ -30,6 +30,16 @@ export interface PendingInvoice {
 
 export type ScenarioMode = 'base' | 'conservative' | 'client_loss' | 'dry_spell' | 'windfall' | 'late_invoice';
 
+export type BusinessEntityType = 'sole_prop' | 'single_member_llc' | 's_corp' | 'foreign_contractor';
+export type PaymentTermsType = 'immediate' | 'net_15' | 'net_30' | 'net_60';
+
+export interface ClientCustomization {
+  entityType: BusinessEntityType;
+  paymentTerms: PaymentTermsType;
+  targetSafetyMonths: number; // e.g. 3, 6, 9, 12
+  fxHaircutPct: number;       // e.g. 0.03 for 3%
+}
+
 export interface CalculatorAssumptions {
   taxReservePct: number;           // e.g. 0.25 for 25%
   bufferMonthsMultiplier: number;  // e.g. 3.5 months
@@ -41,6 +51,10 @@ export interface CalculatorAssumptions {
   retainerProbability?: number;    // e.g. 0.85 for 85% certainty — probability-weight on floor
   // Phase 2: Inflation Drag
   annualInflationRate?: number;    // e.g. 0.055 = 5.5% US CPI default
+  // Client Customizations
+  entityType?: BusinessEntityType;
+  paymentTerms?: PaymentTermsType;
+  fxHaircutPct?: number;
 }
 
 export interface ClientConcentration {
