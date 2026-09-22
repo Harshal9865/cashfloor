@@ -40,22 +40,14 @@ const CustomMonthlyTooltip = ({
 
   return (
     <div
-      className="rounded-xl text-xs overflow-hidden"
-      style={{
-        background: 'var(--cf-surface)',
-        border: '1px solid var(--cf-border)',
-        boxShadow: 'var(--cf-shadow-lg)',
-        minWidth: 200,
-        fontFamily: 'var(--font-sans)',
-      }}
+      className="rounded-xl text-xs overflow-hidden bg-cf-surface border border-cf-border shadow-lg min-w-[200px] font-sans"
     >
-      <div className="px-4 py-2.5 font-semibold flex items-center justify-between"
-        style={{ background: 'var(--cf-surface-alt)', borderBottom: '1px solid var(--cf-border)', color: 'var(--cf-text)' }}>
+      <div className="px-4 py-2.5 font-semibold flex items-center justify-between border-b border-cf-border bg-cf-surface-alt text-cf-text">
         <span>{label}</span>
         <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded uppercase tracking-wider ${
-          isLean ? 'bg-[var(--cf-caution-bg)] text-[var(--cf-caution)]'
-          : isSurplus ? 'bg-[var(--cf-warm-bg)] text-[var(--cf-warm)]'
-          : 'bg-[var(--cf-accent-bg)] text-[var(--cf-accent)]'
+          isLean ? 'bg-cf-caution-bg text-cf-caution'
+          : isSurplus ? 'bg-cf-warm-bg text-cf-warm'
+          : 'bg-cf-accent-bg text-cf-accent'
         }`}>
           {isLean ? 'Lean' : isSurplus ? 'Surplus' : 'Stable'}
         </span>
@@ -63,40 +55,40 @@ const CustomMonthlyTooltip = ({
 
       <div className="px-4 py-3 space-y-2">
         <div className="flex justify-between items-center">
-          <span style={{ color: 'var(--cf-text-muted)' }}>Income</span>
-          <span className="font-mono font-semibold" style={{ color: 'var(--cf-accent)' }}>
+          <span className="text-cf-text-muted">Income</span>
+          <span className="font-mono font-semibold text-cf-accent">
             {currencySymbol}{income.toLocaleString()}
           </span>
         </div>
         <div className="flex justify-between items-center">
-          <span style={{ color: 'var(--cf-text-muted)' }}>Expenses</span>
-          <span className="font-mono font-semibold" style={{ color: 'var(--cf-caution)' }}>
+          <span className="text-cf-text-muted">Expenses</span>
+          <span className="font-mono font-semibold text-cf-caution">
             {currencySymbol}{expenses.toLocaleString()}
           </span>
         </div>
-        <div className="h-px" style={{ background: 'var(--cf-border)' }} />
+        <div className="h-px bg-cf-border" />
         <div className="flex justify-between items-center">
-          <span style={{ color: 'var(--cf-text-muted)' }}>Net Flow</span>
-          <span className={`font-mono font-bold ${netFlow >= 0 ? 'text-[var(--cf-accent)]' : 'text-[var(--cf-caution)]'}`}>
+          <span className="text-cf-text-muted">Net Flow</span>
+          <span className={`font-mono font-bold ${netFlow >= 0 ? 'text-cf-accent' : 'text-cf-caution'}`}>
             {netFlow >= 0 ? '+' : ''}{currencySymbol}{netFlow.toLocaleString()}
           </span>
         </div>
         <div className="flex justify-between items-center">
-          <span style={{ color: 'var(--cf-text-muted)' }}>Cash Balance</span>
-          <span className="font-mono font-bold" style={{ color: 'var(--cf-text)' }}>
+          <span className="text-cf-text-muted">Cash Balance</span>
+          <span className="font-mono font-bold text-cf-text">
             {currencySymbol}{Math.round(balance).toLocaleString()}
           </span>
         </div>
         
-        <div className="pt-2 border-t mt-2 border-[var(--cf-border-soft)]">
+        <div className="pt-2 border-t mt-2 border-cf-border-soft">
           <div className="flex justify-between items-center text-[11px]">
-            <span style={{ color: 'var(--cf-text-faint)' }}>Vs. Survival Floor:</span>
-            <span className={`font-mono font-bold ${floorDelta >= 0 ? 'text-[var(--cf-accent)]' : 'text-[var(--cf-caution)]'}`}>
+            <span className="text-cf-text-faint">Vs. Survival Floor:</span>
+            <span className={`font-mono font-bold ${floorDelta >= 0 ? 'text-cf-accent' : 'text-cf-caution'}`}>
               {floorDelta >= 0 ? '+' : ''}{currencySymbol}{Math.round(floorDelta).toLocaleString()}
             </span>
           </div>
           {isLean && (
-            <div className="text-[10px] pt-1" style={{ color: 'var(--cf-caution)' }}>
+            <div className="text-[10px] pt-1 text-cf-caution">
               ⚠ Below income floor ({currencySymbol}{Math.round(floorIncome).toLocaleString()})
             </div>
           )}
@@ -123,20 +115,12 @@ const CustomDailyTooltip = ({
 
   return (
     <div
-      className="rounded-xl text-xs overflow-hidden"
-      style={{
-        background: 'var(--cf-surface)',
-        border: '1px solid var(--cf-border)',
-        boxShadow: 'var(--cf-shadow-lg)',
-        minWidth: 210,
-        fontFamily: 'var(--font-sans)',
-      }}
+      className="rounded-xl text-xs overflow-hidden bg-cf-surface border border-cf-border shadow-lg min-w-[210px] font-sans"
     >
-      <div className="px-4 py-2 font-semibold flex items-center justify-between border-b"
-        style={{ background: 'var(--cf-surface-alt)', borderColor: 'var(--cf-border)', color: 'var(--cf-text)' }}>
+      <div className="px-4 py-2 font-semibold flex items-center justify-between border-b bg-cf-surface-alt border-cf-border text-cf-text">
         <span>Day {label}</span>
         <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded font-bold ${
-          inflow > 0 ? 'bg-emerald-500/10 text-emerald-600' : 'bg-[var(--cf-surface)] text-[var(--cf-text-muted)]'
+          inflow > 0 ? 'bg-emerald-500/10 text-emerald-600' : 'bg-cf-surface text-cf-text-muted'
         }`}>
           {inflow > 0 ? 'Payment Inflow' : 'Daily Burn'}
         </span>
@@ -149,21 +133,21 @@ const CustomDailyTooltip = ({
             <span className="font-bold">+{currencySymbol}{inflow.toLocaleString()}</span>
           </div>
         )}
-        <div className="flex justify-between items-center text-[var(--cf-text-muted)]">
+        <div className="flex justify-between items-center text-cf-text-muted">
           <span>Daily Outflow:</span>
-          <span className="text-[var(--cf-caution)]">-{currencySymbol}{Math.round(outflow).toLocaleString()}</span>
+          <span className="text-cf-caution">-{currencySymbol}{Math.round(outflow).toLocaleString()}</span>
         </div>
-        <div className="flex justify-between items-center border-t border-[var(--cf-border-soft)] pt-1">
-          <span className="text-[var(--cf-text-faint)]">Net Delta:</span>
-          <span className={net >= 0 ? 'text-emerald-500 font-bold' : 'text-[var(--cf-caution)] font-bold'}>
+        <div className="flex justify-between items-center border-t border-cf-border-soft pt-1">
+          <span className="text-cf-text-faint">Net Delta:</span>
+          <span className={net >= 0 ? 'text-emerald-500 font-bold' : 'text-cf-caution font-bold'}>
             {net >= 0 ? '+' : ''}{currencySymbol}{Math.round(net).toLocaleString()}
           </span>
         </div>
-        <div className="flex justify-between items-center border-t border-[var(--cf-border-soft)] pt-1">
-          <span className="text-[var(--cf-text)] font-semibold font-sans">Day-End Cash:</span>
-          <span className="font-bold text-[var(--cf-text)]">{currencySymbol}{Math.round(balance).toLocaleString()}</span>
+        <div className="flex justify-between items-center border-t border-cf-border-soft pt-1">
+          <span className="text-cf-text font-semibold font-sans">Day-End Cash:</span>
+          <span className="font-bold text-cf-text">{currencySymbol}{Math.round(balance).toLocaleString()}</span>
         </div>
-        <div className="text-[9px] text-[var(--cf-text-faint)] pt-0.5">
+        <div className="text-[9px] text-cf-text-faint pt-0.5">
           Daily Survival Floor: {currencySymbol}{Math.round(dailyFloor)}/day
         </div>
       </div>
@@ -266,10 +250,20 @@ export const CashFlowChart: React.FC<CashFlowChartProps> = ({
 
   const fmt = (v: number) => `${currencySymbol}${Math.round(v).toLocaleString()}`;
 
+  if (!records || records.length === 0) {
+    return (
+      <section className="space-y-5 transition-colors bg-cf-surface px-8 py-6 rounded-2xl border border-cf-border">
+        <div className="w-full h-[320px] rounded-2xl bg-cf-surface-alt/40 flex flex-col items-center justify-center text-xs font-mono text-cf-text-muted gap-4">
+          <Activity className="w-8 h-8 text-cf-border" />
+          <span>No ledger records found. Add transactions to generate your cash flow forecast.</span>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section
-      className="space-y-5 transition-colors"
-      style={{ background: 'var(--cf-surface)', padding: '1.5rem 2rem' }}
+      className="space-y-5 transition-colors bg-cf-surface px-8 py-6 rounded-2xl border border-cf-border"
       id="cash-flow"
     >
       {/* Header with Granularity Switcher */}

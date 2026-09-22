@@ -121,6 +121,25 @@
   --color-caution-dark: #84331e;
   --color-dark-bg: #080C10;
   --color-dark-surface: #0E1420;
+
+  /* CashFloor Tokens */
+  --color-cf-bg: var(--cf-bg);
+  --color-cf-bg-deep: var(--cf-bg-deep);
+  --color-cf-surface: var(--cf-surface);
+  --color-cf-surface-alt: var(--cf-surface-alt);
+  --color-cf-text: var(--cf-text);
+  --color-cf-text-muted: var(--cf-text-muted);
+  --color-cf-text-faint: var(--cf-text-faint);
+  --color-cf-border: var(--cf-border);
+  --color-cf-border-soft: var(--cf-border-soft);
+  --color-cf-accent: var(--cf-accent);
+  --color-cf-accent-bright: var(--cf-accent-bright);
+  --color-cf-accent-bg: var(--cf-accent-bg);
+  --color-cf-warm: var(--cf-warm);
+  --color-cf-caution: var(--cf-caution);
+  --color-cf-warm-bg: var(--cf-warm-bg);
+  --color-cf-caution-bg: var(--cf-caution-bg);
+
   --font-serif: var(--font-fraunces), "Fraunces", Georgia, serif;
   --font-sans: var(--font-plex), "IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: var(--font-mono), "JetBrains Mono", monospace;

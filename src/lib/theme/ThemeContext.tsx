@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
@@ -24,7 +25,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     // On mount, read from localStorage or system preference
     const stored = localStorage.getItem('cf-theme') as Theme | null;
     const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const resolved = stored ?? (systemDark ? 'dark' : 'dark'); // default dark
+    const resolved = stored ?? (systemDark ? 'dark' : 'light');
     setTheme(resolved);
     document.documentElement.setAttribute('data-theme', resolved);
     setMounted(true);

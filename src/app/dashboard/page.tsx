@@ -133,7 +133,7 @@ export default function ExecutiveDashboard() {
         lastSavedAt={lastSavedAt}
       />
 
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-8 py-8 space-y-8">
+      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-8 py-10 space-y-10 lg:space-y-12">
         
         {/* ── Executive Briefing Header ── */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-[var(--cf-border-soft)]">
@@ -176,12 +176,12 @@ export default function ExecutiveDashboard() {
         </div>
 
         {/* ── Core Metric HUD (5 Pillars) ── */}
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3.5 sm:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6">
           
           {/* Card 1: Health Score */}
-          <div className="p-4 sm:p-5 rounded-2xl bg-[var(--cf-surface)] border border-[var(--cf-border-soft)] shadow-xs flex flex-col justify-between">
+          <div className="p-5 sm:p-6 rounded-2xl bg-[var(--cf-surface)] border border-[var(--cf-border-soft)] shadow-xs flex flex-col justify-between">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--cf-text-muted)]">
+              <span className="text-xs font-mono uppercase tracking-wider text-[var(--cf-text-muted)]">
                 Solvency Score
               </span>
               <Activity className="w-4 h-4 text-emerald-500" />
@@ -200,9 +200,9 @@ export default function ExecutiveDashboard() {
           </div>
 
           {/* Card 2: Liquid Runway */}
-          <div className="p-4 sm:p-5 rounded-2xl bg-[var(--cf-surface)] border border-[var(--cf-border-soft)] shadow-xs flex flex-col justify-between">
+          <div className="p-5 sm:p-6 rounded-2xl bg-[var(--cf-surface)] border border-[var(--cf-border-soft)] shadow-xs flex flex-col justify-between">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--cf-text-muted)]">
+              <span className="text-xs font-mono uppercase tracking-wider text-[var(--cf-text-muted)]">
                 Liquid Runway
               </span>
               <Clock className="w-4 h-4 text-[var(--cf-accent)]" />
@@ -221,9 +221,9 @@ export default function ExecutiveDashboard() {
           </div>
 
           {/* Card 3: Bedrock P20 Floor */}
-          <div className="p-4 sm:p-5 rounded-2xl bg-[var(--cf-surface)] border border-[var(--cf-border-soft)] shadow-xs flex flex-col justify-between">
+          <div className="p-5 sm:p-6 rounded-2xl bg-[var(--cf-surface)] border border-[var(--cf-border-soft)] shadow-xs flex flex-col justify-between">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--cf-text-muted)]">
+              <span className="text-xs font-mono uppercase tracking-wider text-[var(--cf-text-muted)]">
                 P20 Bedrock Floor
               </span>
               <ShieldCheck className="w-4 h-4 text-emerald-600" />
@@ -242,9 +242,9 @@ export default function ExecutiveDashboard() {
           </div>
 
           {/* Card 4: Tax Escrow Lock */}
-          <div className="p-4 sm:p-5 rounded-2xl bg-[var(--cf-surface)] border border-[var(--cf-border-soft)] shadow-xs flex flex-col justify-between">
+          <div className="p-5 sm:p-6 rounded-2xl bg-[var(--cf-surface)] border border-[var(--cf-border-soft)] shadow-xs flex flex-col justify-between">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--cf-text-muted)]">
+              <span className="text-xs font-mono uppercase tracking-wider text-[var(--cf-text-muted)]">
                 Tax Escrow Lock
               </span>
               <Lock className="w-4 h-4 text-amber-500" />
@@ -263,9 +263,9 @@ export default function ExecutiveDashboard() {
           </div>
 
           {/* Card 5: Safe To Spend */}
-          <div className="p-4 sm:p-5 rounded-2xl bg-[var(--cf-surface)] border border-[var(--cf-border-soft)] shadow-xs flex flex-col justify-between col-span-2 lg:col-span-1">
+          <div className="p-5 sm:p-6 rounded-2xl bg-[var(--cf-surface)] border border-[var(--cf-border-soft)] shadow-xs flex flex-col justify-between col-span-1 lg:col-span-1">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--cf-text-muted)]">
+              <span className="text-xs font-mono uppercase tracking-wider text-[var(--cf-text-muted)]">
                 Safe To Spend
               </span>
               <DollarSign className="w-4 h-4 text-[var(--cf-accent)]" />
@@ -285,12 +285,12 @@ export default function ExecutiveDashboard() {
         </div>
 
         {/* ── Two Column Layout: What To Do Today + Ingestion Rails ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
           {/* Left Column (2/3): Action Plan & Operational Checklist */}
           <div className="lg:col-span-2 space-y-6">
             
-            <div className="p-6 sm:p-7 rounded-3xl border border-[var(--cf-border)] bg-[var(--cf-surface)] space-y-5 shadow-sm">
+            <div className="p-6 sm:p-8 rounded-3xl border border-[var(--cf-border)] bg-[var(--cf-surface)] space-y-6 shadow-sm">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-[var(--cf-border-soft)]">
                 <div>
                   <h2 className="text-lg font-serif font-bold text-[var(--cf-text)] flex items-center gap-2">
@@ -389,7 +389,7 @@ export default function ExecutiveDashboard() {
                 {/* Station 1: Studio Calculation Engine */}
                 <Link
                   href="/studio"
-                  className="p-5 rounded-2xl border border-[var(--cf-border)] bg-[var(--cf-surface)] hover:border-[var(--cf-accent)] hover:shadow-lg transition-all group flex flex-col justify-between space-y-4"
+                  className="p-6 sm:p-7 rounded-2xl border border-[var(--cf-border)] bg-[var(--cf-surface)] hover:border-[var(--cf-accent)] hover:shadow-lg transition-all group flex flex-col justify-between space-y-5"
                 >
                   <div className="space-y-2">
                     <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 group-hover:scale-105 transition-transform">
@@ -411,7 +411,7 @@ export default function ExecutiveDashboard() {
                 {/* Station 2: Daily Cash Stream */}
                 <Link
                   href="/daily"
-                  className="p-5 rounded-2xl border border-[var(--cf-border)] bg-[var(--cf-surface)] hover:border-[var(--cf-accent)] hover:shadow-lg transition-all group flex flex-col justify-between space-y-4"
+                  className="p-6 sm:p-7 rounded-2xl border border-[var(--cf-border)] bg-[var(--cf-surface)] hover:border-[var(--cf-accent)] hover:shadow-lg transition-all group flex flex-col justify-between space-y-5"
                 >
                   <div className="space-y-2">
                     <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-105 transition-transform">
@@ -433,7 +433,7 @@ export default function ExecutiveDashboard() {
                 {/* Station 3: Integrations & CSV Feeds */}
                 <Link
                   href="/integrations"
-                  className="p-5 rounded-2xl border border-[var(--cf-border)] bg-[var(--cf-surface)] hover:border-[var(--cf-accent)] hover:shadow-lg transition-all group flex flex-col justify-between space-y-4"
+                  className="p-6 sm:p-7 rounded-2xl border border-[var(--cf-border)] bg-[var(--cf-surface)] hover:border-[var(--cf-accent)] hover:shadow-lg transition-all group flex flex-col justify-between space-y-5"
                 >
                   <div className="space-y-2">
                     <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-600 dark:text-purple-400 group-hover:scale-105 transition-transform">
@@ -455,7 +455,7 @@ export default function ExecutiveDashboard() {
                 {/* Station 4: Security & Data Vault */}
                 <Link
                   href="/security"
-                  className="p-5 rounded-2xl border border-[var(--cf-border)] bg-[var(--cf-surface)] hover:border-[var(--cf-accent)] hover:shadow-lg transition-all group flex flex-col justify-between space-y-4"
+                  className="p-6 sm:p-7 rounded-2xl border border-[var(--cf-border)] bg-[var(--cf-surface)] hover:border-[var(--cf-accent)] hover:shadow-lg transition-all group flex flex-col justify-between space-y-5"
                 >
                   <div className="space-y-2">
                     <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400 group-hover:scale-105 transition-transform">

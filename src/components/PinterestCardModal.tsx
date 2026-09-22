@@ -75,7 +75,7 @@ export const PinterestCardModal: React.FC<PinterestCardModalProps> = ({
         <div className="w-full flex justify-center py-2">
           <div
             ref={cardRef}
-            className="w-[360px] sm:w-[400px] bg-[#F1F4F2] border border-[#D8E0DC] p-8 text-center flex flex-col justify-between shadow-xs"
+            className="w-full max-w-[400px] bg-[#F1F4F2] border border-[#D8E0DC] p-6 sm:p-8 text-center flex flex-col justify-between shadow-xs"
             style={{ minHeight: '560px' }}
           >
             {/* Masthead */}

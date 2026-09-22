@@ -54,17 +54,17 @@ export const LedgerRows: React.FC<LedgerRowsProps> = ({
       {/* Stacked Pillar Rows */}
       <div className="divide-y" style={{ borderColor: 'var(--cf-border)' }}>
         {pillars.map((pillar) => {
-          let badgeStyle = 'border-[var(--cf-accent)] bg-[var(--cf-accent-bg)] text-[var(--cf-accent)]';
+          let badgeStyle = 'border-[var(--cf-accent)] bg-[var(--cf-accent)]/10 text-[var(--cf-accent)]';
           let borderOpacity = '33';
           
           if (pillar.solvencyType === 'safe') {
-            badgeStyle = 'bg-[rgba(201,138,62,0.1)] text-[#C98A3E]';
+            badgeStyle = 'bg-amber-500/10 text-amber-600 border-amber-500/20';
             borderOpacity = '40';
           } else if (pillar.solvencyType === 'warning') {
-            badgeStyle = 'bg-[rgba(180,87,63,0.1)] text-[#B4573F]';
+            badgeStyle = 'bg-rose-500/10 text-rose-600 border-rose-500/20';
             borderOpacity = '30';
           } else if (pillar.solvencyType === 'surplus') {
-            badgeStyle = 'bg-[rgba(201,138,62,0.1)] text-[#C98A3E]';
+            badgeStyle = 'bg-amber-500/10 text-amber-600 border-amber-500/20';
             borderOpacity = '40';
           }
 
@@ -73,7 +73,7 @@ export const LedgerRows: React.FC<LedgerRowsProps> = ({
           return (
             <div
               key={pillar.id}
-              className="p-5 lg:px-8 lg:py-4 transition-colors"
+              className={`p-5 lg:px-8 lg:py-4 transition-all duration-300 ${!isTotalRow ? 'hover:bg-[var(--cf-surface-alt)] lg:hover:-translate-y-0.5 lg:hover:shadow-sm' : ''}`}
               style={{
                 background: isTotalRow ? 'var(--cf-surface-alt)' : 'transparent',
                 fontWeight: isTotalRow ? 500 : 400

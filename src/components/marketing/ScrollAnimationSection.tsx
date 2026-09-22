@@ -59,12 +59,12 @@ export default function ScrollAnimationSection() {
   return (
     <section ref={containerRef} className="relative py-28 md:py-40 overflow-hidden bg-[var(--cf-bg)] border-y border-[var(--cf-border)]">
       {/* Background Multi-layer Glow & Mathematical Invariant Watermark */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] bg-[var(--cf-accent)]/10 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute top-1/3 left-1/4 w-[400px] h-[400px] bg-teal-500/10 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150vw] md:w-[900px] h-[150vw] md:h-[900px] bg-[var(--cf-accent)]/10 rounded-full blur-[100px] md:blur-[140px] pointer-events-none" />
+      <div className="absolute top-1/3 left-1/4 w-[80vw] md:w-[400px] h-[80vw] md:h-[400px] bg-teal-500/10 rounded-full blur-[80px] md:blur-[100px] pointer-events-none" />
       
       {/* Subtle Mathematical Watermark */}
       <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] dark:opacity-[0.05] pointer-events-none select-none overflow-hidden">
-        <span className="font-mono text-8xl md:text-9xl font-bold tracking-widest whitespace-nowrap">
+        <span className="font-mono text-5xl sm:text-7xl md:text-9xl font-bold tracking-widest whitespace-nowrap">
           P20(X) = inf {'{'} x : F(x) ≥ 0.20 {'}'}
         </span>
       </div>
@@ -87,7 +87,7 @@ export default function ScrollAnimationSection() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-[var(--cf-text)] tracking-tight leading-[1.12] mb-6"
+            className="font-serif text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-[var(--cf-text)] tracking-tight leading-[1.12] mb-6"
           >
             Engineered for <br />
             <span className="italic font-serif bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 via-teal-500 to-amber-600 dark:from-[#3DE8C8] dark:via-emerald-300 dark:to-[#F5C97A]">
@@ -171,7 +171,7 @@ export default function ScrollAnimationSection() {
               rotateX: mouseX,
               rotateY: mouseY,
             }}
-            className="relative z-10 w-full md:w-[700px] h-[450px] rounded-[2rem] bg-[var(--cf-surface)] border border-[var(--cf-border)] p-[2px] cursor-crosshair shadow-2xl transition-shadow duration-300 hover:shadow-[0_0_80px_rgba(47,111,98,0.3)]"
+            className="relative z-10 w-[90vw] md:w-[700px] h-[400px] md:h-[450px] rounded-[2rem] bg-[var(--cf-surface)] border border-[var(--cf-border)] p-[2px] cursor-crosshair shadow-2xl transition-shadow duration-300 hover:shadow-[0_0_80px_rgba(47,111,98,0.3)]"
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
           >
@@ -201,11 +201,11 @@ export default function ScrollAnimationSection() {
               }} />
               
               <div className="relative z-10 flex flex-col items-center text-center">
-                <div className="w-20 h-20 rounded-3xl bg-[var(--cf-surface-alt)] border border-[var(--cf-border)] flex items-center justify-center mb-8 shadow-[0_0_30px_rgba(47,111,98,0.2)] relative group">
+                <div className="w-16 h-16 md:w-20 md:h-20 rounded-3xl bg-[var(--cf-surface-alt)] border border-[var(--cf-border)] flex items-center justify-center mb-6 md:mb-8 shadow-[0_0_30px_rgba(47,111,98,0.2)] relative group">
                   <div className="absolute inset-0 bg-[var(--cf-accent)] opacity-20 blur-xl group-hover:opacity-40 transition-opacity rounded-3xl" />
-                  <BarChart className="w-10 h-10 text-[var(--cf-accent)] relative z-10" />
+                  <BarChart className="w-8 h-8 md:w-10 md:h-10 text-[var(--cf-accent)] relative z-10" />
                 </div>
-                <h3 className="font-serif text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight">
+                <h3 className="font-serif text-3xl md:text-5xl font-bold text-white mb-4 md:mb-6 tracking-tight">
                   The CashFlow Engine
                 </h3>
                 <p className="text-[var(--cf-text-muted)] text-lg leading-relaxed mb-10 max-w-md mx-auto">

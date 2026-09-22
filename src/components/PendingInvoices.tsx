@@ -83,7 +83,7 @@ export const PendingInvoices: React.FC<PendingInvoicesProps> = ({
 
   return (
     <div className="w-full rounded-2xl border overflow-hidden mt-6" style={{ background: 'var(--cf-surface)', borderColor: 'var(--cf-border)' }}>
-      <div className="p-4 border-b flex items-center justify-between" style={{ borderColor: 'var(--cf-border)', background: 'var(--cf-surface-alt)' }}>
+      <div className="p-4 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-3" style={{ borderColor: 'var(--cf-border)', background: 'var(--cf-surface-alt)' }}>
         <div className="flex items-center gap-2">
           <Clock className="w-4 h-4 text-[var(--cf-accent)]" />
           <h3 className="font-semibold text-sm" style={{ color: 'var(--cf-text)' }}>Accounts Receivable (A/R)</h3>

@@ -201,8 +201,8 @@ export default function MarketingNav() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-x-0 top-16 z-30 border-b backdrop-blur-xl md:hidden"
-            style={{ background: 'var(--cf-nav-bg)', borderColor: 'var(--cf-border)' }}
+            className="fixed inset-x-0 top-16 z-30 border-b md:hidden shadow-xl"
+            style={{ background: 'var(--cf-bg)', borderColor: 'var(--cf-border)' }}
           >
             <div className="px-5 py-4 flex flex-col gap-2">
               {navLinks.map((link) => (

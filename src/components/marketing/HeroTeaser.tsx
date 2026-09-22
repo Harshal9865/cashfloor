@@ -91,7 +91,7 @@ export default function HeroTeaser() {
             {/* Headline — bold and clear */}
             <h1 className="font-serif tracking-tight leading-[1.06]">
               <motion.span
-                className="block text-[clamp(2.8rem,6vw,4.5rem)] text-[var(--cf-text)]"
+                className="block text-4xl sm:text-5xl md:text-[clamp(3rem,6vw,4.5rem)] text-[var(--cf-text)]"
                 initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
@@ -99,7 +99,7 @@ export default function HeroTeaser() {
                 Stop guessing
               </motion.span>
               <motion.span
-                className="block text-[clamp(2.8rem,6vw,4.5rem)] text-[var(--cf-text)]"
+                className="block text-4xl sm:text-5xl md:text-[clamp(3rem,6vw,4.5rem)] text-[var(--cf-text)]"
                 initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.28, ease: [0.16, 1, 0.3, 1] }}
@@ -107,7 +107,7 @@ export default function HeroTeaser() {
                 how long you&apos;ll last.
               </motion.span>
               <motion.span
-                className="block text-[clamp(2.8rem,6vw,4.5rem)] gradient-text italic"
+                className="block text-4xl sm:text-5xl md:text-[clamp(3rem,6vw,4.5rem)] gradient-text italic mt-1 sm:mt-2"
                 initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.42, ease: [0.16, 1, 0.3, 1] }}

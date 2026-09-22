@@ -58,7 +58,7 @@ export default function DailyPage() {
     <div className="min-h-screen flex flex-col bg-[var(--cf-bg)] text-[var(--cf-text)] transition-colors duration-300">
       <DashboardNav />
 
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-8 py-8 space-y-8">
+      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-8 py-10 space-y-10 lg:space-y-12">
         
         {/* Navigation Breadcrumbs & Actions */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -108,9 +108,9 @@ export default function DailyPage() {
         </div>
 
         {/* ── Daily Top KPI Metric Chips ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
           <div 
-            className="p-4 sm:p-5 rounded-3xl border flex items-center gap-4 transition-all"
+            className="p-5 sm:p-6 rounded-3xl border flex items-center gap-5 transition-all"
             style={{ background: 'var(--cf-surface)', borderColor: 'var(--cf-border)' }}
           >
             <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 border ${
@@ -134,7 +134,7 @@ export default function DailyPage() {
           </div>
 
           <div 
-            className="p-4 sm:p-5 rounded-3xl border flex items-center gap-4 transition-all"
+            className="p-5 sm:p-6 rounded-3xl border flex items-center gap-5 transition-all"
             style={{ background: 'var(--cf-surface)', borderColor: 'var(--cf-border)' }}
           >
             <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 border ${
@@ -158,7 +158,7 @@ export default function DailyPage() {
           </div>
 
           <div 
-            className="p-4 sm:p-5 rounded-3xl border flex items-center gap-4 transition-all"
+            className="p-5 sm:p-6 rounded-3xl border flex items-center gap-5 transition-all"
             style={{ background: 'var(--cf-surface)', borderColor: 'var(--cf-border)' }}
           >
             <div className="w-11 h-11 rounded-2xl bg-amber-500/10 text-amber-600 flex items-center justify-center shrink-0 border border-amber-500/20">
@@ -179,7 +179,7 @@ export default function DailyPage() {
         </div>
 
         {/* ── Horizon Range Selector Pills ── */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-2xl bg-[var(--cf-surface-alt)] border border-[var(--cf-border-soft)]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-3xl bg-[var(--cf-surface-alt)] border border-[var(--cf-border-soft)]">
           <span className="text-xs font-mono text-[var(--cf-text-muted)] flex items-center gap-1.5">
             <Calendar className="w-3.5 h-3.5 text-[var(--cf-accent)]" />
             <span>Active Forecast Granularity:</span>
@@ -232,7 +232,7 @@ export default function DailyPage() {
 
         {/* ── Strategy Callout for Daily Tracking ── */}
         <div 
-          className="p-6 rounded-3xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+            className="p-6 sm:p-8 rounded-3xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6"
           style={{ background: 'var(--cf-surface-alt)', borderColor: 'var(--cf-border)' }}
         >
           <div className="space-y-1">

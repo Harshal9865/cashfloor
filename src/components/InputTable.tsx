@@ -194,9 +194,9 @@ export const InputTable: React.FC<InputTableProps> = ({
       {/* Table Container with Horizontal Scroll */}
       <div className="overflow-x-auto min-h-[300px] flex flex-col">
         {records.length === 0 ? (
-          <div className="flex-1 flex flex-col items-center justify-center p-12 text-center" style={{ background: 'var(--cf-surface)' }}>
-            <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 border" style={{ background: 'var(--cf-surface-alt)', borderColor: 'var(--cf-border)' }}>
-              <FileSpreadsheet className="w-8 h-8" style={{ color: 'var(--cf-text-faint)' }} />
+          <div className="flex-1 flex flex-col items-center justify-center p-12 text-center rounded-xl border-2 border-dashed m-6" style={{ background: 'var(--cf-surface-alt)', borderColor: 'var(--cf-border-soft)' }}>
+            <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 border shadow-sm" style={{ background: 'var(--cf-surface)', borderColor: 'var(--cf-border)' }}>
+              <FileSpreadsheet className="w-8 h-8 opacity-80" style={{ color: 'var(--cf-text-muted)' }} />
             </div>
             <h3 className="font-serif text-lg mb-2" style={{ color: 'var(--cf-text)' }}>No Ledger Data</h3>
             <p className="text-sm max-w-md mx-auto mb-6 leading-relaxed" style={{ color: 'var(--cf-text-muted)' }}>
@@ -227,7 +227,7 @@ export const InputTable: React.FC<InputTableProps> = ({
             <div className="hidden md:block w-full">
               <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="font-mono text-[10px] tracking-wider uppercase border-b" style={{ background: 'var(--cf-surface-alt)', color: 'var(--cf-text-muted)', borderColor: 'var(--cf-border)' }}>
+              <tr className="font-mono text-[10px] tracking-wider uppercase border-b-2" style={{ background: 'var(--cf-surface-alt)', color: 'var(--cf-text-muted)', borderColor: 'var(--cf-border-soft)' }}>
                 <th className="py-3 px-4 font-semibold">Month</th>
                 <th className="py-3 px-4 font-semibold text-right">Gross Income</th>
                 <th className="py-3 px-4 font-semibold text-right text-[#875205]">Tax Escrow (-{Math.round(taxReservePct * 100)}%)</th>
@@ -241,7 +241,7 @@ export const InputTable: React.FC<InputTableProps> = ({
               {rowsWithAccounting.map((row, index) => (
                 <tr
                   key={row.id || index}
-                  className="transition-colors hover:bg-[var(--cf-surface-alt)]"
+                  className="transition-all hover:bg-[var(--cf-surface-alt)] group"
                   style={{ background: row.isLean ? 'rgba(180,87,63,0.03)' : 'transparent' }}
                 >
                   {/* Month & Status */}
@@ -252,7 +252,7 @@ export const InputTable: React.FC<InputTableProps> = ({
                         type="text"
                         value={row.month}
                         onChange={(e) => handleRecordChange(index, 'month', e.target.value)}
-                        className="w-20 bg-transparent border-b border-transparent hover:border-[var(--cf-border)] focus:border-[var(--cf-accent)] py-0.5 text-xs font-semibold focus:outline-none"
+                        className="w-20 bg-transparent px-2 py-1 rounded-md border border-transparent hover:border-[var(--cf-border)] focus:border-[var(--cf-accent)] focus:ring-1 focus:ring-[var(--cf-accent)] focus:outline-none transition-all text-xs font-semibold"
                         style={{ color: 'var(--cf-text)' }}
                       />
                       {row.isLean && (
@@ -286,8 +286,8 @@ export const InputTable: React.FC<InputTableProps> = ({
                         step="100"
                         value={row.income || ''}
                         onChange={(e) => handleRecordChange(index, 'income', e.target.value)}
-                        className="w-24 bg-transparent border-b text-right text-xs font-semibold focus:outline-none py-0.5"
-                        style={{ color: 'var(--cf-text)', borderColor: 'var(--cf-border)' }}
+                        className="w-24 bg-[var(--cf-surface)] px-2 py-1 rounded-md border text-right text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[var(--cf-accent)] transition-all"
+                        style={{ color: 'var(--cf-text)', borderColor: 'var(--cf-border-soft)' }}
                       />
                     </div>
                   </td>
@@ -307,8 +307,8 @@ export const InputTable: React.FC<InputTableProps> = ({
                         step="100"
                         value={row.expenses || ''}
                         onChange={(e) => handleRecordChange(index, 'expenses', e.target.value)}
-                        className="w-24 bg-transparent border-b text-right text-xs focus:outline-none py-0.5"
-                        style={{ color: 'var(--cf-text)', borderColor: 'var(--cf-border)' }}
+                        className="w-24 bg-[var(--cf-surface)] px-2 py-1 rounded-md border text-right text-xs focus:outline-none focus:ring-1 focus:ring-[var(--cf-accent)] transition-all"
+                        style={{ color: 'var(--cf-text)', borderColor: 'var(--cf-border-soft)' }}
                       />
                     </div>
                   </td>
@@ -334,12 +334,10 @@ export const InputTable: React.FC<InputTableProps> = ({
                       type="button"
                       aria-label={`Remove ${row.month}`}
                       onClick={() => handleRemoveRow(index)}
-                      className="p-1 transition-colors cursor-pointer"
-                      style={{ color: 'var(--cf-text-faint)' }}
-                      onMouseEnter={e => e.currentTarget.style.color = '#B4573F'}
-                      onMouseLeave={e => e.currentTarget.style.color = 'var(--cf-text-faint)'}
+                      className="p-1.5 rounded-md transition-all cursor-pointer opacity-40 group-hover:opacity-100 hover:scale-110 hover:bg-rose-500/10 hover:text-rose-500"
+                      style={{ color: 'var(--cf-text-muted)' }}
                     >
-                      <Trash2 className="w-3 h-3" />
+                      <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </td>
                 </tr>
@@ -387,16 +385,16 @@ export const InputTable: React.FC<InputTableProps> = ({
                       type="text"
                       value={row.month}
                       onChange={(e) => handleRecordChange(index, 'month', e.target.value)}
-                      className="w-24 bg-transparent border-b border-transparent hover:border-[var(--cf-border)] focus:border-[var(--cf-accent)] py-0.5 text-sm font-semibold focus:outline-none"
-                      style={{ color: 'var(--cf-text)' }}
+                      className="w-24 bg-[var(--cf-surface)] px-2 py-1.5 rounded-md border text-sm font-semibold focus:outline-none focus:ring-1 focus:ring-[var(--cf-accent)] transition-all"
+                      style={{ color: 'var(--cf-text)', borderColor: 'var(--cf-border-soft)' }}
                     />
                   </div>
                   <button
                     type="button"
                     aria-label={`Remove ${row.month}`}
                     onClick={() => handleRemoveRow(index)}
-                    className="p-2 transition-colors cursor-pointer"
-                    style={{ color: 'var(--cf-text-faint)' }}
+                    className="p-2 rounded-md transition-all cursor-pointer hover:bg-rose-500/10 hover:text-rose-500"
+                    style={{ color: 'var(--cf-text-muted)' }}
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -411,8 +409,8 @@ export const InputTable: React.FC<InputTableProps> = ({
                         type="number"
                         value={row.income || ''}
                         onChange={(e) => handleRecordChange(index, 'income', e.target.value)}
-                        className="w-full bg-transparent border-b py-0.5 focus:outline-none"
-                        style={{ color: 'var(--cf-text)', borderColor: 'var(--cf-border)' }}
+                        className="w-full bg-[var(--cf-surface)] px-2 py-1.5 rounded-md border focus:outline-none focus:ring-1 focus:ring-[var(--cf-accent)] transition-all"
+                        style={{ color: 'var(--cf-text)', borderColor: 'var(--cf-border-soft)' }}
                       />
                     </div>
                   </div>
@@ -424,8 +422,8 @@ export const InputTable: React.FC<InputTableProps> = ({
                         type="number"
                         value={row.expenses || ''}
                         onChange={(e) => handleRecordChange(index, 'expenses', e.target.value)}
-                        className="w-full bg-transparent border-b py-0.5 focus:outline-none"
-                        style={{ color: 'var(--cf-text)', borderColor: 'var(--cf-border)' }}
+                        className="w-full bg-[var(--cf-surface)] px-2 py-1.5 rounded-md border focus:outline-none focus:ring-1 focus:ring-[var(--cf-accent)] transition-all"
+                        style={{ color: 'var(--cf-text)', borderColor: 'var(--cf-border-soft)' }}
                       />
                     </div>
                   </div>

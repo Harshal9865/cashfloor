@@ -375,7 +375,7 @@ export function InvoiceGeneratorModal({
                   placeholder="Business / Your Name"
                   value={invoice.issuer.name}
                   onChange={e => handleIssuerChange('name', e.target.value)}
-                  className="px-3 py-2 rounded-xl bg-[var(--cf-surface-alt)] border border-[var(--cf-border)] text-[var(--cf-text)] focus:outline-none focus:ring-1 focus:ring-[var(--cf-accent)]"
+                  className="px-3 py-2 rounded-xl bg-[var(--cf-surface-alt)] border border-[var(--cf-border)] text-[var(--cf-text)] focus:outline-none focus:ring-1 focus:ring-[var(--cf-accent)] shadow-inner"
                 />
                 <div className="grid grid-cols-2 gap-2">
                   <input
@@ -383,14 +383,14 @@ export function InvoiceGeneratorModal({
                     placeholder="Email"
                     value={invoice.issuer.email}
                     onChange={e => handleIssuerChange('email', e.target.value)}
-                    className="px-3 py-2 rounded-xl bg-[var(--cf-surface-alt)] border border-[var(--cf-border)] text-[var(--cf-text)] focus:outline-none focus:ring-1 focus:ring-[var(--cf-accent)]"
+                    className="px-3 py-2 rounded-xl bg-[var(--cf-surface-alt)] border border-[var(--cf-border)] text-[var(--cf-text)] focus:outline-none focus:ring-1 focus:ring-[var(--cf-accent)] shadow-inner"
                   />
                   <input
                     type="text"
                     placeholder="Tax ID / EIN"
                     value={invoice.issuer.taxId || ''}
                     onChange={e => handleIssuerChange('taxId', e.target.value)}
-                    className="px-3 py-2 rounded-xl bg-[var(--cf-surface-alt)] border border-[var(--cf-border)] text-[var(--cf-text)] focus:outline-none focus:ring-1 focus:ring-[var(--cf-accent)]"
+                    className="px-3 py-2 rounded-xl bg-[var(--cf-surface-alt)] border border-[var(--cf-border)] text-[var(--cf-text)] focus:outline-none focus:ring-1 focus:ring-[var(--cf-accent)] shadow-inner"
                   />
                 </div>
                 <input
@@ -398,7 +398,7 @@ export function InvoiceGeneratorModal({
                   placeholder="Address (City, Country)"
                   value={invoice.issuer.address || ''}
                   onChange={e => handleIssuerChange('address', e.target.value)}
-                  className="px-3 py-2 rounded-xl bg-[var(--cf-surface-alt)] border border-[var(--cf-border)] text-[var(--cf-text)] focus:outline-none focus:ring-1 focus:ring-[var(--cf-accent)]"
+                  className="px-3 py-2 rounded-xl bg-[var(--cf-surface-alt)] border border-[var(--cf-border)] text-[var(--cf-text)] focus:outline-none focus:ring-1 focus:ring-[var(--cf-accent)] shadow-inner"
                 />
               </div>
             </div>
@@ -423,14 +423,14 @@ export function InvoiceGeneratorModal({
                     placeholder="Contact Person"
                     value={invoice.client.name}
                     onChange={e => handleClientChange('name', e.target.value)}
-                    className="px-3 py-2 rounded-xl bg-[var(--cf-surface-alt)] border border-[var(--cf-border)] text-[var(--cf-text)] focus:outline-none focus:ring-1 focus:ring-[var(--cf-accent)]"
+                    className="px-3 py-2 rounded-xl bg-[var(--cf-surface-alt)] border border-[var(--cf-border)] text-[var(--cf-text)] focus:outline-none focus:ring-1 focus:ring-[var(--cf-accent)] shadow-inner"
                   />
                   <input
                     type="email"
                     placeholder="Accounts Payable Email"
                     value={invoice.client.email || ''}
                     onChange={e => handleClientChange('email', e.target.value)}
-                    className="px-3 py-2 rounded-xl bg-[var(--cf-surface-alt)] border border-[var(--cf-border)] text-[var(--cf-text)] focus:outline-none focus:ring-1 focus:ring-[var(--cf-accent)]"
+                    className="px-3 py-2 rounded-xl bg-[var(--cf-surface-alt)] border border-[var(--cf-border)] text-[var(--cf-text)] focus:outline-none focus:ring-1 focus:ring-[var(--cf-accent)] shadow-inner"
                   />
                 </div>
                 <input
@@ -438,7 +438,7 @@ export function InvoiceGeneratorModal({
                   placeholder="Client Office Address"
                   value={invoice.client.address || ''}
                   onChange={e => handleClientChange('address', e.target.value)}
-                  className="px-3 py-2 rounded-xl bg-[var(--cf-surface-alt)] border border-[var(--cf-border)] text-[var(--cf-text)] focus:outline-none focus:ring-1 focus:ring-[var(--cf-accent)]"
+                  className="px-3 py-2 rounded-xl bg-[var(--cf-surface-alt)] border border-[var(--cf-border)] text-[var(--cf-text)] focus:outline-none focus:ring-1 focus:ring-[var(--cf-accent)] shadow-inner"
                 />
               </div>
             </div>
@@ -618,7 +618,7 @@ export function InvoiceGeneratorModal({
             {/* The Actual Invoice Sheet */}
             <div 
               id="cashfloor-invoice-canvas"
-              className="w-full max-w-[650px] bg-white text-slate-900 rounded-2xl shadow-xl p-6 sm:p-10 border border-slate-200 flex flex-col justify-between font-sans relative"
+              className="w-full max-w-[650px] bg-white text-slate-900 rounded-lg p-6 sm:p-10 border border-slate-200 flex flex-col justify-between font-sans relative shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] lg:shadow-[0_35px_60px_-15px_rgba(0,0,0,0.6)]"
               style={{ minHeight: '820px' }}
             >
               

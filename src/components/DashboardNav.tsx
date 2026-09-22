@@ -87,12 +87,12 @@ export default function DashboardNav({
 
   return (
     <>
-      <div className="h-20 shrink-0 w-full" /> {/* Spacer for fixed nav */}
+      <div className="h-24 shrink-0 w-full" /> {/* Spacer for fixed nav */}
       <header
         className={`fixed top-4 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none transition-all duration-500`}
       >
         <div
-          className="pointer-events-auto flex items-center justify-between w-full max-w-6xl px-4 h-13 min-h-[52px] max-h-[52px] rounded-2xl border transition-all duration-300"
+          className="pointer-events-auto flex items-center justify-between w-full max-w-7xl px-5 h-16 min-h-[64px] max-h-[64px] rounded-2xl border transition-all duration-300"
           style={{
             background: 'var(--cf-nav-bg)',
             backdropFilter: 'blur(20px)',
@@ -130,7 +130,7 @@ export default function DashboardNav({
                 <Link
                   key={s.label}
                   href={s.href}
-                  className="relative px-3.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap shrink-0 transition-colors duration-200"
+                  className="relative flex items-center justify-center px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors duration-200"
                   style={{ color: isActive ? 'var(--cf-text)' : 'var(--cf-text-muted)' }}
                 >
                   {isActive && (
@@ -141,7 +141,7 @@ export default function DashboardNav({
                       transition={{ type: 'spring', stiffness: 500, damping: 35 }}
                     />
                   )}
-                  <span className="relative z-10 whitespace-nowrap select-none">{s.label}</span>
+                  <span className="relative z-10 select-none whitespace-nowrap">{s.label}</span>
                 </Link>
               );
             })}
@@ -188,13 +188,13 @@ export default function DashboardNav({
               borderBottom: '1px solid var(--cf-nav-border)',
             }}
           >
-            <div className="px-4 py-3 flex flex-col gap-1">
+            <div className="px-5 py-4 flex flex-col gap-2">
               {NAV_SECTIONS.map((s) => (
                 <Link
                   key={s.label}
                   href={s.href}
                   onClick={() => setMobileOpen(false)}
-                  className="px-3 py-2 rounded-lg text-sm transition-colors"
+                  className="px-4 py-3 rounded-lg text-base transition-colors"
                   onMouseEnter={e => {
                     (e.currentTarget as HTMLAnchorElement).style.color = 'var(--cf-text)';
                     (e.currentTarget as HTMLAnchorElement).style.background = 'var(--cf-surface)';

@@ -463,7 +463,7 @@ export default function LivingFloorVisual() {
           </div>
 
           {/* ── Key Live Telemetry Ribbon ── */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-6 pt-5 border-t border-[var(--cf-border-soft)]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mt-6 pt-5 border-t border-[var(--cf-border-soft)]">
             {/* Guaranteed Runway */}
             <div className="p-3 sm:p-3.5 rounded-xl bg-[var(--cf-surface-alt)] border border-[var(--cf-border-soft)]">
               <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--cf-text-faint)] block">
@@ -747,7 +747,7 @@ export default function LivingFloorVisual() {
                 }}
               >
                 <div 
-                  className="p-3 sm:p-4 rounded-2xl border shadow-xl backdrop-blur-xl min-w-[210px] sm:min-w-[240px]"
+                  className="p-3 sm:p-4 rounded-2xl border shadow-xl backdrop-blur-xl w-[90vw] max-w-[240px] sm:w-[240px]"
                   style={{
                     background: 'var(--cf-surface)',
                     borderColor: isInspectedLean ? '#FF8A70' : 'var(--cf-border)',

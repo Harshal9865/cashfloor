@@ -184,7 +184,7 @@ https://cashfloor.app
             <>
               {/* Plan Selection & Cycle Selector */}
               <div className="p-4 rounded-2xl border border-[var(--cf-border)] bg-[var(--cf-surface-alt)] space-y-3">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-semibold text-[var(--cf-text)]">Select Plan:</span>
                     <button
@@ -468,7 +468,7 @@ https://cashfloor.app
 
         {/* Footer */}
         {!isSuccess && (
-          <div className="p-5 border-t border-[var(--cf-border-soft)] flex items-center justify-between bg-[var(--cf-surface-alt)]/40">
+          <div className="p-5 border-t border-[var(--cf-border-soft)] flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-0 bg-[var(--cf-surface-alt)]/40">
             <div className="flex items-center gap-1.5 text-xs font-mono text-[var(--cf-text-muted)]">
               <span>Total:</span>
               <span className="font-bold text-sm text-[var(--cf-text)]">${totalBilledToday}</span>

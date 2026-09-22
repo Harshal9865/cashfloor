@@ -48,15 +48,6 @@ export const metadata: Metadata = {
   },
   description:
     'A quiet, mathematically conservative runway and income floor calculator for freelancers, consultants, and independent contractors. Stress-test delayed invoices and tax obligations without bank logins.',
-  keywords: [
-    'freelance runway calculator',
-    'irregular income calculator',
-    'consultant cash flow simulator',
-    '20th percentile cash floor',
-    'cash floor calculator',
-    'quarterly estimated taxes freelancer',
-    'independent contractor financial planning',
-  ],
   authors: [{ name: 'CashFloor Team' }],
   openGraph: {
     type: 'website',
@@ -127,7 +118,7 @@ export default function RootLayout({
               try {
                 const stored = localStorage.getItem('cf-theme');
                 const system = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                const resolved = stored ?? (system ? 'dark' : 'dark');
+                const resolved = stored ?? (system ? 'dark' : 'light');
                 document.documentElement.setAttribute('data-theme', resolved);
               } catch (e) {}
             `,

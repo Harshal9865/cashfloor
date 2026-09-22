@@ -121,8 +121,8 @@ export const HeroRunway: React.FC<HeroRunwayProps> = ({
         {/* Main Runway Number */}
         <div className="flex items-baseline justify-center space-x-3 py-1">
           <span
-            className="font-serif text-6xl sm:text-7xl md:text-[84px] md:leading-[92px] font-light tracking-tight tabular-nums"
-            style={{ color: 'var(--cf-text)' }}
+            className="font-serif text-6xl sm:text-7xl md:text-[84px] md:leading-[92px] font-light tracking-tight tabular-nums drop-shadow-md"
+            style={{ color: 'var(--cf-text)', textShadow: '0 4px 32px rgba(var(--cf-accent-rgb), 0.3)' }}
           >
             {isInfiniteRunway ? '∞' : displayValue.toFixed(1)}
           </span>
@@ -227,17 +227,17 @@ export const HeroRunway: React.FC<HeroRunwayProps> = ({
         {/* KPI Chips */}
         <div className="flex flex-wrap items-center justify-center gap-2.5 pt-4 font-mono text-[11px]">
           <span
-            className="px-3 py-1 rounded-full border"
-            style={{ background: 'var(--cf-surface-alt)', borderColor: 'var(--cf-border)', color: 'var(--cf-text)' }}
+            className="px-3 py-1 rounded-full border shadow-inner"
+            style={{ background: 'linear-gradient(to bottom, var(--cf-surface-alt), var(--cf-surface))', borderColor: 'var(--cf-border)', color: 'var(--cf-text)' }}
           >
             Buffer:{' '}
             <strong style={{ color: 'var(--cf-accent)' }}>{bufferFundingPercentage}%</strong>{' '}
             of {bufferMonthsMultiplier}-mo target
           </span>
           <span
-            className="px-3 py-1 rounded-full border"
+            className="px-3 py-1 rounded-full border shadow-inner"
             style={{
-              background: surplusMargin >= 0 ? 'rgba(201,138,62,0.08)' : 'rgba(180,87,63,0.08)',
+              background: surplusMargin >= 0 ? 'linear-gradient(to bottom, rgba(201,138,62,0.12), rgba(201,138,62,0.04))' : 'linear-gradient(to bottom, rgba(180,87,63,0.12), rgba(180,87,63,0.04))',
               borderColor: surplusMargin >= 0 ? '#C98A3E44' : '#B4573F44',
               color: surplusMargin >= 0 ? '#875205' : '#B4573F',
             }}
@@ -248,16 +248,16 @@ export const HeroRunway: React.FC<HeroRunwayProps> = ({
             {surplusMargin >= 0 ? 'above buffer' : 'gap'}
           </span>
           <span
-            className="px-3 py-1 rounded-full border"
-            style={{ background: 'var(--cf-surface-alt)', borderColor: 'var(--cf-border)', color: 'var(--cf-text-muted)' }}
+            className="px-3 py-1 rounded-full border shadow-inner"
+            style={{ background: 'linear-gradient(to bottom, var(--cf-surface-alt), var(--cf-surface))', borderColor: 'var(--cf-border)', color: 'var(--cf-text-muted)' }}
           >
             Burn: {currencySymbol}{dailyBurnVelocity.toFixed(2)}/day
           </span>
           {sustainablePaycheck > 0 && (
             <span
-              className="px-3 py-1 rounded-full border flex items-center gap-1 font-semibold"
+              className="px-3 py-1 rounded-full border flex items-center gap-1 font-semibold shadow-inner"
               style={{
-                background: 'rgba(16,185,129,0.08)',
+                background: 'linear-gradient(to bottom, rgba(16,185,129,0.12), rgba(16,185,129,0.04))',
                 borderColor: 'rgba(16,185,129,0.3)',
                 color: '#10B981',
               }}

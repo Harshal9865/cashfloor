@@ -12,7 +12,8 @@ import DashboardNav from '@/components/DashboardNav';
 import { ScenarioPillBar } from '@/components/ScenarioPillBar';
 import { HeroRunway } from '@/components/HeroRunway';
 import { LedgerRows } from '@/components/LedgerRows';
-import { CashFlowChart } from '@/components/CashFlowChart';
+import dynamic from 'next/dynamic';
+const CashFlowChart = dynamic(() => import('@/components/CashFlowChart'), { ssr: false });
 import { CashFlowWaterfall } from '@/components/CashFlowWaterfall';
 import { RiskVolatilityRadar } from '@/components/RiskVolatilityRadar';
 import { AssumptionControls } from '@/components/AssumptionControls';
@@ -356,7 +357,7 @@ export default function StudioEnginePage() {
         currencySymbol={currencySymbol}
       />
 
-      <div className="flex-1 max-w-7xl mx-auto w-full px-4 md:px-8 py-8 space-y-6">
+      <div className="flex-1 max-w-7xl mx-auto w-full px-4 md:px-8 py-10 space-y-10 lg:space-y-12">
         <AnimatePresence>
           {ingestionToast && (
             <motion.div
@@ -465,12 +466,12 @@ export default function StudioEnginePage() {
           variants={containerVariants}
           initial="hidden"
           animate="show"
-          className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+          className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10"
         >
           {/* LEFT COLUMN: Charts & Ledgers (2/3 width) */}
           <div className="lg:col-span-2 space-y-6 min-w-0">
             {/* Safe To Spend Banner */}
-            <motion.div variants={itemVariants} className="w-full bg-[var(--cf-surface)] border border-[var(--cf-border)] rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm relative overflow-hidden">
+            <motion.div variants={itemVariants} className="w-full bg-[var(--cf-surface)] border border-[var(--cf-border)] rounded-2xl p-6 sm:p-8 md:p-10 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-r from-[var(--cf-steady)]/5 to-transparent pointer-events-none" />
               <div>
                 <h3 className="font-serif text-[var(--cf-text)] font-semibold text-lg flex items-center gap-2">
@@ -487,7 +488,7 @@ export default function StudioEnginePage() {
             </motion.div>
 
             {/* Timeline Chart */}
-            <motion.div variants={itemVariants} className="w-full h-[400px] bg-[var(--cf-surface)] border border-[var(--cf-border)] rounded-2xl p-6 flex flex-col shadow-sm relative overflow-hidden group">
+            <motion.div variants={itemVariants} className="w-full h-[400px] bg-[var(--cf-surface)] border border-[var(--cf-border)] rounded-2xl p-6 sm:p-8 flex flex-col shadow-sm relative overflow-hidden group">
               <CashFlowChart
                 records={records}
                 floorIncome={calculation.floorIncome}
@@ -508,7 +509,7 @@ export default function StudioEnginePage() {
             </motion.div>
 
             {/* Dedicated Daily Cash Flow Link */}
-            <motion.section variants={itemVariants} className="dash-card p-5 border border-[var(--cf-border-soft)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-[var(--cf-surface-alt)]/30">
+            <motion.section variants={itemVariants} className="dash-card p-6 sm:p-8 border border-[var(--cf-border-soft)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 bg-[var(--cf-surface-alt)]/30">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 shrink-0">
                   <Activity className="w-4 h-4" />
@@ -527,7 +528,7 @@ export default function StudioEnginePage() {
             </motion.section>
 
             {/* Capital Partitioning */}
-            <motion.section variants={itemVariants} id="partitions" className="dash-card p-6">
+            <motion.section variants={itemVariants} id="partitions" className="dash-card p-6 sm:p-8">
               <LedgerRows
                 result={calculation}
                 assumptions={assumptions}
@@ -581,7 +582,7 @@ export default function StudioEnginePage() {
               />
             </motion.section>
 
-            <motion.section variants={itemVariants} className="dash-card p-5">
+            <motion.section variants={itemVariants} className="dash-card p-6 sm:p-8">
               {!hasEnoughData ? (
                 <div className="flex flex-col items-center justify-center p-8 text-center space-y-3">
                   <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-[var(--cf-surface-alt)] border border-[var(--cf-border)]">
@@ -601,7 +602,7 @@ export default function StudioEnginePage() {
               )}
             </motion.section>
 
-            <motion.section variants={itemVariants} className="dash-card p-5">
+            <motion.section variants={itemVariants} className="dash-card p-6 sm:p-8">
               <CashFlowWaterfall
                 steps={calculation.waterfallSteps}
                 currencySymbol={currencySymbol}
@@ -645,7 +646,7 @@ export default function StudioEnginePage() {
         </motion.div>
 
         {/* Philosophy Drawer & Action Bar */}
-        <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 hairline-t">
+        <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-6 pt-6 hairline-t">
           <button
             type="button"
             onClick={() => setShowPhilosophy(!showPhilosophy)}
@@ -655,7 +656,7 @@ export default function StudioEnginePage() {
             <span className="font-medium">The 20th Percentile Income Floor Philosophy</span>
           </button>
 
-          <div className="flex flex-wrap items-center justify-center sm:justify-end gap-2.5 w-full sm:w-auto">
+          <div className="flex flex-wrap items-center justify-center sm:justify-end gap-3 sm:gap-4 w-full sm:w-auto">
             <button
               type="button"
               onClick={() => setIsTourOpen(true)}
@@ -703,7 +704,7 @@ export default function StudioEnginePage() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="rounded-xl p-6 space-y-3 font-sans text-xs leading-relaxed border bg-[var(--cf-surface)] border-[var(--cf-border)] text-[var(--cf-text-muted)]"
+            className="rounded-xl p-8 space-y-4 font-sans text-sm leading-relaxed border bg-[var(--cf-surface)] border-[var(--cf-border)] text-[var(--cf-text-muted)]"
           >
             <h3 className="font-serif text-base font-semibold text-[var(--cf-text)]">
               The Mathematical Reason Freelancers Go Broke on Average Income
