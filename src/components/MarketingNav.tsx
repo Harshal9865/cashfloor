@@ -93,8 +93,21 @@ export default function MarketingNav() {
       }
     >
       <div className="max-w-7xl mx-auto px-4 md:px-8 h-16 flex items-center justify-between">
-        {/* Logo */}
-        <CashFloorLogo size="md" />
+        <div className="flex items-center gap-2">
+          {/* Mobile hamburger */}
+          <button
+            type="button"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="md:hidden p-2 -ml-2 rounded-xl transition-colors cursor-pointer"
+            style={{ color: 'var(--cf-text-muted)' }}
+            aria-label="Toggle menu"
+          >
+            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+
+          {/* Logo */}
+          <CashFloorLogo size="md" />
+        </div>
 
         {/* Desktop Navigation Links */}
         <nav className="hidden md:flex items-center gap-1">
@@ -180,16 +193,6 @@ export default function MarketingNav() {
             </div>
           )}
 
-          {/* Mobile hamburger */}
-          <button
-            type="button"
-            onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden p-2 rounded-xl transition-colors cursor-pointer"
-            style={{ color: 'var(--cf-text-muted)' }}
-            aria-label="Toggle menu"
-          >
-            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
         </div>
       </div>
 
