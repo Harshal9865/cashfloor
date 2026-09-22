@@ -9,6 +9,8 @@ import { PaymentProvider } from '@/lib/payment/PaymentContext';
 import MockCheckoutModal from '@/components/payment/MockCheckoutModal';
 import { PwaRegister } from '@/components/pwa/PwaRegister';
 
+import MobileBottomNav from '@/components/MobileBottomNav';
+
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
@@ -138,6 +140,7 @@ export default function RootLayout({
               <MockCheckoutModal />
               <WorkspaceLoader />
               {children}
+              <MobileBottomNav />
             </PaymentProvider>
           </AuthProvider>
         </ThemeProvider>

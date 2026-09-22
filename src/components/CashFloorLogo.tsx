@@ -20,17 +20,17 @@ export default function CashFloorLogo({
 }: CashFloorLogoProps) {
   // Dimensions based on size. Using Tailwind responsive classes for 'md' and 'lg' to ensure they shrink on mobile.
   const iconClasses = {
-    sm: 'w-[28px] h-[28px]',
-    md: 'w-[28px] h-[28px] sm:w-[34px] sm:h-[34px]',
-    lg: 'w-[34px] h-[34px] sm:w-[42px] sm:h-[42px]',
-    xl: 'w-[42px] h-[42px] sm:w-[52px] sm:h-[52px]',
+    sm: 'w-[20px] h-[20px] sm:w-[24px] sm:h-[24px]',
+    md: 'w-[24px] h-[24px] sm:w-[34px] sm:h-[34px]',
+    lg: 'w-[28px] h-[28px] sm:w-[42px] sm:h-[42px]',
+    xl: 'w-[34px] h-[34px] sm:w-[52px] sm:h-[52px]',
   }[size];
 
   const textSize = {
-    sm: 'text-base',
-    md: 'text-base sm:text-lg',
-    lg: 'text-lg sm:text-2xl',
-    xl: 'text-2xl sm:text-3xl',
+    sm: 'text-sm sm:text-base',
+    md: 'text-sm sm:text-lg',
+    lg: 'text-base sm:text-2xl',
+    xl: 'text-lg sm:text-3xl',
   }[size];
 
   const logoGraphic = (
@@ -136,7 +136,7 @@ export default function CashFloorLogo({
             >
               Cash<span className="text-[var(--cf-accent)] font-semibold group-hover:text-[#10B981] transition-colors">Floor</span>
             </span>
-            <span className="ml-1.5 px-1.5 py-0.5 rounded text-[9px] font-mono font-bold tracking-widest uppercase bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 group-hover:border-emerald-500/40 group-hover:bg-emerald-500/20 transition-all duration-200">
+            <span className="hidden sm:inline-flex ml-1.5 px-1.5 py-0.5 rounded text-[9px] font-mono font-bold tracking-widest uppercase bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 group-hover:border-emerald-500/40 group-hover:bg-emerald-500/20 transition-all duration-200">
               PRO
             </span>
           </div>

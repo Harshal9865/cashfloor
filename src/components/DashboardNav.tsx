@@ -185,100 +185,119 @@ export default function DashboardNav({
         </div>
       </header>
 
-      {/* Mobile menu */}
+      {/* Standard Side Drawer Overlay & Menu */}
       <AnimatePresence>
         {mobileOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.2 }}
-            className="lg:hidden fixed inset-x-0 top-20 z-30 max-h-[calc(100vh-5rem)] overflow-y-auto shadow-xl"
-            style={{
-              background: 'var(--cf-nav-bg)',
-              backdropFilter: 'blur(12px)',
-              borderBottom: '1px solid var(--cf-nav-border)',
-            }}
-          >
-            <div className="px-4 py-3 flex flex-col gap-1.5 pb-8">
-              {NAV_SECTIONS.map((s) => (
-                <Link
-                  key={s.label}
-                  href={s.href}
-                  onClick={() => setMobileOpen(false)}
-                  className="px-4 py-2.5 rounded-lg text-sm transition-colors"
-                  onMouseEnter={e => {
-                    (e.currentTarget as HTMLAnchorElement).style.color = 'var(--cf-text)';
-                    (e.currentTarget as HTMLAnchorElement).style.background = 'var(--cf-surface)';
-                  }}
-                  onMouseLeave={e => {
-                    (e.currentTarget as HTMLAnchorElement).style.color = 'var(--cf-text-muted)';
-                    (e.currentTarget as HTMLAnchorElement).style.background = 'transparent';
-                  }}
-                >
-                  {s.label}
-                </Link>
-              ))}
-              <div className="px-3 py-2 border-t mt-1" style={{ borderColor: 'var(--cf-border)' }}>
-                <ThemeToggle />
-              </div>
-              {isAuthenticated && user ? (
-                <div className="p-3 rounded-xl border mt-2 flex items-center justify-between"
-                  style={{ background: 'var(--cf-surface)', borderColor: 'var(--cf-border)' }}>
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-br from-[#2F6F62] to-[#0f564a] flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-sm">
-                      {user?.avatar ? (
-                        <img src={user.avatar} alt={displayName} className="w-full h-full object-cover" />
-                      ) : (
-                        initials
-                      )}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-xs font-semibold truncate" style={{ color: 'var(--cf-text)' }}>{displayName}</p>
-                      <p className="text-[11px] truncate" style={{ color: 'var(--cf-text-faint)' }}>{user.email}</p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={async () => { setMobileOpen(false); await signOut(); }}
-                    className="p-1.5 rounded-lg text-xs transition-colors cursor-pointer"
-                    style={{ color: 'var(--cf-caution)' }}
-                    title="Sign Out"
-                  >
-                    <LogOut className="w-4 h-4" />
-                  </button>
-                </div>
-              ) : (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="lg:hidden fixed inset-0 z-40"
+              style={{ background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)' }}
+              onClick={() => setMobileOpen(false)}
+            />
+            {/* Side Drawer */}
+            <motion.div
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="lg:hidden fixed top-0 left-0 bottom-0 w-[280px] z-50 shadow-2xl flex flex-col overflow-y-auto"
+              style={{
+                background: 'var(--cf-surface)',
+                borderRight: '1px solid var(--cf-border)',
+              }}
+            >
+              <div className="p-4 border-b flex items-center justify-between" style={{ borderColor: 'var(--cf-border-soft)' }}>
+                <CashFloorLogo size="sm" />
                 <button
-                  onClick={() => { setMobileOpen(false); handleAuthTrigger(); }}
-                  className="w-full mt-2 py-2 px-3 rounded-lg text-xs font-semibold text-white flex items-center justify-center gap-1.5"
-                  style={{ background: 'linear-gradient(135deg, #2F6F62, #1a4f45)' }}
+                  onClick={() => setMobileOpen(false)}
+                  className="p-1.5 rounded-lg transition-colors cursor-pointer"
+                  style={{ color: 'var(--cf-text-muted)' }}
                 >
-                  <User className="w-3.5 h-3.5" /> Sign In to Pro Suite
+                  <X className="w-5 h-5" />
                 </button>
-              )}
-              <div className="border-t mt-2 pt-2 flex flex-col gap-2" style={{ borderColor: 'var(--cf-border)' }}>
-                {onOpenInvoiceModal && (
-                  <button onClick={() => { onOpenInvoiceModal(); setMobileOpen(false); }}
-                    className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold cursor-pointer border"
-                    style={{ color: 'var(--cf-accent)', borderColor: 'var(--cf-accent)', background: 'var(--cf-accent-bg)' }}>
-                    <FileText className="w-3.5 h-3.5" /> Client Invoice Studio (PDF)
+              </div>
+              <div className="px-4 py-4 flex flex-col gap-1.5 flex-1">
+                {NAV_SECTIONS.map((s) => (
+                  <Link
+                    key={s.label}
+                    href={s.href}
+                    onClick={() => setMobileOpen(false)}
+                    className="px-4 py-3 rounded-lg text-sm font-medium transition-colors"
+                    style={{ color: pathname === s.href ? 'var(--cf-text)' : 'var(--cf-text-muted)', background: pathname === s.href ? 'var(--cf-surface-alt)' : 'transparent' }}
+                  >
+                    {s.label}
+                  </Link>
+                ))}
+              </div>
+              
+              <div className="p-4 border-t mt-auto" style={{ borderColor: 'var(--cf-border-soft)', background: 'var(--cf-surface-alt)' }}>
+                <div className="mb-4">
+                  <ThemeToggle />
+                </div>
+                {isAuthenticated && user ? (
+                  <div className="p-3 rounded-xl border flex items-center justify-between"
+                    style={{ background: 'var(--cf-surface)', borderColor: 'var(--cf-border)' }}>
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-br from-[#2F6F62] to-[#0f564a] flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-sm">
+                        {user?.avatar ? (
+                          <img src={user.avatar} alt={displayName} className="w-full h-full object-cover" />
+                        ) : (
+                          initials
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-semibold truncate" style={{ color: 'var(--cf-text)' }}>{displayName}</p>
+                        <p className="text-[11px] truncate" style={{ color: 'var(--cf-text-faint)' }}>{user.email}</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={async () => { setMobileOpen(false); await signOut(); }}
+                      className="p-1.5 rounded-lg text-xs transition-colors cursor-pointer hover:bg-rose-500/10"
+                      style={{ color: 'var(--cf-caution)' }}
+                      title="Sign Out"
+                    >
+                      <LogOut className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => { setMobileOpen(false); handleAuthTrigger(); }}
+                    className="w-full py-2.5 px-3 rounded-lg text-xs font-semibold text-white flex items-center justify-center gap-1.5 shadow-sm"
+                    style={{ background: 'linear-gradient(135deg, #2F6F62, #1a4f45)' }}
+                  >
+                    <User className="w-4 h-4" /> Sign In to Pro Suite
                   </button>
                 )}
-                <div className="flex gap-2">
-                  <button onClick={() => { onExportCsv?.(); setMobileOpen(false); }}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs cursor-pointer border"
-                    style={{ color: 'var(--cf-text-muted)', borderColor: 'var(--cf-border)', background: 'var(--cf-surface)' }}>
-                    <Download className="w-3.5 h-3.5" /> Export
-                  </button>
-                  <button onClick={() => { onLoadSample?.(); setMobileOpen(false); }}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs cursor-pointer border"
-                    style={{ color: 'var(--cf-text-muted)', borderColor: 'var(--cf-border)', background: 'var(--cf-surface)' }}>
-                    <Database className="w-3.5 h-3.5" /> Sample
-                  </button>
+                
+                <div className="mt-4 flex flex-col gap-2">
+                  {onOpenInvoiceModal && (
+                    <button onClick={() => { onOpenInvoiceModal(); setMobileOpen(false); }}
+                      className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-xs font-semibold cursor-pointer border"
+                      style={{ color: 'var(--cf-accent)', borderColor: 'var(--cf-accent)', background: 'var(--cf-accent-bg)' }}>
+                      <FileText className="w-4 h-4" /> Client Invoice Studio
+                    </button>
+                  )}
+                  <div className="flex gap-2">
+                    <button onClick={() => { onExportCsv?.(); setMobileOpen(false); }}
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-medium cursor-pointer border hover:bg-[var(--cf-surface-alt)]"
+                      style={{ color: 'var(--cf-text-muted)', borderColor: 'var(--cf-border)', background: 'var(--cf-surface)' }}>
+                      <Download className="w-3.5 h-3.5" /> Export
+                    </button>
+                    <button onClick={() => { onLoadSample?.(); setMobileOpen(false); }}
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-medium cursor-pointer border hover:bg-[var(--cf-surface-alt)]"
+                      style={{ color: 'var(--cf-text-muted)', borderColor: 'var(--cf-border)', background: 'var(--cf-surface)' }}>
+                      <Database className="w-3.5 h-3.5" /> Sample
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </>

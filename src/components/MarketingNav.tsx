@@ -208,141 +208,166 @@ export default function MarketingNav() {
         </div>
       </div>
 
-      {/* Mobile Drawer */}
+      {/* Standard Side Drawer Overlay & Menu */}
       <AnimatePresence>
         {mobileOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-x-0 top-16 z-30 border-b md:hidden shadow-xl max-h-[calc(100vh-4rem)] overflow-y-auto"
-            style={{ background: 'var(--cf-bg)', borderColor: 'var(--cf-border)' }}
-          >
-            <div className="px-4 py-3 flex flex-col gap-1.5 pb-8">
-              {navLinks.map((link) => (
-                <div key={link.label} className="flex flex-col gap-1">
-                  {link.items ? (
-                    <>
-                      <div className="px-3 py-2 text-xs font-bold text-[var(--cf-text-faint)] uppercase tracking-wider">
-                        {link.label}
-                      </div>
-                      {link.items.map(item => (
-                        <Link
-                          key={item.label}
-                          href={item.href}
-                          onClick={() => setMobileOpen(false)}
-                          className="px-4 py-2 text-sm rounded-xl transition-colors pl-6"
-                          style={{ color: 'var(--cf-text)' }}
-                        >
-                          {item.label}
-                        </Link>
-                      ))}
-                    </>
-                  ) : (
-                    <Link
-                      href={link.href!}
-                      onClick={() => setMobileOpen(false)}
-                      className="px-3 py-2 text-sm font-semibold rounded-xl transition-colors"
-                      style={{ color: 'var(--cf-text)' }}
-                    >
-                      {link.label}
-                    </Link>
-                  )}
-                </div>
-              ))}
-
-              <div className="flex items-center justify-between px-3 py-2 border-t pt-3" style={{ borderColor: 'var(--cf-border)' }}>
-                <span className="text-xs" style={{ color: 'var(--cf-text-muted)' }}>Theme</span>
-                <ThemeToggle />
-              </div>
-
-              {isAuthenticated && user ? (
-                <div
-                  className="p-3 rounded-2xl border space-y-3 mt-1"
-                  style={{ background: 'var(--cf-surface)', borderColor: 'var(--cf-border)' }}
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="md:hidden fixed inset-0 z-40"
+              style={{ background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)' }}
+              onClick={() => setMobileOpen(false)}
+            />
+            
+            {/* Side Drawer */}
+            <motion.div
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="md:hidden fixed top-0 left-0 bottom-0 w-[280px] z-50 shadow-2xl flex flex-col overflow-y-auto"
+              style={{ background: 'var(--cf-bg)', borderRight: '1px solid var(--cf-border)' }}
+            >
+              <div className="p-4 border-b flex items-center justify-between" style={{ borderColor: 'var(--cf-border-soft)' }}>
+                <CashFloorLogo size="sm" />
+                <button
+                  onClick={() => setMobileOpen(false)}
+                  className="p-1.5 rounded-lg transition-colors cursor-pointer"
+                  style={{ color: 'var(--cf-text-muted)' }}
                 >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center text-xs font-bold text-white shrink-0 shadow-sm"
-                      style={{ background: 'linear-gradient(135deg, #2F6F62, #1a4f45)' }}
-                    >
-                      {user.avatar ? (
-                        <img src={user.avatar} alt={displayName} className="w-full h-full object-cover" />
-                      ) : (
-                        initials
-                      )}
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              
+              <div className="px-4 py-4 flex flex-col gap-1.5 pb-8 flex-1">
+                {navLinks.map((link) => (
+                  <div key={link.label} className="flex flex-col gap-1">
+                    {link.items ? (
+                      <>
+                        <div className="px-3 py-2 text-xs font-bold text-[var(--cf-text-faint)] uppercase tracking-wider">
+                          {link.label}
+                        </div>
+                        {link.items.map(item => (
+                          <Link
+                            key={item.label}
+                            href={item.href}
+                            onClick={() => setMobileOpen(false)}
+                            className="px-4 py-2 text-sm rounded-xl transition-colors pl-6"
+                            style={{ color: 'var(--cf-text)' }}
+                          >
+                            {item.label}
+                          </Link>
+                        ))}
+                      </>
+                    ) : (
+                      <Link
+                        href={link.href!}
+                        onClick={() => setMobileOpen(false)}
+                        className="px-3 py-2 text-sm font-semibold rounded-xl transition-colors"
+                        style={{ color: 'var(--cf-text)' }}
+                      >
+                        {link.label}
+                      </Link>
+                    )}
+                  </div>
+                ))}
+
+                <div className="flex items-center justify-between px-3 py-2 border-t mt-auto pt-4" style={{ borderColor: 'var(--cf-border)' }}>
+                  <span className="text-xs" style={{ color: 'var(--cf-text-muted)' }}>Theme</span>
+                  <ThemeToggle />
+                </div>
+
+                {isAuthenticated && user ? (
+                  <div
+                    className="p-3 rounded-2xl border space-y-3 mt-4"
+                    style={{ background: 'var(--cf-surface)', borderColor: 'var(--cf-border)' }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center text-xs font-bold text-white shrink-0 shadow-sm"
+                        style={{ background: 'linear-gradient(135deg, #2F6F62, #1a4f45)' }}
+                      >
+                        {user.avatar ? (
+                          <img src={user.avatar} alt={displayName} className="w-full h-full object-cover" />
+                        ) : (
+                          initials
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-semibold truncate" style={{ color: 'var(--cf-text)' }}>
+                          {displayName}
+                        </p>
+                        <p className="text-[11px] truncate" style={{ color: 'var(--cf-text-muted)' }}>
+                          {user.email}
+                        </p>
+                      </div>
                     </div>
-                    <div className="min-w-0">
-                      <p className="text-xs font-semibold truncate" style={{ color: 'var(--cf-text)' }}>
-                        {displayName}
-                      </p>
-                      <p className="text-[11px] truncate" style={{ color: 'var(--cf-text-muted)' }}>
-                        {user.email}
-                      </p>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <Link
+                        href="/dashboard"
+                        onClick={() => setMobileOpen(false)}
+                        className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold text-white"
+                        style={{ background: 'linear-gradient(135deg, #2F6F62, #1a4f45)' }}
+                      >
+                        <LayoutDashboard className="w-3.5 h-3.5" />
+                        Dashboard
+                      </Link>
+
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          setMobileOpen(false);
+                          await signOut();
+                        }}
+                        className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold border cursor-pointer hover:bg-rose-500/10"
+                        style={{
+                          borderColor: 'var(--cf-border)',
+                          color: 'var(--cf-caution)',
+                          background: 'var(--cf-caution-bg)',
+                        }}
+                      >
+                        <LogOut className="w-3.5 h-3.5" />
+                        Sign Out
+                      </button>
                     </div>
                   </div>
+                ) : (
+                  <div className="flex flex-col gap-2 pt-4 border-t mt-4" style={{ borderColor: 'var(--cf-border)' }}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMobileOpen(false);
+                        openAuthModal();
+                      }}
+                      className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-semibold border"
+                      style={{
+                        background: 'var(--cf-surface)',
+                        borderColor: 'var(--cf-border)',
+                        color: 'var(--cf-text)',
+                      }}
+                    >
+                      <User className="w-3.5 h-3.5 text-[#2F6F62]" />
+                      Sign In
+                    </button>
 
-                  <div className="grid grid-cols-2 gap-2">
                     <Link
                       href="/dashboard"
                       onClick={() => setMobileOpen(false)}
-                      className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold text-white"
+                      className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-semibold text-white"
                       style={{ background: 'linear-gradient(135deg, #2F6F62, #1a4f45)' }}
                     >
-                      <LayoutDashboard className="w-3.5 h-3.5" />
-                      Dashboard
+                      Try Free <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
-
-                    <button
-                      type="button"
-                      onClick={async () => {
-                        setMobileOpen(false);
-                        await signOut();
-                      }}
-                      className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold border cursor-pointer"
-                      style={{
-                        borderColor: 'var(--cf-border)',
-                        color: 'var(--cf-caution)',
-                        background: 'var(--cf-caution-bg)',
-                      }}
-                    >
-                      <LogOut className="w-3.5 h-3.5" />
-                      Sign Out
-                    </button>
                   </div>
-                </div>
-              ) : (
-                <div className="flex flex-col gap-2 pt-2 border-t" style={{ borderColor: 'var(--cf-border)' }}>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMobileOpen(false);
-                      openAuthModal();
-                    }}
-                    className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-semibold border"
-                    style={{
-                      background: 'var(--cf-surface)',
-                      borderColor: 'var(--cf-border)',
-                      color: 'var(--cf-text)',
-                    }}
-                  >
-                    <User className="w-3.5 h-3.5 text-[#2F6F62]" />
-                    Sign In
-                  </button>
-
-                  <Link
-                    href="/dashboard"
-                    onClick={() => setMobileOpen(false)}
-                    className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-semibold text-white"
-                    style={{ background: 'linear-gradient(135deg, #2F6F62, #1a4f45)' }}
-                  >
-                    Try Free <ArrowRight className="w-3.5 h-3.5" />
-                  </Link>
-                </div>
-              )}
-            </div>
-          </motion.div>
+                )}
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </motion.header>

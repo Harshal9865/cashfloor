@@ -246,7 +246,7 @@ export function SolvencyReportModal({
               </span>
             </h3>
 
-            <div className="overflow-x-auto mobile-touch-scroll rounded-2xl border border-[var(--cf-border)]">
+            <div className="w-full overflow-x-auto mobile-touch-scroll rounded-2xl border border-[var(--cf-border)]">
               <table className="w-full min-w-[560px] text-xs font-mono text-left border-collapse">
                 <thead>
                   <tr className="bg-[var(--cf-surface-alt)] border-b border-[var(--cf-border)] text-[var(--cf-text-muted)]">

@@ -235,11 +235,11 @@ export function RunwayAiCopilot({
   return (
     <>
       {/* Floating Trigger Button */}
-      <div className="fixed bottom-6 right-6 z-40">
+      <div className="fixed bottom-6 right-4 sm:right-6 z-40">
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="relative group flex items-center gap-2.5 px-4 py-3 rounded-full text-xs font-semibold text-white shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
+          className="relative group flex items-center justify-center p-3.5 sm:px-4 sm:py-3 rounded-full text-xs font-semibold text-white shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
           style={{
             background: 'linear-gradient(135deg, #1a4f45, #2F6F62, #0f564a)',
             boxShadow: '0 10px 30px -5px rgba(47, 111, 98, 0.5), 0 0 20px 2px rgba(61, 232, 200, 0.25)',
@@ -249,10 +249,10 @@ export function RunwayAiCopilot({
           {/* Radar pulsing status orb */}
           <div className="relative flex items-center justify-center">
             <span className="animate-ping absolute inline-flex h-3 w-3 rounded-full bg-emerald-400 opacity-75" />
-            <Bot className="w-4 h-4 text-emerald-300 relative z-10" />
+            <Bot className="w-5 h-5 sm:w-4 sm:h-4 text-emerald-300 relative z-10" />
           </div>
-          <span className="font-semibold tracking-wide">Runway AI Advisor</span>
-          <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+          <span className="hidden sm:inline-block font-semibold tracking-wide ml-2.5">Runway AI Advisor</span>
+          <span className="hidden sm:inline-block ml-1.5 px-1.5 py-0.2 rounded text-[9px] font-mono font-bold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
             DSA Engine
           </span>
         </button>

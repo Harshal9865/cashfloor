@@ -261,6 +261,7 @@ export const CashFlowChart: React.FC<CashFlowChartProps> = ({
     );
   }
 
+  return (
     <section
       className="flex flex-col h-full min-h-[320px] min-w-0 space-y-5"
       id="cash-flow"
