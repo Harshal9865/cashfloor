@@ -120,8 +120,7 @@ export const RiskVolatilityRadar: React.FC<RiskVolatilityRadarProps> = ({
 
   return (
     <section
-      className="space-y-5 transition-colors relative"
-      style={{ background: 'var(--cf-surface)', padding: '1.5rem 2rem' }}
+      className="flex flex-col w-full min-w-0 space-y-5 transition-colors relative"
       id="risk-radar"
     >
       {/* Lock overlay */}
@@ -167,16 +166,16 @@ export const RiskVolatilityRadar: React.FC<RiskVolatilityRadarProps> = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-6">
+      <div className="grid grid-cols-1 gap-6 min-w-0 w-full">
         {/* Radar chart */}
-        <div>
+        <div className="min-w-0 w-full">
           <div className="text-xs font-mono mb-3 flex items-center justify-between" style={{ color: 'var(--cf-text-muted)' }}>
             <span>Risk dimensions (0 = no risk, 100 = high risk)</span>
             <span className="font-bold text-sm" style={{ color: badgeConfig.color }}>
               Score: {overallScore}/100
             </span>
           </div>
-          <div style={{ height: 240 }}>
+          <div className="min-w-0 w-full" style={{ height: 240 }}>
             <ResponsiveContainer width="100%" height="100%">
               <RadarChart data={radarData} margin={{ top: 10, right: 30, bottom: 10, left: 30 }}>
                 <PolarGrid stroke="var(--cf-border)" />

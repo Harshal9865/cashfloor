@@ -68,6 +68,18 @@ export default function MarketingNav() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [mobileOpen]);
+
   return (
     <motion.header
       initial={{ y: -20, opacity: 0 }}
@@ -204,10 +216,10 @@ export default function MarketingNav() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-x-0 top-16 z-30 border-b md:hidden shadow-xl"
+            className="fixed inset-x-0 top-16 z-30 border-b md:hidden shadow-xl max-h-[calc(100vh-4rem)] overflow-y-auto"
             style={{ background: 'var(--cf-bg)', borderColor: 'var(--cf-border)' }}
           >
-            <div className="px-5 py-4 flex flex-col gap-2">
+            <div className="px-4 py-3 flex flex-col gap-1.5 pb-8">
               {navLinks.map((link) => (
                 <div key={link.label} className="flex flex-col gap-1">
                   {link.items ? (

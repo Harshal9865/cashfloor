@@ -85,8 +85,7 @@ export const MonteCarloRiskLab: React.FC<MonteCarloRiskLabProps> = ({
 
   return (
     <section
-      className="space-y-5 transition-colors rounded-2xl border p-5 relative"
-      style={{ background: 'var(--cf-surface)', borderColor: 'var(--cf-border)' }}
+      className="flex flex-col w-full min-w-0 space-y-5 transition-colors relative"
       id="monte-carlo"
     >
       {/* Lock overlay */}

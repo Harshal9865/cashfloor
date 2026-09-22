@@ -261,9 +261,8 @@ export const CashFlowChart: React.FC<CashFlowChartProps> = ({
     );
   }
 
-  return (
     <section
-      className="space-y-5 transition-colors bg-cf-surface px-8 py-6 rounded-2xl border border-cf-border"
+      className="flex flex-col h-full min-h-[320px] min-w-0 space-y-5"
       id="cash-flow"
     >
       {/* Header with Granularity Switcher */}
@@ -354,7 +353,7 @@ export const CashFlowChart: React.FC<CashFlowChartProps> = ({
       </div>
 
       {/* ── Dynamic Chart Rendering ── */}
-      <div style={{ width: '100%', height: 320 }}>
+      <div className="flex-1 min-h-[250px] min-w-0 w-full relative">
         {mounted ? (
           <ResponsiveContainer width="100%" height="100%">
             {viewMode === '12_months' ? (

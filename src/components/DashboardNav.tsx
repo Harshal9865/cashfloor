@@ -75,6 +75,18 @@ export default function DashboardNav({
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [mobileOpen]);
+
   const syncColor =
     syncStatus === 'synced' ? 'var(--cf-accent)' :
     syncStatus === 'saving' ? 'var(--cf-warm)' :
@@ -181,20 +193,20 @@ export default function DashboardNav({
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="lg:hidden sticky top-14 z-30 overflow-hidden"
+            className="lg:hidden fixed inset-x-0 top-20 z-30 max-h-[calc(100vh-5rem)] overflow-y-auto shadow-xl"
             style={{
               background: 'var(--cf-nav-bg)',
               backdropFilter: 'blur(12px)',
               borderBottom: '1px solid var(--cf-nav-border)',
             }}
           >
-            <div className="px-5 py-4 flex flex-col gap-2">
+            <div className="px-4 py-3 flex flex-col gap-1.5 pb-8">
               {NAV_SECTIONS.map((s) => (
                 <Link
                   key={s.label}
                   href={s.href}
                   onClick={() => setMobileOpen(false)}
-                  className="px-4 py-3 rounded-lg text-base transition-colors"
+                  className="px-4 py-2.5 rounded-lg text-sm transition-colors"
                   onMouseEnter={e => {
                     (e.currentTarget as HTMLAnchorElement).style.color = 'var(--cf-text)';
                     (e.currentTarget as HTMLAnchorElement).style.background = 'var(--cf-surface)';

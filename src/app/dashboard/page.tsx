@@ -288,7 +288,7 @@ export default function ExecutiveDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
           {/* Left Column (2/3): Action Plan & Operational Checklist */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-6 min-w-0">
             
             <div className="p-6 sm:p-8 rounded-3xl border border-[var(--cf-border)] bg-[var(--cf-surface)] space-y-6 shadow-sm">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-[var(--cf-border-soft)]">
@@ -480,7 +480,7 @@ export default function ExecutiveDashboard() {
           </div>
 
           {/* Right Column (1/3): Quick Tools & Live Ingestion Rails */}
-          <div className="space-y-6">
+          <div className="space-y-6 min-w-0">
             
             {/* Quick Action Tools Hub */}
             <div className="p-6 rounded-3xl border border-[var(--cf-border)] bg-[var(--cf-surface)] space-y-4 shadow-sm">

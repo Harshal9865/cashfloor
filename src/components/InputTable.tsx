@@ -114,7 +114,7 @@ export const InputTable: React.FC<InputTableProps> = ({
 
   return (
     <section
-      className="overflow-hidden transition-colors relative rounded-2xl border"
+      className="flex flex-col w-full min-w-0 overflow-hidden transition-colors relative rounded-2xl border"
       style={{ background: 'var(--cf-surface)', borderColor: 'var(--cf-border)' }}
       id="ledger-archive"
     >

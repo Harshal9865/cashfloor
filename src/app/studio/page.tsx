@@ -488,7 +488,7 @@ export default function StudioEnginePage() {
             </motion.div>
 
             {/* Timeline Chart */}
-            <motion.div variants={itemVariants} className="w-full h-[400px] bg-[var(--cf-surface)] border border-[var(--cf-border)] rounded-2xl p-6 sm:p-8 flex flex-col shadow-sm relative overflow-hidden group">
+            <motion.div variants={itemVariants} className="w-full min-h-[400px] min-w-0 bg-[var(--cf-surface)] border border-[var(--cf-border)] rounded-2xl p-4 sm:p-6 flex flex-col shadow-sm relative overflow-hidden group">
               <CashFlowChart
                 records={records}
                 floorIncome={calculation.floorIncome}
@@ -528,7 +528,7 @@ export default function StudioEnginePage() {
             </motion.section>
 
             {/* Capital Partitioning */}
-            <motion.section variants={itemVariants} id="partitions" className="dash-card p-6 sm:p-8">
+            <motion.section variants={itemVariants} id="partitions" className="dash-card p-4 sm:p-6 min-w-0 w-full flex flex-col">
               <LedgerRows
                 result={calculation}
                 assumptions={assumptions}
@@ -537,7 +537,7 @@ export default function StudioEnginePage() {
             </motion.section>
 
             {/* Input Table (Editable) */}
-            <motion.div variants={itemVariants} id="ledger-data-entry">
+            <motion.div variants={itemVariants} id="ledger-data-entry" className="min-w-0 w-full flex flex-col">
               <InputTable
                 records={records}
                 onChange={setRecords}
@@ -582,7 +582,7 @@ export default function StudioEnginePage() {
               />
             </motion.section>
 
-            <motion.section variants={itemVariants} className="dash-card p-6 sm:p-8">
+            <motion.section variants={itemVariants} className="dash-card p-4 sm:p-6 min-w-0 flex flex-col w-full">
               {!hasEnoughData ? (
                 <div className="flex flex-col items-center justify-center p-8 text-center space-y-3">
                   <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-[var(--cf-surface-alt)] border border-[var(--cf-border)]">
@@ -622,7 +622,7 @@ export default function StudioEnginePage() {
               />
             </motion.div>
 
-            <motion.section variants={itemVariants} id="monte-carlo" className="dash-card p-5">
+            <motion.section variants={itemVariants} id="monte-carlo" className="dash-card p-4 sm:p-5 min-w-0 flex flex-col w-full">
               {!hasEnoughData ? (
                 <div className="flex flex-col items-center justify-center p-8 text-center space-y-3">
                   <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-[var(--cf-surface-alt)] border border-[var(--cf-border)]">

@@ -18,27 +18,26 @@ export default function CashFloorLogo({
   className = '',
   href = '/',
 }: CashFloorLogoProps) {
-  // Dimensions based on size
-  const iconDimensions = {
-    sm: { box: 28, svg: 28 },
-    md: { box: 34, svg: 34 },
-    lg: { box: 42, svg: 42 },
-    xl: { box: 52, svg: 52 },
+  // Dimensions based on size. Using Tailwind responsive classes for 'md' and 'lg' to ensure they shrink on mobile.
+  const iconClasses = {
+    sm: 'w-[28px] h-[28px]',
+    md: 'w-[28px] h-[28px] sm:w-[34px] sm:h-[34px]',
+    lg: 'w-[34px] h-[34px] sm:w-[42px] sm:h-[42px]',
+    xl: 'w-[42px] h-[42px] sm:w-[52px] sm:h-[52px]',
   }[size];
 
   const textSize = {
     sm: 'text-base',
-    md: 'text-lg',
-    lg: 'text-2xl',
-    xl: 'text-3xl',
+    md: 'text-base sm:text-lg',
+    lg: 'text-lg sm:text-2xl',
+    xl: 'text-2xl sm:text-3xl',
   }[size];
 
   const logoGraphic = (
-    <div className={`flex items-center gap-3 group select-none ${className}`}>
+    <div className={`flex items-center gap-2 sm:gap-3 group select-none ${className}`}>
       {/* Precision Geometric SVG Emblem */}
       <div 
-        className="relative shrink-0 flex items-center justify-center transition-transform duration-300 group-hover:scale-105"
-        style={{ width: iconDimensions.box, height: iconDimensions.box }}
+        className={`relative shrink-0 flex items-center justify-center transition-transform duration-300 group-hover:scale-105 ${iconClasses}`}
       >
         {/* Subtle ambient halo with enhanced hover glow */}
         <div 
