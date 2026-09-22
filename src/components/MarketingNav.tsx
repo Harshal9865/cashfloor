@@ -163,7 +163,7 @@ export default function MarketingNav() {
 
         {/* Right side actions */}
         <div className="flex items-center gap-3">
-          <ThemeToggle className="hidden sm:flex" />
+          <ThemeToggle className="flex shrink-0" />
 
           {isAuthenticated && user ? (
             <ProfileDropdown align="right" />
@@ -337,23 +337,25 @@ export default function MarketingNav() {
                     </div>
                   </div>
                 ) : (
-                  <div className="flex flex-col gap-2 pt-4 border-t mt-4" style={{ borderColor: 'var(--cf-border)' }}>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setMobileOpen(false);
-                        openAuthModal();
-                      }}
-                      className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-semibold border"
-                      style={{
-                        background: 'var(--cf-surface)',
-                        borderColor: 'var(--cf-border)',
-                        color: 'var(--cf-text)',
-                      }}
-                    >
-                      <User className="w-3.5 h-3.5 text-[#2F6F62]" />
-                      Sign In
-                    </button>
+                  <div className="flex flex-col gap-2 pt-4 border-t mt-auto" style={{ borderColor: 'var(--cf-border)' }}>
+                    {!isAuthenticated && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMobileOpen(false);
+                          openAuthModal();
+                        }}
+                        className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-semibold border"
+                        style={{
+                          background: 'var(--cf-surface)',
+                          borderColor: 'var(--cf-border)',
+                          color: 'var(--cf-text)',
+                        }}
+                      >
+                        <User className="w-3.5 h-3.5 text-[#2F6F62]" />
+                        Sign In
+                      </button>
+                    )}
 
                     <Link
                       href="/dashboard"

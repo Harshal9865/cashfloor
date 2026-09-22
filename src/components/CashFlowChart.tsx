@@ -354,7 +354,7 @@ export const CashFlowChart: React.FC<CashFlowChartProps> = ({
       </div>
 
       {/* ── Dynamic Chart Rendering ── */}
-      <div className="flex-1 min-h-[250px] min-w-0 w-full relative">
+      <div className="h-[250px] sm:h-auto sm:flex-1 sm:min-h-[250px] min-w-0 w-full relative">
         {mounted ? (
           <ResponsiveContainer width="100%" height="100%">
             {viewMode === '12_months' ? (

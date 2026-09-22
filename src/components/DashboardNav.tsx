@@ -176,7 +176,7 @@ export default function DashboardNav({
               <span className="font-medium whitespace-nowrap">{syncLabel}</span>
             </div>
             
-            <ThemeToggle className="hidden sm:flex shrink-0" />
+            <ThemeToggle className="shrink-0" />
 
             {/* Unified Canonical Profile Dropdown */}
             <ProfileDropdown align="right" className="shrink-0" />
@@ -236,65 +236,16 @@ export default function DashboardNav({
               </div>
               
               <div className="p-4 border-t mt-auto" style={{ borderColor: 'var(--cf-border-soft)', background: 'var(--cf-surface-alt)' }}>
-                <div className="mb-4">
-                  <ThemeToggle />
-                </div>
-                {isAuthenticated && user ? (
-                  <div className="p-3 rounded-xl border flex items-center justify-between"
-                    style={{ background: 'var(--cf-surface)', borderColor: 'var(--cf-border)' }}>
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-br from-[#2F6F62] to-[#0f564a] flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-sm">
-                        {user?.avatar ? (
-                          <img src={user.avatar} alt={displayName} className="w-full h-full object-cover" />
-                        ) : (
-                          initials
-                        )}
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-xs font-semibold truncate" style={{ color: 'var(--cf-text)' }}>{displayName}</p>
-                        <p className="text-[11px] truncate" style={{ color: 'var(--cf-text-faint)' }}>{user.email}</p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={async () => { setMobileOpen(false); await signOut(); }}
-                      className="p-1.5 rounded-lg text-xs transition-colors cursor-pointer hover:bg-rose-500/10"
-                      style={{ color: 'var(--cf-caution)' }}
-                      title="Sign Out"
-                    >
-                      <LogOut className="w-4 h-4" />
-                    </button>
-                  </div>
-                ) : (
+                {!isAuthenticated && (
                   <button
                     onClick={() => { setMobileOpen(false); handleAuthTrigger(); }}
-                    className="w-full py-2.5 px-3 rounded-lg text-xs font-semibold text-white flex items-center justify-center gap-1.5 shadow-sm"
+                    className="w-full py-2.5 px-3 mb-4 rounded-lg text-xs font-semibold text-white flex items-center justify-center gap-1.5 shadow-sm"
                     style={{ background: 'linear-gradient(135deg, #2F6F62, #1a4f45)' }}
                   >
                     <User className="w-4 h-4" /> Sign In to Pro Suite
                   </button>
                 )}
-                
-                <div className="mt-4 flex flex-col gap-2">
-                  {onOpenInvoiceModal && (
-                    <button onClick={() => { onOpenInvoiceModal(); setMobileOpen(false); }}
-                      className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-xs font-semibold cursor-pointer border"
-                      style={{ color: 'var(--cf-accent)', borderColor: 'var(--cf-accent)', background: 'var(--cf-accent-bg)' }}>
-                      <FileText className="w-4 h-4" /> Client Invoice Studio
-                    </button>
-                  )}
-                  <div className="flex gap-2">
-                    <button onClick={() => { onExportCsv?.(); setMobileOpen(false); }}
-                      className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-medium cursor-pointer border hover:bg-[var(--cf-surface-alt)]"
-                      style={{ color: 'var(--cf-text-muted)', borderColor: 'var(--cf-border)', background: 'var(--cf-surface)' }}>
-                      <Download className="w-3.5 h-3.5" /> Export
-                    </button>
-                    <button onClick={() => { onLoadSample?.(); setMobileOpen(false); }}
-                      className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-medium cursor-pointer border hover:bg-[var(--cf-surface-alt)]"
-                      style={{ color: 'var(--cf-text-muted)', borderColor: 'var(--cf-border)', background: 'var(--cf-surface)' }}>
-                      <Database className="w-3.5 h-3.5" /> Sample
-                    </button>
-                  </div>
-                </div>
+
               </div>
             </motion.div>
           </>

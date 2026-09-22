@@ -253,7 +253,7 @@ export function RunwayAiCopilot({
           </div>
           <span className="hidden sm:inline-block font-semibold tracking-wide ml-2.5">Runway AI Advisor</span>
           <span className="hidden sm:inline-block ml-1.5 px-1.5 py-0.2 rounded text-[9px] font-mono font-bold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
-            DSA Engine
+            Preview
           </span>
         </button>
       </div>

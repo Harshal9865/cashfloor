@@ -652,15 +652,15 @@ export default function AccountPage() {
               </div>
             </section>
 
-            <div className="flex justify-end pt-2">
+            <div className="flex justify-center pt-4">
               <button
                 type="submit"
                 disabled={saving}
-                className="px-6 py-2.5 rounded-xl text-xs font-semibold text-white shadow-md hover:shadow-lg transition-all flex items-center gap-2 disabled:opacity-50 cursor-pointer"
+                className="px-8 py-2.5 rounded-full text-sm font-bold text-white shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
                 style={{ background: 'linear-gradient(135deg, var(--cf-accent), #1a4f45)' }}
               >
-                {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
-                Save Entity Preferences
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                Save
               </button>
             </div>
           </form>

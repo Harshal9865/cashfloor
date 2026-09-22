@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { usePayment } from '@/lib/payment/PaymentContext';
 
 interface CashFloorLogoProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
@@ -20,18 +21,31 @@ export default function CashFloorLogo({
 }: CashFloorLogoProps) {
   // Dimensions based on size. Using Tailwind responsive classes for 'md' and 'lg' to ensure they shrink on mobile.
   const iconClasses = {
-    sm: 'w-[20px] h-[20px] sm:w-[24px] sm:h-[24px]',
-    md: 'w-[24px] h-[24px] sm:w-[34px] sm:h-[34px]',
-    lg: 'w-[28px] h-[28px] sm:w-[42px] sm:h-[42px]',
-    xl: 'w-[34px] h-[34px] sm:w-[52px] sm:h-[52px]',
+    sm: 'w-[20px] h-[20px] sm:w-[22px] sm:h-[22px]',
+    md: 'w-[24px] h-[24px] sm:w-[28px] sm:h-[28px]',
+    lg: 'w-[28px] h-[28px] sm:w-[36px] sm:h-[36px]',
+    xl: 'w-[34px] h-[34px] sm:w-[48px] sm:h-[48px]',
   }[size];
 
   const textSize = {
-    sm: 'text-sm sm:text-base',
-    md: 'text-sm sm:text-lg',
-    lg: 'text-base sm:text-2xl',
-    xl: 'text-lg sm:text-3xl',
+    sm: 'text-xs sm:text-sm',
+    md: 'text-sm sm:text-base',
+    lg: 'text-base sm:text-xl',
+    xl: 'text-lg sm:text-2xl',
   }[size];
+
+  // Try to safely access payment context (might be null in tests or some edge cases if not wrapped)
+  let planLabel = 'PRO';
+  try {
+    const payment = usePayment();
+    if (payment?.isProSubscriber) {
+      planLabel = (payment.activePlan || 'PRO').toUpperCase();
+    } else {
+      planLabel = 'FREE';
+    }
+  } catch (e) {
+    // Fallback if usePayment fails
+  }
 
   const logoGraphic = (
     <div className={`flex items-center gap-2 sm:gap-3 group select-none ${className}`}>
@@ -136,8 +150,8 @@ export default function CashFloorLogo({
             >
               Cash<span className="text-[var(--cf-accent)] font-semibold group-hover:text-[#10B981] transition-colors">Floor</span>
             </span>
-            <span className="hidden sm:inline-flex ml-1.5 px-1.5 py-0.5 rounded text-[9px] font-mono font-bold tracking-widest uppercase bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 group-hover:border-emerald-500/40 group-hover:bg-emerald-500/20 transition-all duration-200">
-              PRO
+            <span className="hidden sm:inline-flex ml-1.5 px-1.5 py-0.5 rounded text-[8px] sm:text-[9px] font-mono font-bold tracking-widest uppercase bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 group-hover:border-emerald-500/40 group-hover:bg-emerald-500/20 transition-all duration-200">
+              {planLabel}
             </span>
           </div>
 

@@ -588,6 +588,25 @@ export default function ExecutiveDashboard() {
               </div>
             </div>
 
+            {/* Latest Insights & Intel */}
+            <div className="p-6 rounded-3xl border border-[var(--cf-border)] bg-[var(--cf-surface)] space-y-4 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-indigo-500 font-semibold text-xs">
+                  <FileText className="w-4 h-4" />
+                  <span>Latest Insights &amp; Intel</span>
+                </div>
+                <Link
+                  href="/blog"
+                  className="text-[10px] font-mono text-[var(--cf-accent)] hover:underline flex items-center gap-1"
+                >
+                  View All <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+              <p className="text-[11px] text-[var(--cf-text-muted)] leading-relaxed">
+                Check our latest methodological research and community articles to optimize your runway and cash management.
+              </p>
+            </div>
+
           </div>
 
         </div>

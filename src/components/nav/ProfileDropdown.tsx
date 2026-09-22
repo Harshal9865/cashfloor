@@ -185,14 +185,6 @@ export default function ProfileDropdown({ align = 'right', className = '' }: Pro
               </Link>
             </div>
 
-            {/* Theme Toggle Bar */}
-            <div className="px-3 py-2 border-t border-[var(--cf-border-soft)] flex items-center justify-between text-xs text-[var(--cf-text-muted)]">
-              <span className="text-[11px] font-medium flex items-center gap-1.5">
-                <span>Display Theme</span>
-              </span>
-              <ThemeToggle />
-            </div>
-
             {/* Sign Out Trigger */}
             <div className="p-1.5 border-t border-[var(--cf-border-soft)]">
               <button

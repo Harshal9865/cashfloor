@@ -47,8 +47,39 @@ export function getFullArticleBySlug(slug: string): FullBlogPost | undefined {
  * Requires NO API key, completely public and open.
  */
 export async function fetchLiveFreelanceArticles(): Promise<BlogPost[]> {
-  // Always return our 100% authentic, verified, on-topic CashFloor guides
-  return CORNERSTONE_POSTS;
+  try {
+    const res = await fetch('https://dev.to/api/articles?tag=freelance&per_page=30');
+    if (!res.ok) {
+      return CORNERSTONE_POSTS;
+    }
+    const data = await res.json();
+    const livePosts: BlogPost[] = data.map((item: any) => ({
+      id: item.id.toString(),
+      slug: item.slug,
+      title: item.title,
+      description: item.description || item.title,
+      date: new Date(item.published_at).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      }),
+      category: 'Community',
+      readingTime: `${item.reading_time_minutes || 5} min read`,
+      url: item.url,
+      isExternal: true,
+      coverImage: item.cover_image || item.social_image || 'https://images.unsplash.com/photo-1450133064473-71024230f91b?w=1200&auto=format&fit=crop&q=80',
+      author: {
+        name: item.user?.name || 'Community Member',
+        avatar: item.user?.profile_image_90 || '',
+      },
+      tags: item.tag_list || [],
+    }));
+    
+    return [...CORNERSTONE_POSTS, ...livePosts];
+  } catch (error) {
+    console.error('Error fetching live articles:', error);
+    return CORNERSTONE_POSTS;
+  }
 }
 
 function capitalize(str: string): string {
