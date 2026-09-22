@@ -39,7 +39,7 @@ const navLinks = [
       { label: 'Why CashFloor', href: '/about', desc: 'The Sovereign Freelancer Manifesto' },
       { label: 'Calculation Math', href: '/blog/the-20th-percentile-math', desc: '20th-percentile math & 5 pillars' },
       { label: 'Data Privacy & Security', href: '/security', desc: 'Zero-bank-surveillance architecture' },
-      { label: 'Financial Guides', href: '/blog', desc: 'Freelance financial playbooks' },
+      { label: 'Blogs', href: '/blog', desc: 'Freelance financial playbooks' },
       { label: 'How It Works', href: '/#how-it-works', desc: 'Step-by-step operating guide' }
     ]
   }
@@ -81,9 +81,10 @@ export default function MarketingNav() {
   }, [mobileOpen]);
 
   return (
-    <motion.header
-      initial={{ y: -20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
+    <>
+      <motion.header
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
       className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
         scrolled
@@ -207,6 +208,7 @@ export default function MarketingNav() {
 
         </div>
       </div>
+      </motion.header>
 
       {/* Standard Side Drawer Overlay & Menu */}
       <AnimatePresence>
@@ -275,103 +277,11 @@ export default function MarketingNav() {
                     )}
                   </div>
                 ))}
-
-                <div className="flex items-center justify-between px-3 py-2 border-t mt-auto pt-4" style={{ borderColor: 'var(--cf-border)' }}>
-                  <span className="text-xs" style={{ color: 'var(--cf-text-muted)' }}>Theme</span>
-                  <ThemeToggle />
-                </div>
-
-                {isAuthenticated && user ? (
-                  <div
-                    className="p-3 rounded-2xl border space-y-3 mt-4"
-                    style={{ background: 'var(--cf-surface)', borderColor: 'var(--cf-border)' }}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center text-xs font-bold text-white shrink-0 shadow-sm"
-                        style={{ background: 'linear-gradient(135deg, #2F6F62, #1a4f45)' }}
-                      >
-                        {user.avatar ? (
-                          <img src={user.avatar} alt={displayName} className="w-full h-full object-cover" />
-                        ) : (
-                          initials
-                        )}
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-xs font-semibold truncate" style={{ color: 'var(--cf-text)' }}>
-                          {displayName}
-                        </p>
-                        <p className="text-[11px] truncate" style={{ color: 'var(--cf-text-muted)' }}>
-                          {user.email}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2">
-                      <Link
-                        href="/dashboard"
-                        onClick={() => setMobileOpen(false)}
-                        className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold text-white"
-                        style={{ background: 'linear-gradient(135deg, #2F6F62, #1a4f45)' }}
-                      >
-                        <LayoutDashboard className="w-3.5 h-3.5" />
-                        Dashboard
-                      </Link>
-
-                      <button
-                        type="button"
-                        onClick={async () => {
-                          setMobileOpen(false);
-                          await signOut();
-                        }}
-                        className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold border cursor-pointer hover:bg-rose-500/10"
-                        style={{
-                          borderColor: 'var(--cf-border)',
-                          color: 'var(--cf-caution)',
-                          background: 'var(--cf-caution-bg)',
-                        }}
-                      >
-                        <LogOut className="w-3.5 h-3.5" />
-                        Sign Out
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex flex-col gap-2 pt-4 border-t mt-auto" style={{ borderColor: 'var(--cf-border)' }}>
-                    {!isAuthenticated && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setMobileOpen(false);
-                          openAuthModal();
-                        }}
-                        className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-semibold border"
-                        style={{
-                          background: 'var(--cf-surface)',
-                          borderColor: 'var(--cf-border)',
-                          color: 'var(--cf-text)',
-                        }}
-                      >
-                        <User className="w-3.5 h-3.5 text-[#2F6F62]" />
-                        Sign In
-                      </button>
-                    )}
-
-                    <Link
-                      href="/dashboard"
-                      onClick={() => setMobileOpen(false)}
-                      className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-semibold text-white"
-                      style={{ background: 'linear-gradient(135deg, #2F6F62, #1a4f45)' }}
-                    >
-                      Try Free <ArrowRight className="w-3.5 h-3.5" />
-                    </Link>
-                  </div>
-                )}
               </div>
             </motion.div>
           </>
         )}
       </AnimatePresence>
-    </motion.header>
+    </>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import DashboardNav from '@/components/DashboardNav';
+import MarketingNav from '@/components/MarketingNav';
 import Footer from '@/components/marketing/Footer';
 import Link from 'next/link';
 import { Shield, Lock, Server, CheckCircle2, Key, ArrowRight, EyeOff, ShieldCheck, Database } from 'lucide-react';
@@ -12,7 +12,7 @@ import EnclaveInspector from '@/components/security/EnclaveInspector';
 export default function SecurityPage() {
   return (
     <div className="min-h-screen bg-[var(--cf-bg)] flex flex-col font-sans transition-colors duration-300">
-      <DashboardNav />
+      <MarketingNav />
       
       <main className="flex-1 flex flex-col items-center justify-start pt-6 pb-24 px-4 sm:px-6 md:px-8 relative z-10 overflow-hidden">
         {/* Ambient background glow */}

@@ -2,7 +2,7 @@ import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import DashboardNav from '@/components/DashboardNav';
+import MarketingNav from '@/components/MarketingNav';
 import Footer from '@/components/marketing/Footer';
 import { getFullArticleBySlug, CORNERSTONE_POSTS } from '@/lib/blog/blogService';
 import { REAL_BLOG_ARTICLES } from '@/lib/blog/articles';
@@ -60,7 +60,7 @@ export default async function BlogPostPage({ params }: BlogPostProps) {
 
   return (
     <div className="min-h-screen bg-[var(--cf-bg)] text-[var(--cf-text)] transition-colors duration-300 flex flex-col font-sans">
-      <DashboardNav />
+      <MarketingNav />
 
       <main className="flex-1 max-w-4xl mx-auto px-4 sm:px-6 md:px-8 pt-6 pb-20 w-full space-y-10">
         {/* Navigation Breadcrumb */}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Metadata } from 'next';
 import Link from 'next/link';
-import DashboardNav from '@/components/DashboardNav';
+import MarketingNav from '@/components/MarketingNav';
 import Footer from '@/components/marketing/Footer';
 import { ShieldAlert, FileText, CheckCircle2, ArrowLeft, Scale, AlertTriangle, ArrowRight } from 'lucide-react';
 
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function TermsPage() {
   return (
     <div className="min-h-screen bg-[var(--cf-bg)] text-[var(--cf-text)] transition-colors duration-300 font-sans flex flex-col">
-      <DashboardNav />
+      <MarketingNav />
       
       <main className="flex-1 max-w-4xl mx-auto px-4 sm:px-6 md:px-8 pt-6 pb-20 w-full space-y-10">
         {/* Navigation Breadcrumb */}
