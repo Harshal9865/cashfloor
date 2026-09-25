@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { CalendarClock, AlertCircle, Download, Check, ExternalLink, ShieldCheck } from 'lucide-react';
+import { CalendarClock, AlertCircle, Download, Check, ExternalLink, ShieldCheck, Bell } from 'lucide-react';
 import { downloadTaxCalendarFile } from '@/lib/calendar/icsGenerator';
+import { TaxReminderModal } from '@/components/TaxReminderModal';
 
 interface TaxDeadlineRemindersProps {
   taxReservePct?: number;
@@ -16,6 +17,7 @@ export const TaxDeadlineReminders: React.FC<TaxDeadlineRemindersProps> = ({
   currencySymbol = '$',
 }) => {
   const [downloadSuccess, setDownloadSuccess] = useState(false);
+  const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
 
   const now = new Date();
   const currentYear = now.getFullYear();
@@ -138,6 +140,16 @@ export const TaxDeadlineReminders: React.FC<TaxDeadlineRemindersProps> = ({
             )}
           </button>
 
+          <button
+            type="button"
+            onClick={() => setIsAlertModalOpen(true)}
+            title="Schedule email & browser push reminders for this tax deadline"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-mono border transition-all cursor-pointer shadow-xs border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400 hover:bg-amber-500/20"
+          >
+            <Bell className="w-3.5 h-3.5" />
+            <span>Set Alerts</span>
+          </button>
+
           <a
             href="https://www.irs.gov/payments"
             target="_blank"
@@ -149,6 +161,15 @@ export const TaxDeadlineReminders: React.FC<TaxDeadlineRemindersProps> = ({
           </a>
         </div>
       </div>
+
+      <TaxReminderModal
+        isOpen={isAlertModalOpen}
+        onClose={() => setIsAlertModalOpen(false)}
+        taxReserveAmount={quarterlyEscrowAmount || 0}
+        nextDeadlineDate={nextDeadline.dateStr}
+        nextQuarterName={nextDeadline.period}
+        currencySymbol={currencySymbol}
+      />
     </div>
   );
 };

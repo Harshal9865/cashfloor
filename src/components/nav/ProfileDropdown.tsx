@@ -43,7 +43,7 @@ export default function ProfileDropdown({ align = 'right', className = '' }: Pro
     return () => document.removeEventListener('mousedown', handleOutsideClick);
   }, []);
 
-  if (loading) {
+  if (loading && !user) {
     return (
       <div className="w-20 h-8 rounded-full bg-[var(--cf-surface-alt)]/60 border border-[var(--cf-border-soft)] animate-pulse" />
     );
@@ -91,7 +91,18 @@ export default function ProfileDropdown({ align = 'right', className = '' }: Pro
             style={{ background: 'linear-gradient(135deg, #2F6F62, #1a4f45)' }}
           >
             {user.avatar ? (
-              <img src={user.avatar} alt={displayName} className="w-full h-full object-cover" />
+              <img
+                src={user.avatar}
+                alt={displayName}
+                loading="eager"
+                decoding="async"
+                // @ts-ignore fetchpriority
+                fetchPriority="high"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
             ) : (
               initials
             )}
@@ -143,7 +154,16 @@ export default function ProfileDropdown({ align = 'right', className = '' }: Pro
                   style={{ background: 'linear-gradient(135deg, #2F6F62, #1a4f45)' }}
                 >
                   {user.avatar ? (
-                    <img src={user.avatar} alt={displayName} className="w-full h-full object-cover" />
+                    <img
+                      src={user.avatar}
+                      alt={displayName}
+                      loading="eager"
+                      decoding="async"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
                   ) : (
                     initials
                   )}

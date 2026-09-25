@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { DEMO_PERSONAS } from './AuthContext';
+import { DEMO_PERSONAS, formatInitials, LOCAL_STORAGE_USER_KEY } from './AuthContext';
 
 describe('AuthContext and Persona Configuration', () => {
   it('defines realistic, diversified demo personas', () => {
@@ -22,5 +22,16 @@ describe('AuthContext and Persona Configuration', () => {
       expect(persona.description).toBeTruthy();
       expect(persona.email).toMatch(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
     });
+  });
+
+  it('correctly generates initials for profile fallback', () => {
+    expect(formatInitials('Sarah Jenkins')).toBe('SJ');
+    expect(formatInitials('alex.rivera@cashfloor.app')).toBe('AR');
+    expect(formatInitials('SingleWord')).toBe('SI');
+    expect(formatInitials('')).toBe('CF');
+  });
+
+  it('maintains the expected local storage key for profile persistence and preloading', () => {
+    expect(LOCAL_STORAGE_USER_KEY).toBe('cf_auth_profile_v2');
   });
 });

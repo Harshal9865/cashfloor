@@ -39,6 +39,10 @@ import { RealDataWizardModal } from '@/components/RealDataWizardModal';
 import { CsvPasteModal } from '@/components/CsvPasteModal';
 import { LegalDisclaimer } from '@/components/LegalDisclaimer';
 import { RunwayAiCopilot } from '@/components/ai/RunwayAiCopilot';
+import { OnboardingWizardModal } from '@/components/onboarding/OnboardingWizardModal';
+import { AccountantShareModal } from '@/components/share/AccountantShareModal';
+import { TaxReminderModal } from '@/components/TaxReminderModal';
+import { Bell } from 'lucide-react';
 
 const DEFAULT_RECORDS: MonthlyRecord[] = [
   { id: '1', month: 'Jul', income: 4050, expenses: 2100, clientTag: 'Acme Retainer' },
@@ -75,12 +79,17 @@ export default function ExecutiveDashboard() {
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('offline');
   const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
   const [activeRails, setActiveRails] = useState<string[]>(['STRIPE', 'WISE']);
+  const [isUsingDemoData, setIsUsingDemoData] = useState(true);
+  const [demoBannerDismissed, setDemoBannerDismissed] = useState(false);
   
   // Modals
   const [isSolvencyModalOpen, setIsSolvencyModalOpen] = useState(false);
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
   const [isWizardOpen, setIsWizardOpen] = useState(false);
   const [isCsvModalOpen, setIsCsvModalOpen] = useState(false);
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [isTaxReminderModalOpen, setIsTaxReminderModalOpen] = useState(false);
 
   // Today's completed action items checklist (persisted locally)
   const [completedSteps, setCompletedSteps] = useState<{ [key: string]: boolean }>({
@@ -96,6 +105,7 @@ export default function ExecutiveDashboard() {
       setRecords(local.records);
       setAssumptions(local.assumptions);
       setCurrencySymbol(local.currencySymbol || '$');
+      setIsUsingDemoData(false);
     }
 
     if (typeof window !== 'undefined') {
@@ -109,6 +119,8 @@ export default function ExecutiveDashboard() {
           if (connected.length > 0) setActiveRails(connected);
         } catch {}
       }
+      const dismissed = localStorage.getItem('cf_demo_banner_dismissed');
+      if (dismissed === 'true') setDemoBannerDismissed(true);
     }
   }, []);
 
@@ -180,7 +192,67 @@ export default function ExecutiveDashboard() {
         lastSavedAt={lastSavedAt}
       />
 
-      <main id="main-content" className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-8 py-10 space-y-10 lg:space-y-12">
+      <main id="main-content" className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-8 py-10 space-y-8 lg:space-y-10">
+
+        {/* Demo Data Banner */}
+        {isUsingDemoData && !demoBannerDismissed && (
+          <div
+            className="flex flex-col sm:flex-row items-start sm:items-center gap-3 px-4 py-3 rounded-2xl border"
+            style={{
+              background: 'rgba(201,138,62,0.08)',
+              borderColor: 'rgba(201,138,62,0.25)',
+            }}
+          >
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+              <span className="text-xs font-bold font-mono" style={{ color: 'var(--cf-warm)' }}>Demo Mode</span>
+            </div>
+            <p className="text-xs flex-1" style={{ color: 'var(--cf-text-muted)' }}>
+              You're viewing sample data. Add your real income and expense data in{' '}
+              <button onClick={() => setIsWizardOpen(true)} className="underline font-semibold cursor-pointer" style={{ color: 'var(--cf-warm)' }}>Calibrate Numbers</button>
+              {' '}or{' '}
+              <a href="/studio" className="underline font-semibold" style={{ color: 'var(--cf-warm)' }}>Runway Studio</a>
+              {' '}to see your real financial posture.
+            </p>
+            <button
+              onClick={() => {
+                setDemoBannerDismissed(true);
+                if (typeof window !== 'undefined') localStorage.setItem('cf_demo_banner_dismissed', 'true');
+              }}
+              className="shrink-0 text-xs font-mono cursor-pointer hover:opacity-70 transition-opacity"
+              style={{ color: 'var(--cf-text-faint)' }}
+              aria-label="Dismiss demo notice"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
+
+        {/* ── Low Runway Emergency Alert Banner (< 3 months) ── */}
+        {calculation.runwayMonths < 3.0 && !calculation.isInfiniteRunway && (
+          <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-start sm:items-center gap-3">
+              <div className="w-8 h-8 rounded-xl bg-rose-500/20 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
+                <AlertTriangle className="w-4 h-4" />
+              </div>
+              <div className="space-y-0.5">
+                <h4 className="text-xs font-bold font-mono text-rose-700 dark:text-rose-400">
+                  Critical Solvency Warning: {calculation.runwayMonths.toFixed(1)} Months Runway Remaining
+                </h4>
+                <p className="text-xs text-[var(--cf-text-muted)]">
+                  Your liquid cash reserves will sustain operations for only {calculation.runwayMonths.toFixed(1)} months at your current burn rate ({currencySymbol}{calculation.avgMonthlyExpenses.toLocaleString()}/mo). Recommended: Reduce non-essential expenses and collect pending client invoices immediately.
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsInvoiceModalOpen(true)}
+              className="px-3.5 py-1.5 rounded-xl bg-rose-600 text-white font-mono text-xs font-bold hover:bg-rose-500 transition-colors shrink-0 shadow-xs cursor-pointer"
+            >
+              Collect Invoices
+            </button>
+          </div>
+        )}
         
         {/* ── Executive Briefing Header ── */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-[var(--cf-border-soft)]">
@@ -204,10 +276,29 @@ export default function ExecutiveDashboard() {
 
           <div className="flex flex-wrap items-center gap-2.5">
             <button
-              onClick={() => setIsWizardOpen(true)}
+              type="button"
+              onClick={() => setIsOnboardingOpen(true)}
               className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-mono font-medium border border-[var(--cf-border)] bg-[var(--cf-surface)] text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-all cursor-pointer shadow-xs"
             >
               <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+              <span>Setup Wizard</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIsShareModalOpen(true)}
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-mono font-medium border border-indigo-500/30 bg-indigo-500/5 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/10 transition-all cursor-pointer shadow-xs"
+            >
+              <Share2 className="w-3.5 h-3.5" />
+              <span>Share with CPA</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIsWizardOpen(true)}
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-mono font-medium border border-[var(--cf-border)] bg-[var(--cf-surface)] text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-all cursor-pointer shadow-xs"
+            >
+              <TrendingUp className="w-3.5 h-3.5 text-[var(--cf-accent)]" />
               <span>Calibrate Numbers</span>
             </button>
 
@@ -621,9 +712,19 @@ export default function ExecutiveDashboard() {
 
             {/* Upcoming Tax Obligations Box */}
             <div className="p-6 rounded-3xl border border-amber-500/20 bg-amber-500/5 space-y-3 shadow-sm">
-              <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400 font-semibold text-xs">
-                <Calendar className="w-4 h-4" />
-                <span>Next IRS Quarterly Deadline</span>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400 font-semibold text-xs">
+                  <Calendar className="w-4 h-4" />
+                  <span>Next IRS Quarterly Deadline</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsTaxReminderModalOpen(true)}
+                  className="inline-flex items-center gap-1 text-[11px] font-mono text-amber-700 dark:text-amber-400 hover:underline cursor-pointer"
+                >
+                  <Bell className="w-3 h-3" />
+                  <span>Alerts</span>
+                </button>
               </div>
               <div className="space-y-1">
                 <div className="text-lg font-mono font-bold text-[var(--cf-text)]">
@@ -632,6 +733,16 @@ export default function ExecutiveDashboard() {
                 <p className="text-[11px] text-[var(--cf-text-muted)] leading-relaxed">
                   {nextTaxDeadline.quarter} Form 1040-ES estimated tax voucher. Target escrow reserve is fully allocated at {currencySymbol}{Math.round(calculation.taxReserve).toLocaleString()}.
                 </p>
+                <div className="pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setIsTaxReminderModalOpen(true)}
+                    className="w-full py-1.5 px-3 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400 font-mono text-xs font-semibold hover:bg-amber-500/20 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                  >
+                    <Bell className="w-3.5 h-3.5" />
+                    <span>Schedule Automated Alerts</span>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -697,6 +808,38 @@ export default function ExecutiveDashboard() {
           setRecords(pasted);
         }}
         currencySymbol={currencySymbol}
+      />
+
+      <OnboardingWizardModal
+        isOpen={isOnboardingOpen}
+        onClose={() => setIsOnboardingOpen(false)}
+        onComplete={(newRecords, newAssumptions, currency) => {
+          setRecords(newRecords);
+          setAssumptions(prev => ({ ...prev, ...newAssumptions }));
+          setCurrencySymbol(currency);
+          setIsUsingDemoData(false);
+        }}
+        initialCurrency={currencySymbol}
+      />
+
+      <AccountantShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        result={calculation}
+        assumptions={assumptions}
+        records={records}
+        currencySymbol={currencySymbol}
+        userName={user?.name || 'Founder'}
+      />
+
+      <TaxReminderModal
+        isOpen={isTaxReminderModalOpen}
+        onClose={() => setIsTaxReminderModalOpen(false)}
+        taxReserveAmount={calculation.taxReserve}
+        nextDeadlineDate={nextTaxDeadline.date}
+        nextQuarterName={nextTaxDeadline.quarter}
+        currencySymbol={currencySymbol}
+        runwayMonths={calculation.runwayMonths}
       />
 
       {/* Real-time Client-side AI Runway Advisor Copilot */}

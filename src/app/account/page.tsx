@@ -21,6 +21,7 @@ import {
   HardDrive,
   FileCheck,
   CreditCard,
+  Building2,
   Key,
   Receipt,
   Server,
@@ -62,11 +63,21 @@ export default function AccountPage() {
   const [deleting, setDeleting] = useState(false);
 
   // Profile fields
-  const [fullName, setFullName] = useState('');
-  const [avatarUrl, setAvatarUrl] = useState('');
+  const [fullName, setFullName] = useState(user?.name || '');
+  const [avatarUrl, setAvatarUrl] = useState(user?.avatar || '');
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const backupFileInputRef = useRef<HTMLInputElement>(null);
+
+  // Sync state if user context resolves or updates
+  useEffect(() => {
+    if (user?.avatar && !avatarUrl) {
+      setAvatarUrl(user.avatar);
+    }
+    if (user?.name && !fullName) {
+      setFullName(user.name);
+    }
+  }, [user?.avatar, user?.name, avatarUrl, fullName]);
 
   // Global Financial Preferences & Legal Architecture
   const [defaultCurrency, setDefaultCurrency] = useState('$');
@@ -75,6 +86,7 @@ export default function AccountPage() {
   const [paymentTerms, setPaymentTerms] = useState<'immediate' | 'net_15' | 'net_30' | 'net_60'>('net_30');
   const [targetSafetyMonths, setTargetSafetyMonths] = useState<number>(6);
   const [fxHaircutPct, setFxHaircutPct] = useState<string>('3');
+  const [billingRailMode, setBillingRailMode] = useState<'lemonsqueezy' | 'stripe'>('lemonsqueezy');
 
   // DSA Algorithm & Computational Tuning
   const [quantilePercentile, setQuantilePercentile] = useState<number>(20);
@@ -228,6 +240,9 @@ export default function AccountPage() {
       setAvatarUrl(data.publicUrl);
 
       updateProfileData({ avatar: data.publicUrl });
+      await supabase.auth.updateUser({
+        data: { avatar_url: data.publicUrl },
+      }).catch(() => {});
       await supabase.from('profiles').upsert({
         id: user.id,
         avatar_url: data.publicUrl,
@@ -469,7 +484,7 @@ export default function AccountPage() {
         )}
 
         {/* 5-Tab Navigation Bar */}
-        <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-[var(--cf-surface-alt)] border border-[var(--cf-border)] overflow-x-auto scrollbar-none">
+        <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-[var(--cf-surface-alt)] border border-[var(--cf-border)] overflow-x-auto no-scrollbar">
           <button
             type="button"
             onClick={() => setActiveTab('general')}
@@ -545,7 +560,15 @@ export default function AccountPage() {
                 <div className="relative group shrink-0">
                   <div className="w-24 h-24 rounded-2xl overflow-hidden border border-[var(--cf-border)] bg-[var(--cf-surface-alt)] flex items-center justify-center shadow-sm">
                     {avatarUrl ? (
-                      <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                      <img
+                        src={avatarUrl}
+                        alt="Avatar"
+                        className="w-full h-full object-cover"
+                        loading="eager"
+                        decoding="async"
+                        // @ts-ignore fetchpriority
+                        fetchPriority="high"
+                      />
                     ) : (
                       <span className="text-3xl font-serif text-[var(--cf-text-muted)]">
                         {fullName ? fullName.charAt(0).toUpperCase() : (user?.email ? user.email.charAt(0).toUpperCase() : 'V')}
@@ -814,6 +837,110 @@ export default function AccountPage() {
                   <ExternalLink className="w-3 h-3" />
                 </Link>
               </div>
+            </section>
+
+            {/* Payment Gateway Rails & Student MoR Architecture Card */}
+            <section className="p-6 rounded-2xl border border-[var(--cf-border)] bg-[var(--cf-surface)] space-y-5 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <Building2 className="w-5 h-5 text-amber-500" />
+                    <h3 className="font-serif text-lg font-bold">Payment Rail & Gateway Architecture</h3>
+                  </div>
+                  <p className="text-xs text-[var(--cf-text-muted)]">
+                    Configure your live checkout backend: Merchant of Record (Zero-Company setup) vs Direct PSP.
+                  </p>
+                </div>
+
+                {/* Mode Selector */}
+                <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[var(--cf-surface-alt)] border border-[var(--cf-border)] font-mono text-xs">
+                  <button
+                    type="button"
+                    onClick={() => setBillingRailMode('lemonsqueezy')}
+                    className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
+                      billingRailMode === 'lemonsqueezy'
+                        ? 'bg-[var(--cf-accent)] text-white font-bold shadow-xs'
+                        : 'text-[var(--cf-text-muted)] hover:text-[var(--cf-text)]'
+                    }`}
+                  >
+                    🍋 Lemon Squeezy (MoR)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setBillingRailMode('stripe')}
+                    className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
+                      billingRailMode === 'stripe'
+                        ? 'bg-[var(--cf-accent)] text-white font-bold shadow-xs'
+                        : 'text-[var(--cf-text-muted)] hover:text-[var(--cf-text)]'
+                    }`}
+                  >
+                    Stripe (Direct PSP)
+                  </button>
+                </div>
+              </div>
+
+              {/* Mode Explanation Panel */}
+              {billingRailMode === 'lemonsqueezy' ? (
+                <div className="p-4 rounded-xl border border-amber-500/30 bg-amber-500/5 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-mono font-bold text-amber-700 dark:text-amber-400">
+                      ★ Recommended for Solo Developers & Students
+                    </span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold border border-emerald-500/20">
+                      Zero Entity Required
+                    </span>
+                  </div>
+
+                  <p className="text-xs text-[var(--cf-text-muted)] leading-relaxed">
+                    <strong className="text-[var(--cf-text)]">How it works:</strong> Under Merchant of Record (MoR) law, Lemon Squeezy becomes the legal reseller. You do <strong className="text-[var(--cf-text)]">not</strong> need an LLC, C-Corp, GST, or business tax ID. They collect and remit 100% of global VAT and US sales tax, manage invoicing, and send payouts directly to your personal bank, PayPal, or Wise.
+                  </p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+                    <div className="p-2.5 rounded-lg bg-[var(--cf-surface)] border border-[var(--cf-border)] text-[11px] font-mono">
+                      <span className="text-[var(--cf-text-muted)] block">API Route:</span>
+                      <span className="font-bold text-[var(--cf-text)]">/api/billing/checkout</span>
+                    </div>
+                    <div className="p-2.5 rounded-lg bg-[var(--cf-surface)] border border-[var(--cf-border)] text-[11px] font-mono">
+                      <span className="text-[var(--cf-text-muted)] block">Webhook Route:</span>
+                      <span className="font-bold text-[var(--cf-text)]">/api/billing/webhook</span>
+                    </div>
+                    <div className="p-2.5 rounded-lg bg-[var(--cf-surface)] border border-[var(--cf-border)] text-[11px] font-mono">
+                      <span className="text-[var(--cf-text-muted)] block">Tax Remittance:</span>
+                      <span className="font-bold text-emerald-600 dark:text-emerald-400">Automated by MoR</span>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="p-4 rounded-xl border border-[var(--cf-border)] bg-[var(--cf-surface-alt)] space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-mono font-bold text-[var(--cf-text)]">
+                      Stripe Direct PSP (Payment Service Provider)
+                    </span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold border border-indigo-500/20">
+                      Corporate LLC / Corp
+                    </span>
+                  </div>
+
+                  <p className="text-xs text-[var(--cf-text-muted)] leading-relaxed">
+                    Stripe requires an incorporated business or formal sole proprietorship in supported countries with business bank accounts and tax registrations. As the seller of record, you are responsible for calculating sales tax and filing state/international tax returns.
+                  </p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+                    <div className="p-2.5 rounded-lg bg-[var(--cf-surface)] border border-[var(--cf-border)] text-[11px] font-mono">
+                      <span className="text-[var(--cf-text-muted)] block">Stripe API Status:</span>
+                      <span className="font-bold text-emerald-600">Route Ready</span>
+                    </div>
+                    <div className="p-2.5 rounded-lg bg-[var(--cf-surface)] border border-[var(--cf-border)] text-[11px] font-mono">
+                      <span className="text-[var(--cf-text-muted)] block">Required Env:</span>
+                      <span className="font-bold text-[var(--cf-text)]">STRIPE_SECRET_KEY</span>
+                    </div>
+                    <div className="p-2.5 rounded-lg bg-[var(--cf-surface)] border border-[var(--cf-border)] text-[11px] font-mono">
+                      <span className="text-[var(--cf-text-muted)] block">Tax Compliance:</span>
+                      <span className="font-bold text-amber-600">Requires Stripe Tax</span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </section>
 
             {/* Invoices & Receipts Ledger Table */}

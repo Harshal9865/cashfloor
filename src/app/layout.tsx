@@ -124,6 +124,25 @@ export default function RootLayout({
                 const resolved = stored ?? (system ? 'dark' : 'light');
                 document.documentElement.setAttribute('data-theme', resolved);
               } catch (e) {}
+
+              try {
+                const profileRaw = localStorage.getItem('cf_auth_profile_v2');
+                if (profileRaw) {
+                  const profile = JSON.parse(profileRaw);
+                  if (profile && profile.avatar) {
+                    const preloadLink = document.createElement('link');
+                    preloadLink.rel = 'preload';
+                    preloadLink.as = 'image';
+                    preloadLink.href = profile.avatar;
+                    preloadLink.fetchPriority = 'high';
+                    document.head.appendChild(preloadLink);
+
+                    const img = new Image();
+                    img.fetchPriority = 'high';
+                    img.src = profile.avatar;
+                  }
+                }
+              } catch (e) {}
             `,
           }}
         />

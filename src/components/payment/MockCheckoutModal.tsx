@@ -29,7 +29,7 @@ export default function MockCheckoutModal() {
   const [cvc, setCvc] = useState('');
   const [name, setName] = useState('');
   const [postalCode, setPostalCode] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState<'card' | 'apple_google' | 'wise'>('card');
+  const [paymentMethod, setPaymentMethod] = useState<'card' | 'lemonsqueezy' | 'apple_google' | 'wise'>('card');
 
   // Processing state
   const [isProcessing, setIsProcessing] = useState(false);
@@ -267,7 +267,19 @@ https://cashfloor.app
                   </button>
                 </label>
 
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod('lemonsqueezy')}
+                    className={`p-2.5 rounded-xl border text-xs font-mono flex items-center justify-center gap-1.5 cursor-pointer transition-all ${
+                      paymentMethod === 'lemonsqueezy'
+                        ? 'border-[var(--cf-accent)] bg-[var(--cf-accent-bg)] text-[var(--cf-accent)] font-semibold shadow-xs'
+                        : 'border-[var(--cf-border)] bg-[var(--cf-surface)] text-[var(--cf-text-muted)] hover:border-[var(--cf-border-soft)]'
+                    }`}
+                  >
+                    <span>🍋 Lemon Squeezy</span>
+                  </button>
+
                   <button
                     type="button"
                     onClick={() => setPaymentMethod('card')}
@@ -278,7 +290,7 @@ https://cashfloor.app
                     }`}
                   >
                     <CreditCard className="w-4 h-4" />
-                    <span>Credit Card</span>
+                    <span>Card / Stripe</span>
                   </button>
 
                   <button
@@ -306,69 +318,133 @@ https://cashfloor.app
                   </button>
                 </div>
 
+                {/* Lemon Squeezy MoR View */}
+                {paymentMethod === 'lemonsqueezy' && (
+                  <div className="p-4 rounded-2xl border border-amber-500/30 bg-amber-500/5 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-base">🍋</span>
+                        <h4 className="font-serif font-bold text-sm text-[var(--cf-text)]">
+                          Merchant of Record (MoR) Hosted Checkout
+                        </h4>
+                      </div>
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold border border-emerald-500/20">
+                        0 Company Setup Needed
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-[var(--cf-text-muted)] leading-relaxed">
+                      <strong className="text-[var(--cf-text)]">Student & Solo Developer Rails:</strong> Lemon Squeezy acts as the Merchant of Record. They legally sell your software, remit all international sales tax / VAT, fight fraud, and transfer payouts directly to your personal bank account or PayPal with zero corporate incorporation.
+                    </p>
+
+                    <div className="p-3 rounded-xl bg-[var(--cf-surface)] border border-[var(--cf-border)] font-mono text-[11px] text-[var(--cf-text-muted)] space-y-1">
+                      <div className="flex justify-between">
+                        <span>Legal Entity Required:</span>
+                        <span className="text-emerald-600 dark:text-emerald-400 font-bold">None (Personal ID)</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Global VAT / Tax Remittance:</span>
+                        <span className="text-emerald-600 dark:text-emerald-400 font-bold">100% Handled by MoR</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Payout Rails:</span>
+                        <span className="text-[var(--cf-text)] font-semibold">PayPal / Direct Bank / Wise</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Card Fields */}
-                <div className="p-4 rounded-2xl border border-[var(--cf-border)] bg-[var(--cf-surface)] space-y-3">
-                  <div className="space-y-1">
-                    <label className="text-[11px] font-mono text-[var(--cf-text-muted)]">Card Number</label>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        value={cardNumber}
-                        onChange={handleCardNumberChange}
-                        placeholder="4242 4242 4242 4242"
-                        className="w-full pl-3 pr-10 py-2 rounded-xl border border-[var(--cf-border)] bg-[var(--cf-surface-alt)] font-mono text-xs text-[var(--cf-text)] focus:outline-none focus:border-[var(--cf-accent)] transition-colors"
-                      />
-                      <CreditCard className="w-4 h-4 text-[var(--cf-text-muted)] absolute right-3 top-1/2 -translate-y-1/2" />
+                {paymentMethod === 'card' && (
+                  <div className="p-4 rounded-2xl border border-[var(--cf-border)] bg-[var(--cf-surface)] space-y-3">
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-mono text-[var(--cf-text-muted)]">Card Number</label>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={cardNumber}
+                          onChange={handleCardNumberChange}
+                          placeholder="4242 4242 4242 4242"
+                          className="w-full pl-3 pr-10 py-2 rounded-xl border border-[var(--cf-border)] bg-[var(--cf-surface-alt)] font-mono text-xs text-[var(--cf-text)] focus:outline-none focus:border-[var(--cf-accent)] transition-colors"
+                        />
+                        <CreditCard className="w-4 h-4 text-[var(--cf-text-muted)] absolute right-3 top-1/2 -translate-y-1/2" />
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1">
-                      <label className="text-[11px] font-mono text-[var(--cf-text-muted)]">Expiration (MM/YY)</label>
-                      <input
-                        type="text"
-                        value={expiry}
-                        onChange={handleExpiryChange}
-                        placeholder="12/28"
-                        className="w-full px-3 py-2 rounded-xl border border-[var(--cf-border)] bg-[var(--cf-surface-alt)] font-mono text-xs text-[var(--cf-text)] focus:outline-none focus:border-[var(--cf-accent)] transition-colors"
-                      />
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-mono text-[var(--cf-text-muted)]">Expiration (MM/YY)</label>
+                        <input
+                          type="text"
+                          value={expiry}
+                          onChange={handleExpiryChange}
+                          placeholder="12/28"
+                          className="w-full px-3 py-2 rounded-xl border border-[var(--cf-border)] bg-[var(--cf-surface-alt)] font-mono text-xs text-[var(--cf-text)] focus:outline-none focus:border-[var(--cf-accent)] transition-colors"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-mono text-[var(--cf-text-muted)]">CVC / Security Code</label>
+                        <input
+                          type="password"
+                          maxLength={4}
+                          value={cvc}
+                          onChange={(e) => setCvc(e.target.value.replace(/\D/g, ''))}
+                          placeholder="999"
+                          className="w-full px-3 py-2 rounded-xl border border-[var(--cf-border)] bg-[var(--cf-surface-alt)] font-mono text-xs text-[var(--cf-text)] focus:outline-none focus:border-[var(--cf-accent)] transition-colors"
+                        />
+                      </div>
                     </div>
-                    <div className="space-y-1">
-                      <label className="text-[11px] font-mono text-[var(--cf-text-muted)]">CVC / Security Code</label>
-                      <input
-                        type="password"
-                        maxLength={4}
-                        value={cvc}
-                        onChange={(e) => setCvc(e.target.value.replace(/\D/g, ''))}
-                        placeholder="999"
-                        className="w-full px-3 py-2 rounded-xl border border-[var(--cf-border)] bg-[var(--cf-surface-alt)] font-mono text-xs text-[var(--cf-text)] focus:outline-none focus:border-[var(--cf-accent)] transition-colors"
-                      />
-                    </div>
-                  </div>
 
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1">
-                      <label className="text-[11px] font-mono text-[var(--cf-text-muted)]">Cardholder Name</label>
-                      <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="Alex Vance"
-                        className="w-full px-3 py-2 rounded-xl border border-[var(--cf-border)] bg-[var(--cf-surface-alt)] text-xs text-[var(--cf-text)] focus:outline-none focus:border-[var(--cf-accent)] transition-colors"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-[11px] font-mono text-[var(--cf-text-muted)]">Postal / ZIP Code</label>
-                      <input
-                        type="text"
-                        value={postalCode}
-                        onChange={(e) => setPostalCode(e.target.value)}
-                        placeholder="94107"
-                        className="w-full px-3 py-2 rounded-xl border border-[var(--cf-border)] bg-[var(--cf-surface-alt)] font-mono text-xs text-[var(--cf-text)] focus:outline-none focus:border-[var(--cf-accent)] transition-colors"
-                      />
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-mono text-[var(--cf-text-muted)]">Cardholder Name</label>
+                        <input
+                          type="text"
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          placeholder="Alex Vance"
+                          className="w-full px-3 py-2 rounded-xl border border-[var(--cf-border)] bg-[var(--cf-surface-alt)] text-xs text-[var(--cf-text)] focus:outline-none focus:border-[var(--cf-accent)] transition-colors"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-mono text-[var(--cf-text-muted)]">Postal / ZIP Code</label>
+                        <input
+                          type="text"
+                          value={postalCode}
+                          onChange={(e) => setPostalCode(e.target.value)}
+                          placeholder="94107"
+                          className="w-full px-3 py-2 rounded-xl border border-[var(--cf-border)] bg-[var(--cf-surface-alt)] font-mono text-xs text-[var(--cf-text)] focus:outline-none focus:border-[var(--cf-accent)] transition-colors"
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
+
+                {/* Apple / Google Pay */}
+                {paymentMethod === 'apple_google' && (
+                  <div className="p-4 rounded-2xl border border-[var(--cf-border)] bg-[var(--cf-surface)] text-center space-y-2">
+                    <p className="text-xs text-[var(--cf-text)] font-semibold">
+                      Instant Device Biometric Authorization
+                    </p>
+                    <p className="text-[11px] text-[var(--cf-text-muted)]">
+                      Authorizes with Apple FaceID / TouchID or Google Wallet without typing credit card numbers.
+                    </p>
+                  </div>
+                )}
+
+                {/* Wise Wire */}
+                {paymentMethod === 'wise' && (
+                  <div className="p-4 rounded-2xl border border-[var(--cf-border)] bg-[var(--cf-surface)] space-y-2 text-xs font-mono">
+                    <div className="flex justify-between">
+                      <span className="text-[var(--cf-text-muted)]">Routing / Swift:</span>
+                      <span className="font-bold text-[var(--cf-text)]">TRWIKB11</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-[var(--cf-text-muted)]">Reference:</span>
+                      <span className="font-bold text-[var(--cf-accent)]">CF-PLAN-{planId.toUpperCase()}</span>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Processing Progress Steps */}

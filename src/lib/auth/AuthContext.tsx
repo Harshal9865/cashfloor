@@ -57,7 +57,7 @@ export const DEMO_PERSONAS: Record<DemoPersonaKey, DemoPersona> = {
   },
 };
 
-const LOCAL_STORAGE_USER_KEY = 'cf_auth_profile_v2';
+export const LOCAL_STORAGE_USER_KEY = 'cf_auth_profile_v2';
 
 interface AuthContextValue {
   user: UserProfile | null;
@@ -99,7 +99,7 @@ const AuthContext = createContext<AuthContextValue>({
   signOut: async () => {},
 });
 
-function formatInitials(nameOrEmail: string): string {
+export function formatInitials(nameOrEmail: string): string {
   if (!nameOrEmail) return 'CF';
   const clean = nameOrEmail.includes('@') ? nameOrEmail.split('@')[0] : nameOrEmail;
   const parts = clean.split(/[._\s-]+/).filter(Boolean);
@@ -181,14 +181,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data: { session } } = await supabase.auth.getSession();
     if (session?.user) {
       const dbProfile = await fetchDbProfile(session.user.id);
-      const profile = mapSupabaseUser(session.user, dbProfile);
-      setUser(profile);
-      persistProfile(profile);
+      setUser((current) => {
+        const profile = mapSupabaseUser(session.user, {
+          avatar_url: dbProfile?.avatar_url || current?.avatar,
+          full_name: dbProfile?.full_name || current?.name,
+        });
+        persistProfile(profile);
+        return profile;
+      });
     }
   }, [fetchDbProfile, mapSupabaseUser, persistProfile]);
 
   // Direct optimistic update of profile data
   const updateProfileData = useCallback((updates: { name?: string; avatar?: string }) => {
+    if (updates.avatar && typeof window !== 'undefined') {
+      try {
+        const img = new Image();
+        img.src = updates.avatar;
+      } catch {}
+    }
     setUser(prev => {
       if (!prev) return null;
       const next = {
@@ -205,14 +216,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const supabase = createClient();
 
-    // Check local storage for persistent session baseline first
+    // Check local storage for persistent session baseline first (instant 0ms hydration)
     if (typeof window !== 'undefined') {
       try {
         const stored = localStorage.getItem(LOCAL_STORAGE_USER_KEY);
         if (stored) {
           const parsed = JSON.parse(stored);
-          if (parsed && parsed.email) {
+          if (parsed && (parsed.email || parsed.id)) {
             setUser(parsed);
+            // Immediately unblock the UI so the avatar & user details render in 0ms!
+            setLoading(false);
+            if (parsed.avatar) {
+              try {
+                const img = new Image();
+                img.src = parsed.avatar;
+              } catch {}
+            }
           }
         }
       } catch (e) {
@@ -220,17 +239,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
-    // Helper to sync user with db
+    // Helper to sync user with db without clobbering cached avatar or name
     const syncUserSession = async (sbUser: User) => {
-      const initialProfile = mapSupabaseUser(sbUser);
-      setUser(initialProfile);
-      persistProfile(initialProfile);
+      let currentCachedAvatar: string | undefined;
+      let currentCachedName: string | undefined;
+
+      setUser((current) => {
+        currentCachedAvatar = current?.id === sbUser.id ? current.avatar : undefined;
+        currentCachedName = current?.id === sbUser.id ? current.name : undefined;
+        const initialProfile = mapSupabaseUser(sbUser, {
+          avatar_url: currentCachedAvatar,
+          full_name: currentCachedName,
+        });
+        persistProfile(initialProfile);
+        return initialProfile;
+      });
 
       const dbProfile = await fetchDbProfile(sbUser.id);
       if (dbProfile) {
-        const enrichedProfile = mapSupabaseUser(sbUser, dbProfile);
-        setUser(enrichedProfile);
-        persistProfile(enrichedProfile);
+        setUser((current) => {
+          const enrichedProfile = mapSupabaseUser(sbUser, {
+            avatar_url: dbProfile.avatar_url || current?.avatar || currentCachedAvatar,
+            full_name: dbProfile.full_name || current?.name || currentCachedName,
+          });
+          persistProfile(enrichedProfile);
+          return enrichedProfile;
+        });
       }
     };
 

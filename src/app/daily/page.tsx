@@ -16,7 +16,9 @@ import {
 import DashboardNav from '@/components/DashboardNav';
 import Footer from '@/components/marketing/Footer';
 import DailyPaymentLog, { DailyTransaction } from '@/components/DailyPaymentLog';
-import { MonthlyRecord } from '@/lib/calculator/types';
+import { MonthlyRecord, CalculatorAssumptions } from '@/lib/calculator/types';
+import { getLocalLedgerState } from '@/lib/supabase/ledgerService';
+import { computeFullLedger } from '@/lib/calculator/engine';
 
 const CashFlowChart = dynamic(
   () => import('@/components/CashFlowChart'),
@@ -49,10 +51,40 @@ export default function DailyPage() {
   const [currencySymbol, setCurrencySymbol] = useState('$');
   const [horizon, setHorizon] = useState<'7_days' | '14_days' | '30_days' | '90_days'>('30_days');
   const [simulateDelay, setSimulateDelay] = useState(false);
+  const [months, setMonths] = useState<MonthlyRecord[]>(SAMPLE_MONTHS);
+  const [assumptions, setAssumptions] = useState<CalculatorAssumptions>({
+    taxReservePct: 0.25,
+    bufferMonthsMultiplier: 3.5,
+    currentSavings: 12400,
+    percentile: 20,
+    scenario: 'base',
+    clientLossPercentage: 0.30,
+    windfallAmount: 10000,
+    retainerProbability: 0.85,
+  });
+  const [isDemo, setIsDemo] = useState(true);
+
+  // Load real data from localStorage
+  React.useEffect(() => {
+    const local = getLocalLedgerState();
+    if (local && local.records && local.records.length > 0) {
+      setMonths(local.records);
+      setAssumptions(local.assumptions);
+      setCurrencySymbol(local.currencySymbol || '$');
+      setIsDemo(false);
+    }
+  }, []);
 
   const displayedMonths = simulateDelay
-    ? SAMPLE_MONTHS.map((m, i) => i === 0 ? { ...m, income: 1200 } : m)
-    : SAMPLE_MONTHS;
+    ? months.map((m, i) => i === 0 ? { ...m, income: Math.round(m.income * 0.27) } : m)
+    : months;
+
+  // Compute real ledger values from current months
+  const ledger = React.useMemo(() => computeFullLedger(displayedMonths, assumptions, []), [displayedMonths, assumptions]);
+  const dailyBurn = ledger.avgMonthlyExpenses / 30.5;
+  const todayInflow = displayedMonths.length > 0
+    ? (simulateDelay ? Math.round(displayedMonths[0].income * 0.27) : Math.round(displayedMonths[0].income / 30.5 * 1.2))
+    : 0;
 
   return (
     <div className="min-h-screen flex flex-col bg-[var(--cf-bg)] text-[var(--cf-text)] transition-colors duration-300">
@@ -125,10 +157,10 @@ export default function DailyPage() {
                 Today&apos;s Cleared Inflow
               </span>
               <div className="text-xl font-bold font-mono tabular-nums text-[var(--cf-text)]">
-                {simulateDelay ? `${currencySymbol}1,200.00` : `${currencySymbol}4,250.00`}
+                {currencySymbol}{todayInflow.toLocaleString()}
               </div>
               <span className={`text-[10px] font-mono ${simulateDelay ? 'text-amber-600 font-semibold' : 'text-emerald-600'}`}>
-                {simulateDelay ? '⚠️ $3,050 retainer payment delayed' : '+2 transactions logged'}
+                {simulateDelay ? `⚠️ ${currencySymbol}${Math.round(displayedMonths[0]?.income - todayInflow).toLocaleString()} payment delayed` : '+2 transactions logged'}
               </span>
             </div>
           </div>
@@ -169,7 +201,7 @@ export default function DailyPage() {
                 Daily Burn Velocity
               </span>
               <div className="text-xl font-bold font-mono tabular-nums text-[var(--cf-text)]">
-                {currencySymbol}70.00<span className="text-xs font-normal text-[var(--cf-text-muted)]">/day</span>
+                {currencySymbol}{dailyBurn.toFixed(0)}<span className="text-xs font-normal text-[var(--cf-text-muted)]">/day</span>
               </div>
               <span className="text-[10px] font-mono text-[var(--cf-text-muted)]">
                 Baseline fixed survival burn
@@ -215,11 +247,11 @@ export default function DailyPage() {
         >
           <CashFlowChart
             records={displayedMonths}
-            floorIncome={3200}
-            avgExpenses={2100}
-            currentSavings={simulateDelay ? 9350 : 12400}
-            bufferTarget={7350}
-            taxReservePct={0.25}
+            floorIncome={ledger.floorIncome}
+            avgExpenses={ledger.avgMonthlyExpenses}
+            currentSavings={assumptions.currentSavings}
+            bufferTarget={ledger.bufferTarget}
+            taxReservePct={assumptions.taxReservePct}
             currencySymbol={currencySymbol}
             initialViewMode={horizon === '90_days' ? '90_drought' : '30_days'}
           />
