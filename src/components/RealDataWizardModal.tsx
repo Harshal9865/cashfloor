@@ -334,7 +334,7 @@ export function RealDataWizardModal({
 
                 <div className="p-4 rounded-2xl border border-[var(--cf-border-soft)] bg-[var(--cf-surface-alt)]">
                   <label className="text-xs font-semibold text-[var(--cf-text)] block mb-1">
-                    Basic Groceries &amp; Utilities
+                    Basic Groceries & Utilities
                   </label>
                   <div className="relative">
                     <span className="absolute left-3 top-2.5 text-xs font-mono text-[var(--cf-text-faint)]">
@@ -351,7 +351,7 @@ export function RealDataWizardModal({
 
                 <div className="p-4 rounded-2xl border border-[var(--cf-border-soft)] bg-[var(--cf-surface-alt)]">
                   <label className="text-xs font-semibold text-[var(--cf-text)] block mb-1">
-                    Software, Hosting &amp; Tools
+                    Software, Hosting & Tools
                   </label>
                   <div className="relative">
                     <span className="absolute left-3 top-2.5 text-xs font-mono text-[var(--cf-text-faint)]">
@@ -368,7 +368,7 @@ export function RealDataWizardModal({
 
                 <div className="p-4 rounded-2xl border border-[var(--cf-border-soft)] bg-[var(--cf-surface-alt)]">
                   <label className="text-xs font-semibold text-[var(--cf-text)] block mb-1">
-                    Health Insurance &amp; Taxes
+                    Health Insurance & Taxes
                   </label>
                   <div className="relative">
                     <span className="absolute left-3 top-2.5 text-xs font-mono text-[var(--cf-text-faint)]">
@@ -401,7 +401,7 @@ export function RealDataWizardModal({
             <div className="space-y-5">
               <div>
                 <h3 className="text-sm font-semibold text-[var(--cf-text)]">
-                  3. Cash In Bank &amp; Tax Partitioning
+                  3. Cash In Bank & Tax Partitioning
                 </h3>
                 <p className="text-xs text-[var(--cf-text-muted)] mt-0.5">
                   How much liquid cash is sitting in your checking and business accounts right now?
@@ -526,7 +526,7 @@ export function RealDataWizardModal({
               style={{ background: 'linear-gradient(135deg, #2F6F62 0%, #0f564a 100%)' }}
             >
               <Sparkles className="w-4 h-4" />
-              <span>Generate My Real Floor &amp; Graphs</span>
+              <span>Generate My Real Floor & Graphs</span>
             </button>
           )}
         </div>

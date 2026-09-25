@@ -15,7 +15,7 @@ export default function TermsPage() {
     <div className="min-h-screen bg-[var(--cf-bg)] text-[var(--cf-text)] transition-colors duration-300 font-sans flex flex-col">
       <MarketingNav />
       
-      <main className="flex-1 max-w-4xl mx-auto px-4 sm:px-6 md:px-8 pt-6 pb-20 w-full space-y-10">
+      <main id="main-content" className="flex-1 max-w-4xl mx-auto px-4 sm:px-6 md:px-8 pt-6 pb-20 w-full space-y-10">
         {/* Navigation Breadcrumb */}
         <div className="flex items-center justify-between">
           <Link
@@ -27,7 +27,7 @@ export default function TermsPage() {
           </Link>
 
           <span className="px-3 py-1 rounded-full text-[11px] font-mono font-semibold bg-[var(--cf-surface-alt)] text-[var(--cf-text-muted)] border border-[var(--cf-border)]">
-            Legal Terms &amp; Conditions
+            Legal Terms & Conditions
           </span>
         </div>
 
@@ -67,7 +67,7 @@ export default function TermsPage() {
           <section className="p-6 rounded-2xl border border-[var(--cf-border)] bg-[var(--cf-surface)] space-y-3">
             <h2 className="text-base font-serif font-bold text-[var(--cf-text)] flex items-center gap-2">
               <FileText className="w-4 h-4 text-[var(--cf-accent)]" />
-              <span>2. Software License &amp; Usage Rights</span>
+              <span>2. Software License & Usage Rights</span>
             </h2>
             <p>
               CashFloor grants you a personal, non-exclusive, non-transferable, revocable license to utilize our client-side software algorithms, calculation tools, and exports solely for your personal freelancing or internal business management operations.
@@ -94,6 +94,75 @@ export default function TermsPage() {
             </h2>
             <p>
               In no event shall CashFloor, its developers, affiliates, or licensors be liable for any indirect, incidental, punitive, or consequential damages (including, without limitation, loss of business revenue, missed tax deadlines, penalties assessed by tax authorities, or liquidity shortfalls) arising out of the use or inability to use the software.
+            </p>
+          </section>
+
+          <section className="p-6 rounded-2xl border border-[var(--cf-border)] bg-[var(--cf-surface)] space-y-3">
+            <h2 className="text-base font-serif font-bold text-[var(--cf-text)] flex items-center gap-2">
+              <FileText className="w-4 h-4 text-[var(--cf-accent)]" />
+              <span>5. Subscriptions, Invoicing & Cancellations</span>
+            </h2>
+            <p>
+              CashFloor offers both free local-first tiers and paid subscription plans (&ldquo;Pro Sentinel&rdquo; and &ldquo;Studio & Agency&rdquo;). Paid tiers are billed on a recurring monthly or annual basis via Stripe.
+            </p>
+            <p>
+              You may cancel your subscription at any time via your Account Settings. Upon cancellation, you retain full access to paid features until the end of your current billing period. We do not provide prorated refunds for partial billing cycles, except where mandatory by applicable local law.
+            </p>
+          </section>
+
+          <section className="p-6 rounded-2xl border border-[var(--cf-border)] bg-[var(--cf-surface)] space-y-3">
+            <h2 className="text-base font-serif font-bold text-[var(--cf-text)] flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-[var(--cf-accent)]" />
+              <span>6. Intellectual Property & Customer Data Ownership</span>
+            </h2>
+            <p>
+              <strong>Your Data:</strong> You retain complete ownership and intellectual property rights in all data, invoices, client records, and financial figures you input or upload into CashFloor. CashFloor claims zero ownership over your business records.
+            </p>
+            <p>
+              <strong>CashFloor Platform:</strong> The algorithms, Monte Carlo mathematical models, user interfaces, documentation, logos, and visual assets are the exclusive intellectual property of CashFloor Technologies.
+            </p>
+          </section>
+
+          <section className="p-6 rounded-2xl border border-[var(--cf-border)] bg-[var(--cf-surface)] space-y-3">
+            <h2 className="text-base font-serif font-bold text-[var(--cf-text)] flex items-center gap-2">
+              <Scale className="w-4 h-4 text-[var(--cf-accent)]" />
+              <span>7. Indemnification</span>
+            </h2>
+            <p>
+              You agree to defend, indemnify, and hold harmless CashFloor, its officers, contractors, and affiliates from and against any third-party claims, liabilities, damages, and expenses (including reasonable attorneys&apos; fees) arising out of or related to your breach of these Terms or your use of the platform for illegal, fraudulent, or non-compliant financial reporting.
+            </p>
+          </section>
+
+          <section className="p-6 rounded-2xl border border-[var(--cf-border)] bg-[var(--cf-surface)] space-y-3">
+            <h2 className="text-base font-serif font-bold text-[var(--cf-text)] flex items-center gap-2">
+              <Scale className="w-4 h-4 text-[var(--cf-accent)]" />
+              <span>8. Dispute Resolution & Binding Arbitration</span>
+            </h2>
+            <p>
+              Any dispute, claim, or controversy arising out of or relating to these Terms or the service shall be resolved through final and binding individual arbitration administered by the American Arbitration Association (AAA) under its Commercial Arbitration Rules.
+            </p>
+            <p>
+              <strong>Class Action Waiver:</strong> You and CashFloor agree that any proceedings to resolve disputes will be conducted solely on an individual basis, and not in a class, consolidated, or representative action.
+            </p>
+          </section>
+
+          <section className="p-6 rounded-2xl border border-[var(--cf-border)] bg-[var(--cf-surface)] space-y-3">
+            <h2 className="text-base font-serif font-bold text-[var(--cf-text)] flex items-center gap-2">
+              <Scale className="w-4 h-4 text-[var(--cf-accent)]" />
+              <span>9. Governing Law & Jurisdiction</span>
+            </h2>
+            <p>
+              These Terms shall be governed by and construed in accordance with the laws of the State of Delaware, United States, without regard to its conflict of law principles. Any legal suit or proceeding not subject to arbitration shall be instituted exclusively in the state or federal courts located in New Castle County, Delaware.
+            </p>
+          </section>
+
+          <section className="p-6 rounded-2xl border border-[var(--cf-border)] bg-[var(--cf-surface)] space-y-3">
+            <h2 className="text-base font-serif font-bold text-[var(--cf-text)] flex items-center gap-2">
+              <FileText className="w-4 h-4 text-[var(--cf-accent)]" />
+              <span>10. Contact Information</span>
+            </h2>
+            <p>
+              For legal inquiries, copyright notices, or questions regarding these Terms, please reach out to our legal desk at <a href="mailto:legal@cashfloor.app" className="text-[var(--cf-accent)] font-mono hover:underline">legal@cashfloor.app</a>.
             </p>
           </section>
         </div>

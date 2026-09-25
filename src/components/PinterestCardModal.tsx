@@ -140,7 +140,7 @@ export const PinterestCardModal: React.FC<PinterestCardModalProps> = ({
               <p className="font-medium text-[#16232B]">
                 Budget off your floor, not your average.
               </p>
-              <p className="mt-1 text-[10px]">cashfloor.app · Free &amp; anonymous</p>
+              <p className="mt-1 text-[10px]">cashfloor.app · Free & anonymous</p>
             </div>
           </div>
         </div>

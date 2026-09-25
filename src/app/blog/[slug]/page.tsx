@@ -132,7 +132,7 @@ export default async function BlogPostPage({ params }: BlogPostProps) {
           <div className="p-6 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 space-y-3">
             <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300 font-serif font-bold text-base">
               <Sparkles className="w-4 h-4 text-emerald-600" />
-              <span>Executive Summary &amp; Key Takeaways</span>
+              <span>Executive Summary & Key Takeaways</span>
             </div>
             <ul className="space-y-2 text-xs sm:text-sm text-[var(--cf-text-muted)] leading-relaxed">
               {article.keyTakeaways.map((takeaway, idx) => (

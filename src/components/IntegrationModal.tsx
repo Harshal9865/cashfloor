@@ -359,7 +359,7 @@ export default function IntegrationModal({
                     ) : (
                       <>
                         <Zap className="w-3.5 h-3.5 text-[var(--cf-accent)]" />
-                        <span>Test Connection &amp; Check Latency</span>
+                        <span>Test Connection & Check Latency</span>
                       </>
                     )}
                   </button>
@@ -542,7 +542,7 @@ export default function IntegrationModal({
                   className="px-5 py-2 rounded-xl text-xs font-mono font-semibold text-white transition-all shadow-md cursor-pointer hover:opacity-95"
                   style={{ background: 'linear-gradient(135deg, #2F6F62 0%, #1a4f45 100%)' }}
                 >
-                  Save &amp; Activate Feed
+                  Save & Activate Feed
                 </button>
               ) : (
                 <button

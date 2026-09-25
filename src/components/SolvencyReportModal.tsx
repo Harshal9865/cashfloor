@@ -85,7 +85,7 @@ export function SolvencyReportModal({
             <div className="h-4 w-px bg-[var(--cf-border)]" />
             <div className="flex items-center gap-1.5 text-xs font-mono text-emerald-600 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
               <ShieldCheck className="w-3.5 h-3.5" />
-              <span>CPA &amp; Lease Underwriting Report Ready</span>
+              <span>CPA & Lease Underwriting Report Ready</span>
             </div>
           </div>
 
@@ -125,7 +125,7 @@ export function SolvencyReportModal({
                 </span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-serif font-bold text-[var(--cf-text)] tracking-tight">
-                Independent Professional Liquidity &amp; Runway Audit
+                Independent Professional Liquidity & Runway Audit
               </h1>
               <p className="text-xs text-[var(--cf-text-muted)] max-w-xl">
                 Generated via CashFloor Sovereign Financial Architecture. Stress-tested against 20th-percentile cash flows, invoice aging lags, and quarterly tax reserves.
@@ -207,7 +207,7 @@ export function SolvencyReportModal({
                 <span className="text-xs font-mono font-normal text-[var(--cf-text-muted)]">/mo</span>
               </p>
               <span className="text-[10px] font-mono text-[var(--cf-text-muted)] block">
-                After tax escrow &amp; buffer requirements
+                After tax escrow & buffer requirements
               </span>
             </div>
 
@@ -240,7 +240,7 @@ export function SolvencyReportModal({
           {/* 12-Month Performance & Projection Table */}
           <div className="space-y-2">
             <h3 className="font-serif font-bold text-sm text-[var(--cf-text)] flex items-center justify-between">
-              <span>12-Month Cash Flow &amp; Escrow Schedule</span>
+              <span>12-Month Cash Flow & Escrow Schedule</span>
               <span className="text-[11px] font-mono font-normal text-[var(--cf-text-muted)]">
                 All amounts in {currencySymbol}
               </span>
@@ -252,7 +252,7 @@ export function SolvencyReportModal({
                   <tr className="bg-[var(--cf-surface-alt)] border-b border-[var(--cf-border)] text-[var(--cf-text-muted)]">
                     <th className="p-2.5 font-bold">Month</th>
                     <th className="p-2.5 font-bold text-right">Invoiced Income</th>
-                    <th className="p-2.5 font-bold text-right">Living &amp; Biz Burn</th>
+                    <th className="p-2.5 font-bold text-right">Living & Biz Burn</th>
                     <th className="p-2.5 font-bold text-right">Tax Escrow</th>
                     <th className="p-2.5 font-bold text-right">Net Month Delta</th>
                     <th className="p-2.5 font-bold text-right">Projected Cash Balance</th>
@@ -296,7 +296,7 @@ export function SolvencyReportModal({
           <div className="p-4 rounded-2xl border border-[var(--cf-border)] bg-[var(--cf-surface-alt)] space-y-2 text-xs text-[var(--cf-text-muted)] leading-relaxed">
             <h4 className="font-serif font-bold text-[var(--cf-text)] flex items-center gap-2">
               <Lock className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Note to Mortgage Underwriters, Landlords &amp; CPAs</span>
+              <span>Note to Mortgage Underwriters, Landlords & CPAs</span>
             </h4>
             <p>
               Traditional freelance income verification relies on crude multi-year averages, which fail to capture irregular seasonal inflows or sudden payment delays. CashFloor implements a mathematically conservative <strong>20th-percentile floor analysis</strong>: in 80% of historical months, the subject exceeded this income threshold. Furthermore, quarterly estimated taxes have been systematically partitioned into escrow prior to calculating Safe-To-Spend liquidity.

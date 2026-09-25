@@ -116,6 +116,53 @@ export default function ExecutiveDashboard() {
     return computeFullLedger(records, assumptions, []);
   }, [records, assumptions]);
 
+  // BUG-03 FIX: Compute real solvency score from 5 weighted factors
+  const solvencyScore = useMemo(() => {
+    const c = calculation;
+    let score = 100;
+    // Deduct for structural deficit (heaviest penalty)
+    if (c.hasDeficitAtFloor) score -= 35;
+    // Deduct for runway risk
+    if (!c.isInfiniteRunway) {
+      if (c.runwayMonths < 2) score -= 25;
+      else if (c.runwayMonths < 4) score -= 15;
+      else if (c.runwayMonths < 6) score -= 8;
+    }
+    // Deduct for buffer underfunding
+    if (c.bufferFundingPercentage < 50) score -= 15;
+    else if (c.bufferFundingPercentage < 80) score -= 8;
+    // Deduct for high volatility
+    if (c.volatility.volatilityTier === 'volatile') score -= 10;
+    else if (c.volatility.volatilityTier === 'moderate') score -= 5;
+    // Deduct for client concentration risk
+    if (c.clientConcentrations[0]?.isHighRisk) score -= 10;
+    return Math.max(0, Math.min(100, score));
+  }, [calculation]);
+
+  const solvencyLabel = solvencyScore >= 80 ? 'Resilient Posture' : solvencyScore >= 50 ? 'Moderate Risk' : 'Critical Risk';
+  const solvencyHex = solvencyScore >= 80 ? '#10b981' : solvencyScore >= 50 ? '#f59e0b' : '#ef4444';
+
+  // BUG-04 FIX: Compute next IRS quarterly estimated tax deadline dynamically
+  const nextTaxDeadline = useMemo(() => {
+    const now = new Date();
+    const year = now.getFullYear();
+    // IRS quarterly deadlines: Jan 15, Apr 15, Jun 15, Sep 15
+    const deadlines = [
+      new Date(year, 0, 15),  // Jan 15
+      new Date(year, 3, 15),  // Apr 15
+      new Date(year, 5, 15),  // Jun 15
+      new Date(year, 8, 15),  // Sep 15
+      new Date(year + 1, 0, 15), // Jan 15 next year
+    ];
+    const next = deadlines.find(d => d > now) || deadlines[deadlines.length - 1];
+    const quarter = deadlines.indexOf(next);
+    const qLabel = ['Q4', 'Q1', 'Q2', 'Q3', 'Q4'][quarter] || 'Q4';
+    return {
+      date: next.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+      quarter: qLabel,
+    };
+  }, []);
+
   const toggleStep = (key: string) => {
     setCompletedSteps(prev => ({ ...prev, [key]: !prev[key] }));
   };
@@ -133,7 +180,7 @@ export default function ExecutiveDashboard() {
         lastSavedAt={lastSavedAt}
       />
 
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-8 py-10 space-y-10 lg:space-y-12">
+      <main id="main-content" className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-8 py-10 space-y-10 lg:space-y-12">
         
         {/* ── Executive Briefing Header ── */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-[var(--cf-border-soft)]">
@@ -184,18 +231,18 @@ export default function ExecutiveDashboard() {
               <span className="text-xs font-mono uppercase tracking-wider text-[var(--cf-text-muted)]">
                 Solvency Score
               </span>
-              <Activity className="w-4 h-4 text-emerald-500" />
+              <Activity className="w-4 h-4" style={{ color: solvencyHex }} />
             </div>
             <div className="py-2">
               <div className="text-2xl sm:text-3xl font-mono font-bold text-[var(--cf-text)]">
-                94<span className="text-xs text-[var(--cf-text-muted)] font-normal">/100</span>
+                {solvencyScore}<span className="text-xs text-[var(--cf-text-muted)] font-normal">/100</span>
               </div>
-              <span className="text-[10px] font-mono font-semibold text-emerald-600 dark:text-emerald-400">
-                Resilient Posture
+              <span className="text-[10px] font-mono font-semibold" style={{ color: solvencyHex }}>
+                {solvencyLabel}
               </span>
             </div>
             <div className="w-full bg-[var(--cf-surface-alt)] h-1.5 rounded-full overflow-hidden">
-              <div className="bg-emerald-500 h-full rounded-full w-[94%]" />
+              <div className="h-full rounded-full" style={{ width: `${solvencyScore}%`, backgroundColor: solvencyHex }} />
             </div>
           </div>
 
@@ -440,7 +487,7 @@ export default function ExecutiveDashboard() {
                       <Zap className="w-5 h-5" />
                     </div>
                     <h3 className="text-sm font-serif font-bold text-[var(--cf-text)] group-hover:text-[var(--cf-accent)] transition-colors">
-                      Integrations &amp; CSV Ingestion
+                      Integrations & CSV Ingestion
                     </h3>
                     <p className="text-xs text-[var(--cf-text-muted)] leading-relaxed">
                       Connect Stripe, Mercury, Wise, and Upwork or drag-and-drop bank statement files with zero surveillance.
@@ -462,7 +509,7 @@ export default function ExecutiveDashboard() {
                       <Lock className="w-5 h-5" />
                     </div>
                     <h3 className="text-sm font-serif font-bold text-[var(--cf-text)] group-hover:text-[var(--cf-accent)] transition-colors">
-                      Security &amp; Enclave Vault
+                      Security & Enclave Vault
                     </h3>
                     <p className="text-xs text-[var(--cf-text-muted)] leading-relaxed">
                       Audit browser storage allocation in KB, confirm 0 tracking scripts, and verify mathematical sovereignty.
@@ -485,7 +532,7 @@ export default function ExecutiveDashboard() {
             {/* Quick Action Tools Hub */}
             <div className="p-6 rounded-3xl border border-[var(--cf-border)] bg-[var(--cf-surface)] space-y-4 shadow-sm">
               <h3 className="text-sm font-serif font-bold text-[var(--cf-text)]">
-                Solvency &amp; Billing Tools
+                Solvency & Billing Tools
               </h3>
               
               <div className="space-y-2">
@@ -508,7 +555,7 @@ export default function ExecutiveDashboard() {
                 >
                   <div className="flex items-center gap-2.5">
                     <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                    <span className="text-xs font-semibold text-[var(--cf-text)]">CPA &amp; Lease Solvency Audit</span>
+                    <span className="text-xs font-semibold text-[var(--cf-text)]">CPA & Lease Solvency Audit</span>
                   </div>
                   <span className="text-[10px] font-mono text-[var(--cf-text-muted)] group-hover:text-[var(--cf-text)]">
                     Audit PDF →
@@ -580,10 +627,10 @@ export default function ExecutiveDashboard() {
               </div>
               <div className="space-y-1">
                 <div className="text-lg font-mono font-bold text-[var(--cf-text)]">
-                  October 15, 2026
+                  {nextTaxDeadline.date}
                 </div>
                 <p className="text-[11px] text-[var(--cf-text-muted)] leading-relaxed">
-                  Q3 Form 1040-ES estimated tax voucher. Target escrow reserve is fully allocated at {currencySymbol}{Math.round(calculation.taxReserve).toLocaleString()}.
+                  {nextTaxDeadline.quarter} Form 1040-ES estimated tax voucher. Target escrow reserve is fully allocated at {currencySymbol}{Math.round(calculation.taxReserve).toLocaleString()}.
                 </p>
               </div>
             </div>
@@ -593,7 +640,7 @@ export default function ExecutiveDashboard() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-indigo-500 font-semibold text-xs">
                   <FileText className="w-4 h-4" />
-                  <span>Latest Insights &amp; Intel</span>
+                  <span>Latest Insights & Intel</span>
                 </div>
                 <Link
                   href="/blog"

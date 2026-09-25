@@ -60,7 +60,7 @@ export const ScenarioSimulator: React.FC<ScenarioSimulatorProps> = ({
                 PRO FEATURE
               </span>
               <h3 className="font-serif text-xl font-medium" style={{ color: 'var(--cf-text)' }}>
-                Stress Testing &amp; Scenario Simulator
+                Stress Testing & Scenario Simulator
               </h3>
               <p className="text-xs mt-1 leading-relaxed" style={{ color: 'var(--cf-text-muted)' }}>
                 Model worst-case retainer cancellations, dry spells, and delayed client payments.
@@ -82,7 +82,7 @@ export const ScenarioSimulator: React.FC<ScenarioSimulatorProps> = ({
         <div>
           <div className="flex items-center space-x-3">
             <h2 className="font-serif text-xl sm:text-2xl text-[#16232B] font-normal tracking-tight">
-              Stress Testing &amp; Scenario Simulator
+              Stress Testing & Scenario Simulator
             </h2>
             <span className="text-[10px] font-mono uppercase tracking-wider bg-[#E8EDE9] px-2 py-0.5 border border-[#16232B]/10 text-[#5C6D77]">
               Financial Stress Lab

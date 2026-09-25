@@ -12,10 +12,18 @@ export default function Footer() {
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !email.includes('@')) return;
+    try {
+      const stored = localStorage.getItem('cf_newsletter_subscribers') || '[]';
+      const list = JSON.parse(stored);
+      if (!list.includes(email.trim().toLowerCase())) {
+        list.push(email.trim().toLowerCase());
+        localStorage.setItem('cf_newsletter_subscribers', JSON.stringify(list));
+      }
+    } catch {}
     setSubscribed(true);
     setTimeout(() => {
       setEmail('');
-    }, 4000);
+    }, 5000);
   };
 
   return (
@@ -66,19 +74,20 @@ export default function Footer() {
             <h4 className="text-[var(--cf-text)] font-semibold text-xs tracking-wider uppercase">Product</h4>
             <Link href="/dashboard" className="text-[var(--cf-text-muted)] text-xs hover:text-[var(--cf-accent)] transition-colors">Studio Dashboard</Link>
             <Link href="/#features" className="text-[var(--cf-text-muted)] text-xs hover:text-[var(--cf-accent)] transition-colors">Risk Simulator</Link>
-            <Link href="/pricing" className="text-[var(--cf-text-muted)] text-xs hover:text-[var(--cf-accent)] transition-colors">Pricing &amp; Vaults</Link>
-            <Link href="/integrations" className="text-[var(--cf-text-muted)] text-xs hover:text-[var(--cf-accent)] transition-colors">Bank &amp; CSV Integrations</Link>
+            <Link href="/pricing" className="text-[var(--cf-text-muted)] text-xs hover:text-[var(--cf-accent)] transition-colors">Pricing & Vaults</Link>
+            <Link href="/integrations" className="text-[var(--cf-text-muted)] text-xs hover:text-[var(--cf-accent)] transition-colors">Bank & CSV Integrations</Link>
             <Link href="/daily" className="text-[var(--cf-text-muted)] text-xs hover:text-[var(--cf-accent)] transition-colors">Daily Cash Stream</Link>
           </div>
 
           {/* Resources Column */}
           <div className="flex flex-col gap-3 font-sans">
-            <h4 className="text-[var(--cf-text)] font-semibold text-xs tracking-wider uppercase">Research &amp; Guides</h4>
+            <h4 className="text-[var(--cf-text)] font-semibold text-xs tracking-wider uppercase">Research & Guides</h4>
             <Link href="/blog/the-20th-percentile-math" className="text-[var(--cf-text-muted)] text-xs hover:text-[var(--cf-accent)] transition-colors">The 20th Percentile Rule</Link>
             <Link href="/blog/five-pillar-partitioning" className="text-[var(--cf-text-muted)] text-xs hover:text-[var(--cf-accent)] transition-colors">The 5-Pillar Partition</Link>
             <Link href="/blog/fx-volatility-haircuts" className="text-[var(--cf-text-muted)] text-xs hover:text-[var(--cf-accent)] transition-colors">Cross-Border FX Buffers</Link>
             <Link href="/blog" className="text-[var(--cf-text-muted)] text-xs hover:text-[var(--cf-accent)] transition-colors">The CashFloor Journal</Link>
-            <Link href="/help" className="text-[var(--cf-text-muted)] text-xs hover:text-[var(--cf-accent)] transition-colors">Help Center &amp; FAQs</Link>
+            <Link href="/help" className="text-[var(--cf-text-muted)] text-xs hover:text-[var(--cf-accent)] transition-colors">Help Center & FAQs</Link>
+            <Link href="/contact" className="text-[var(--cf-text-muted)] text-xs hover:text-[var(--cf-accent)] transition-colors">Contact & Support Desk</Link>
           </div>
 
           {/* Legal Column */}
@@ -87,6 +96,7 @@ export default function Footer() {
             <Link href="/privacy" className="text-[var(--cf-text-muted)] text-xs hover:text-[var(--cf-accent)] transition-colors">Zero-Surveillance Privacy</Link>
             <Link href="/terms" className="text-[var(--cf-text-muted)] text-xs hover:text-[var(--cf-accent)] transition-colors">Terms of Service</Link>
             <Link href="/security" className="text-[var(--cf-text-muted)] text-xs hover:text-[var(--cf-accent)] transition-colors">Security Architecture</Link>
+            <Link href="/contact" className="text-[var(--cf-text-muted)] text-xs hover:text-[var(--cf-accent)] transition-colors">Data Subject Inquiries</Link>
           </div>
 
         </div>

@@ -407,7 +407,7 @@ export function InvoiceGeneratorModal({
             <div className="space-y-3 pt-3 border-t border-[var(--cf-border-soft)]">
               <span className="text-xs font-mono uppercase tracking-wider text-[var(--cf-text-muted)] font-semibold flex items-center gap-1.5">
                 <Building2 className="w-3.5 h-3.5 text-blue-500" />
-                Client &amp; Billing Recipient
+                Client & Billing Recipient
               </span>
               <div className="grid grid-cols-1 gap-2 text-xs">
                 <input
@@ -447,7 +447,7 @@ export function InvoiceGeneratorModal({
             <div className="space-y-3 pt-3 border-t border-[var(--cf-border-soft)]">
               <span className="text-xs font-mono uppercase tracking-wider text-[var(--cf-text-muted)] font-semibold flex items-center gap-1.5">
                 <FileText className="w-3.5 h-3.5 text-amber-500" />
-                Invoice Details &amp; Terms
+                Invoice Details & Terms
               </span>
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div>

@@ -41,7 +41,7 @@ export default function HelpPage() {
     <div className="min-h-screen bg-[var(--cf-bg)] flex flex-col font-sans transition-colors duration-300">
       <MarketingNav />
       
-      <main className="flex-1 flex flex-col items-center justify-start pt-6 pb-24 px-4 sm:px-6 md:px-8 relative z-10 overflow-hidden">
+      <main id="main-content" className="flex-1 flex flex-col items-center justify-start pt-6 pb-24 px-4 sm:px-6 md:px-8 relative z-10 overflow-hidden">
         {/* Ambient background glow */}
         <div 
           className="absolute top-[-20%] left-[50%] -translate-x-1/2 w-[800px] h-[600px] rounded-full blur-[140px] opacity-15 pointer-events-none" 
@@ -58,7 +58,7 @@ export default function HelpPage() {
               className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-medium text-emerald-600 bg-emerald-500/10 border border-emerald-500/20"
             >
               <HelpCircle className="w-3.5 h-3.5" />
-              <span>CashFloor Knowledge &amp; Support Hub</span>
+              <span>CashFloor Knowledge & Support Hub</span>
             </motion.div>
 
             <motion.h1 
@@ -88,7 +88,7 @@ export default function HelpPage() {
           >
             <HelpCard 
               icon={<BookOpen className="w-6 h-6 text-emerald-600" />}
-              title="Mathematical Journal &amp; Guides"
+              title="Mathematical Journal & Guides"
               description="Read our 7 in-depth financial engineering guides covering P20 formulas, quarterly tax escrow, S-Corp draws, and FX haircuts."
               actionText="Browse Guides"
               href="/blog"
@@ -109,7 +109,7 @@ export default function HelpPage() {
             />
             <HelpCard 
               icon={<Mail className="w-6 h-6 text-emerald-600" />}
-              title="Direct Advisory &amp; Support Desk"
+              title="Direct Advisory & Support Desk"
               description="Have questions regarding an edge case or multi-currency ledger setup? Reach out directly to our engineering team."
               actionText="Contact Support"
               href="mailto:support@cashfloor.app"

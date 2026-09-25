@@ -181,7 +181,7 @@ export default function ProfileDropdown({ align = 'right', className = '' }: Pro
                 className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface-alt)] transition-colors"
               >
                 <User className="w-3.5 h-3.5 text-purple-500" />
-                <span>Account &amp; Settings</span>
+                <span>Account & Settings</span>
               </Link>
             </div>
 

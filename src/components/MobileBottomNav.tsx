@@ -9,9 +9,19 @@ export default function MobileBottomNav() {
   const router = useRouter();
   const pathname = usePathname();
 
-  // Do not render on marketing pages or auth routes if desired, or render everywhere.
-  // We'll render it globally, but you might want to hide it on the homepage.
-  if (pathname === '/' || pathname === '/pricing' || pathname === '/about') {
+  // Hide on public marketing, legal, and educational pages so it doesn't overlap content
+  const isMarketingOrLegal = 
+    pathname === '/' ||
+    pathname.startsWith('/pricing') ||
+    pathname.startsWith('/about') ||
+    pathname.startsWith('/contact') ||
+    pathname.startsWith('/terms') ||
+    pathname.startsWith('/privacy') ||
+    pathname.startsWith('/security') ||
+    pathname.startsWith('/blog') ||
+    pathname.startsWith('/help');
+
+  if (isMarketingOrLegal) {
     return null;
   }
 

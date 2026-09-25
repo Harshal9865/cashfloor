@@ -30,7 +30,7 @@ export const LedgerRows: React.FC<LedgerRowsProps> = ({
       <div className="p-5 md:px-8 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-2" style={{ borderColor: 'var(--cf-border)' }}>
         <div>
           <h2 className="font-serif text-xl sm:text-2xl tracking-tight font-normal" style={{ color: 'var(--cf-text)' }}>
-            Capital Partitioning &amp; Reserve Pillars
+            Capital Partitioning & Reserve Pillars
           </h2>
           <p className="font-sans text-xs mt-0.5" style={{ color: 'var(--cf-text-muted)' }}>
             Strict double-entry allocation ensuring core freelancer survival before elective distributions.
@@ -44,7 +44,7 @@ export const LedgerRows: React.FC<LedgerRowsProps> = ({
 
       {/* Ledger Table Header (Desktop lg+) */}
       <div className="hidden lg:grid grid-cols-12 px-8 py-3 font-mono text-[10px] uppercase tracking-wider border-b" style={{ background: 'var(--cf-surface-alt)', color: 'var(--cf-text-muted)', borderColor: 'var(--cf-border)' }}>
-        <div className="col-span-4">Pillar &amp; Objective</div>
+        <div className="col-span-4">Pillar & Objective</div>
         <div className="col-span-2 text-right">Monthly Quota</div>
         <div className="col-span-2 text-right">Methodology</div>
         <div className="col-span-2 text-right">Funded Balance</div>

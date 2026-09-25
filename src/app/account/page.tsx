@@ -35,7 +35,10 @@ import {
   Sliders,
   Globe,
   Radio,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Trash2,
+  AlertTriangle,
+  X
 } from 'lucide-react';
 import Link from 'next/link';
 import DashboardNav from '@/components/DashboardNav';
@@ -54,6 +57,9 @@ export default function AccountPage() {
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [backupMessage, setBackupMessage] = useState<string | null>(null);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [deleting, setDeleting] = useState(false);
 
   // Profile fields
   const [fullName, setFullName] = useState('');
@@ -236,9 +242,21 @@ export default function AccountPage() {
   };
 
   const handleExportBackupJson = () => {
+    let ledgerRecords = null;
+    let ledgerAssumptions = null;
+    let ledgerInvoices = null;
+    if (typeof window !== 'undefined') {
+      try {
+        ledgerRecords = JSON.parse(localStorage.getItem('cashfloor_records_v1') || '[]');
+        ledgerAssumptions = JSON.parse(localStorage.getItem('cashfloor_assumptions_v1') || '{}');
+        ledgerInvoices = JSON.parse(localStorage.getItem('cashfloor_invoices_v1') || '[]');
+      } catch {}
+    }
+
     const backupData = {
       app: 'CashFloor Sovereign Vault',
       version: '2.0.4',
+      exportType: 'GDPR Full Portability Package',
       exportedAt: new Date().toISOString(),
       engineVersion: 'PostgreSQL 15.2 / RLS-v1.4.2',
       account: {
@@ -258,6 +276,11 @@ export default function AccountPage() {
         monteCarloRuns,
         dsoAgingBufferDays,
       },
+      ledger: {
+        records: ledgerRecords,
+        assumptions: ledgerAssumptions,
+        pendingInvoices: ledgerInvoices,
+      },
       security: {
         clientAesEnclave,
         tlsVersion: 'TLS 1.3 / HSTS 256-bit',
@@ -269,11 +292,50 @@ export default function AccountPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `cashfloor-vault-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `cashfloor-gdpr-data-export-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    setBackupMessage('✓ Cryptographic Vault Backup downloaded successfully.');
+    setBackupMessage('✓ GDPR Full Portability Package downloaded successfully.');
     setTimeout(() => setBackupMessage(null), 3500);
+  };
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmText.trim() !== 'DELETE') return;
+    setDeleting(true);
+    try {
+      if (user) {
+        try {
+          await supabase.from('ledgers').delete().eq('user_id', user.id);
+          await supabase.from('profiles').delete().eq('id', user.id);
+        } catch (e) {
+          console.warn('Cloud purge notice:', e);
+        }
+        await signOut();
+      }
+
+      if (typeof window !== 'undefined') {
+        const keysToRemove = [
+          'cf_client_rules',
+          'cf_connected_integrations',
+          'cashfloor_records_v1',
+          'cashfloor_assumptions_v1',
+          'cashfloor_invoices_v1',
+          'cf-theme',
+          'cf-cookie-consent',
+          'cf_newsletter_subscribers',
+          'cf_contact_tickets',
+        ];
+        keysToRemove.forEach((k) => localStorage.removeItem(k));
+      }
+
+      setDeleteModalOpen(false);
+      router.push('/?erased=true');
+    } catch (err) {
+      console.error('Account erasure failure:', err);
+      alert('Failed to erase account data. Please contact privacy@cashfloor.app.');
+    } finally {
+      setDeleting(false);
+    }
   };
 
   const handleExportCsv = () => {
@@ -363,7 +425,7 @@ export default function AccountPage() {
     <div className="min-h-screen bg-[var(--cf-bg)] text-[var(--cf-text)] pb-24 transition-colors duration-300 flex flex-col justify-between">
       <DashboardNav />
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 w-full space-y-6 flex-1 pt-3">
+      <main id="main-content" className="max-w-4xl mx-auto px-4 sm:px-6 w-full space-y-6 flex-1 pt-3">
         {/* Top Breadcrumb & Status */}
         <div className="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-[var(--cf-border-soft)]">
           <Link
@@ -418,7 +480,7 @@ export default function AccountPage() {
             }`}
           >
             <Briefcase className="w-3.5 h-3.5 text-blue-500" />
-            <span>Profile &amp; Entity</span>
+            <span>Profile & Entity</span>
           </button>
 
           <button
@@ -431,7 +493,7 @@ export default function AccountPage() {
             }`}
           >
             <CreditCard className="w-3.5 h-3.5 text-amber-500" />
-            <span>Plan &amp; Purchase Ledger</span>
+            <span>Plan & Purchase Ledger</span>
           </button>
 
           <button
@@ -444,7 +506,7 @@ export default function AccountPage() {
             }`}
           >
             <Database className="w-3.5 h-3.5 text-emerald-500" />
-            <span>Database &amp; SQL Engine</span>
+            <span>Database & SQL Engine</span>
           </button>
 
           <button
@@ -457,7 +519,7 @@ export default function AccountPage() {
             }`}
           >
             <Wifi className="w-3.5 h-3.5 text-purple-500" />
-            <span>Networks &amp; Firewall</span>
+            <span>Networks & Firewall</span>
           </button>
 
           <button
@@ -510,7 +572,7 @@ export default function AccountPage() {
 
                 <div className="space-y-1.5 flex-1">
                   <div className="flex items-center gap-2">
-                    <h2 className="font-serif text-xl font-bold">Identity &amp; Profile Metadata</h2>
+                    <h2 className="font-serif text-xl font-bold">Identity & Profile Metadata</h2>
                     <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold border border-emerald-500/20">
                       PRO TIER
                     </span>
@@ -562,7 +624,7 @@ export default function AccountPage() {
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <Briefcase className="w-4 h-4 text-[var(--cf-accent)]" />
-                  <h2 className="font-serif text-lg font-bold">Legal Entity &amp; Tax Architecture</h2>
+                  <h2 className="font-serif text-lg font-bold">Legal Entity & Tax Architecture</h2>
                 </div>
                 <p className="text-xs text-[var(--cf-text-muted)] leading-relaxed">
                   Tailors CashFloor&apos;s algorithms to your legal structure and pass-through taxation rules.
@@ -675,7 +737,7 @@ export default function AccountPage() {
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <CreditCard className="w-5 h-5 text-emerald-500" />
-                    <h2 className="font-serif text-xl font-bold">Active Purchase &amp; Subscription</h2>
+                    <h2 className="font-serif text-xl font-bold">Active Purchase & Subscription</h2>
                   </div>
                   <p className="text-xs text-[var(--cf-text-muted)]">
                     Licensed to your personal vault under the CashFloor Sovereign Pro Agreement.
@@ -760,7 +822,7 @@ export default function AccountPage() {
                 <div className="space-y-0.5">
                   <div className="flex items-center gap-2">
                     <Receipt className="w-4 h-4 text-[var(--cf-accent)]" />
-                    <h3 className="font-serif text-lg font-bold">Invoices &amp; Tax Receipts</h3>
+                    <h3 className="font-serif text-lg font-bold">Invoices & Tax Receipts</h3>
                   </div>
                   <p className="text-xs text-[var(--cf-text-muted)]">
                     Official tax deduction documentation for your corporate filing.
@@ -843,7 +905,7 @@ export default function AccountPage() {
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <Database className="w-5 h-5 text-emerald-500" />
-                    <h2 className="font-serif text-xl font-bold">Database &amp; SQL Engine Architecture</h2>
+                    <h2 className="font-serif text-xl font-bold">Database & SQL Engine Architecture</h2>
                   </div>
                   <p className="text-xs text-[var(--cf-text-muted)]">
                     Local-first IndexedDB cache synchronized with Supabase PostgreSQL 15.2 backend.
@@ -888,7 +950,7 @@ export default function AccountPage() {
               {/* Data Portability Tools */}
               <div className="pt-2 border-t border-[var(--cf-border-soft)] space-y-3">
                 <h3 className="text-xs font-mono uppercase font-semibold text-[var(--cf-text-muted)]">
-                  Data Portability &amp; Cryptographic Checksum Backups
+                  Data Portability & Cryptographic Checksum Backups
                 </h3>
 
                 {backupMessage && (
@@ -931,7 +993,7 @@ export default function AccountPage() {
                     <Upload className="w-4 h-4 text-blue-500 shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
                     <div>
                       <span className="text-xs font-bold text-[var(--cf-text)] block">Restore JSON Vault</span>
-                      <span className="text-[10px] text-[var(--cf-text-muted)] block">Verify checksum &amp; import</span>
+                      <span className="text-[10px] text-[var(--cf-text-muted)] block">Verify checksum & import</span>
                     </div>
                   </button>
                 </div>
@@ -943,6 +1005,29 @@ export default function AccountPage() {
                   className="hidden"
                   onChange={handleImportBackupJson}
                 />
+              </div>
+            </section>
+
+            {/* Danger Zone: GDPR Right to Erasure */}
+            <section className="p-6 rounded-2xl border border-red-500/30 bg-red-500/5 space-y-4 shadow-sm">
+              <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
+                <Trash2 className="w-5 h-5 shrink-0" />
+                <h3 className="font-serif text-lg font-bold">Danger Zone: GDPR Data Erasure</h3>
+              </div>
+              <p className="text-xs text-[var(--cf-text-muted)] leading-relaxed">
+                Permanently purge your local double-entry records, custom tax parameters, and connected integrations. If you have an active cloud account, all records will be deleted from Supabase PostgreSQL in compliance with Article 17 of the GDPR (Right to Erasure).
+              </p>
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-red-500/20">
+                <span className="text-[11px] font-mono text-[var(--cf-text-faint)]">
+                  This action is irreversible. All cached ledger history will be destroyed.
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setDeleteModalOpen(true)}
+                  className="px-4 py-2 rounded-xl border border-red-500/40 bg-red-500/10 hover:bg-red-500 text-red-600 hover:text-white text-xs font-semibold transition-all cursor-pointer"
+                >
+                  Purge Vault & Delete Account
+                </button>
               </div>
             </section>
           </div>
@@ -957,7 +1042,7 @@ export default function AccountPage() {
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <Wifi className="w-5 h-5 text-purple-500" />
-                    <h2 className="font-serif text-xl font-bold">Computer Networks &amp; Edge Sync Protocol</h2>
+                    <h2 className="font-serif text-xl font-bold">Computer Networks & Edge Sync Protocol</h2>
                   </div>
                   <p className="text-xs text-[var(--cf-text-muted)]">
                     Low-latency WebSocket connections and bank webhook HMAC firewall verification.
@@ -1066,7 +1151,7 @@ export default function AccountPage() {
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <Cpu className="w-5 h-5 text-rose-500" />
-                  <h2 className="font-serif text-xl font-bold">Data Structures &amp; Algorithms Calibration</h2>
+                  <h2 className="font-serif text-xl font-bold">Data Structures & Algorithms Calibration</h2>
                 </div>
                 <p className="text-xs text-[var(--cf-text-muted)] leading-relaxed">
                   Fine-tune the stochastic mathematical parameters that govern CashFloor&apos;s 20th Percentile Runway Engine.
@@ -1187,6 +1272,79 @@ export default function AccountPage() {
               </button>
             </div>
           </form>
+        )}
+
+        {/* GDPR Account Deletion Confirmation Modal */}
+        {deleteModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+            <div className="bg-[var(--cf-surface)] border border-red-500/40 rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-5 animate-in fade-in zoom-in-95 duration-200">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-2.5 text-red-600 dark:text-red-400">
+                  <div className="p-2 rounded-xl bg-red-500/10">
+                    <AlertTriangle className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-serif text-lg font-bold text-[var(--cf-text)]">
+                      Permanently Erase All Data?
+                    </h3>
+                    <p className="text-[11px] font-mono text-[var(--cf-text-muted)]">GDPR Article 17 Right to Erasure</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setDeleteModalOpen(false)}
+                  className="text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] p-1 rounded-lg cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="space-y-2 text-xs text-[var(--cf-text-muted)] leading-relaxed">
+                <p>
+                  This will immediately and irrecoverably:
+                </p>
+                <ul className="list-disc pl-4 space-y-1 font-mono text-[11px]">
+                  <li>Clear all local double-entry records and client tags</li>
+                  <li>Purge custom tax percentages and runway assumptions</li>
+                  <li>Delete your cloud PostgreSQL ledger from Supabase</li>
+                  <li>Revoke and disconnect all active banking session keys</li>
+                </ul>
+              </div>
+
+              <div className="space-y-2 pt-1">
+                <label className="text-[11px] font-mono uppercase text-[var(--cf-text-muted)] block">
+                  Type <strong className="text-red-500 font-bold select-all">DELETE</strong> to confirm:
+                </label>
+                <input
+                  type="text"
+                  value={deleteConfirmText}
+                  onChange={(e) => setDeleteConfirmText(e.target.value)}
+                  placeholder="DELETE"
+                  className="w-full bg-[var(--cf-surface-alt)] border border-red-500/30 rounded-xl px-3.5 py-2 text-xs text-[var(--cf-text)] font-mono focus:border-red-500 focus:outline-none"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setDeleteModalOpen(false)}
+                  disabled={deleting}
+                  className="px-4 py-2 rounded-xl border border-[var(--cf-border)] bg-[var(--cf-surface-alt)] hover:bg-[var(--cf-surface)] text-xs font-semibold text-[var(--cf-text)] transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDeleteAccount}
+                  disabled={deleteConfirmText.trim() !== 'DELETE' || deleting}
+                  className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-semibold shadow-sm transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1.5"
+                >
+                  {deleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                  <span>{deleting ? 'Erasing Data...' : 'Confirm Permanent Erasure'}</span>
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </main>
 

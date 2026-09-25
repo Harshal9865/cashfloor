@@ -77,6 +77,7 @@ export default function PricingPage() {
         'Priority Technical & Financial Desk Support',
       ],
       notIncluded: [],
+      savingsBadge: isAnnual ? 'Save 25%' : null,
       cta: 'Start 14-Day Free Trial',
       href: '/dashboard',
       highlight: true,
@@ -87,6 +88,7 @@ export default function PricingPage() {
       badge: 'Boutique Firm',
       price: isAnnual ? '$24' : '$29',
       period: isAnnual ? 'per month, billed annually ($288/yr)' : 'per month, billed monthly',
+      savingsBadge: isAnnual ? 'Save 17%' : null,
       description: 'Advanced liquidity fortress for boutique studios, multi-client agencies, and high-retainer teams.',
       features: [
         'Everything in Pro Sentinel included',
@@ -107,7 +109,7 @@ export default function PricingPage() {
   const FAQS = [
     {
       q: 'How does CashFloor protect my banking and financial data?',
-      a: 'CashFloor is built on a client-side first architecture. All Monte Carlo simulations, runway models, and Safe-To-Spend figures are computed in your browser using WebAssembly and V8. When synced to Supabase Cloud, records are protected with strict PostgreSQL Row Level Security (RLS) bound solely to your cryptographic user ID. We never sell or inspect your ledgers.',
+      a: 'CashFloor is built on a client-side first architecture. All Monte Carlo simulations, runway models, and Safe-To-Spend figures are computed in your browser using JavaScript and React. When synced to Supabase Cloud, records are protected with strict PostgreSQL Row Level Security (RLS) bound solely to your cryptographic user ID. We never sell or inspect your ledgers.',
     },
     {
       q: 'Why do I need CashFloor if I already use QuickBooks, Wave, or Stripe?',
@@ -132,7 +134,7 @@ export default function PricingPage() {
       <MarketingNav />
 
       {/* Main Content */}
-      <main className="flex-1 max-w-6xl mx-auto px-4 sm:px-6 md:px-8 pt-4 pb-24 space-y-16">
+      <main id="main-content" className="flex-1 max-w-6xl mx-auto px-4 sm:px-6 md:px-8 pt-4 pb-24 space-y-16">
         
         {/* Breadcrumb & Quick Return */}
         <div className="flex items-center justify-between pt-4">
@@ -214,7 +216,7 @@ export default function PricingPage() {
             >
               <span>Annual Billing</span>
               <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-sm ring-1 ring-emerald-400/30">
-                Save 25%
+                Save up to 25%
               </span>
             </button>
           </div>
@@ -278,13 +280,20 @@ export default function PricingPage() {
 
                   {/* Price Display */}
                   <div className="pt-2 pb-4 border-b border-[var(--cf-border)]">
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-4xl sm:text-5xl font-serif font-bold text-[var(--cf-text)] tracking-tight">
-                        {plan.price}
-                      </span>
-                      <span className="text-xs font-mono text-[var(--cf-text-muted)]">
-                        {plan.price === '$0' ? '/ forever' : '/ month'}
-                      </span>
+                    <div className="flex items-baseline justify-between gap-1">
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-4xl sm:text-5xl font-serif font-bold text-[var(--cf-text)] tracking-tight">
+                          {plan.price}
+                        </span>
+                        <span className="text-xs font-mono text-[var(--cf-text-muted)]">
+                          {plan.price === '$0' ? '/ forever' : '/ month'}
+                        </span>
+                      </div>
+                      {plan.savingsBadge && (
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                          {plan.savingsBadge}
+                        </span>
+                      )}
                     </div>
                     <p className="text-[11px] font-mono text-[var(--cf-text-muted)] mt-1">
                       {plan.period}
@@ -377,7 +386,7 @@ export default function PricingPage() {
                   <th className="p-4 font-mono font-bold uppercase tracking-wider text-[var(--cf-text)]">Capabilities</th>
                   <th className="p-4 font-mono font-bold text-center text-[var(--cf-text)]">Free Vault</th>
                   <th className="p-4 font-mono font-bold text-center text-[var(--cf-accent)]">Pro Sentinel</th>
-                  <th className="p-4 font-mono font-bold text-center text-[var(--cf-text)]">Studio &amp; Agency</th>
+                  <th className="p-4 font-mono font-bold text-center text-[var(--cf-text)]">Studio & Agency</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--cf-border)] text-[var(--cf-text)]">
@@ -388,7 +397,7 @@ export default function PricingPage() {
                   <td className="p-4 text-center font-mono font-bold text-emerald-600">24 Months</td>
                 </tr>
                 <tr>
-                  <td className="p-4 font-medium">Storage &amp; Encryption</td>
+                  <td className="p-4 font-medium">Storage & Encryption</td>
                   <td className="p-4 text-center">Local Browser Only</td>
                   <td className="p-4 text-center text-emerald-600 font-semibold">Postgres RLS Cloud Sync</td>
                   <td className="p-4 text-center text-emerald-600 font-semibold">Postgres RLS + Multi-Vault</td>
@@ -406,7 +415,7 @@ export default function PricingPage() {
                   <td className="p-4 text-center text-emerald-600">Custom Tunable Haircut</td>
                 </tr>
                 <tr>
-                  <td className="p-4 font-medium">Stripe, Wise, &amp; PayPal Ingestion</td>
+                  <td className="p-4 font-medium">Stripe, Wise, & PayPal Ingestion</td>
                   <td className="p-4 text-center text-[var(--cf-text-muted)]">Manual Only</td>
                   <td className="p-4 text-center text-emerald-600">Universal CSV Auto-Detect</td>
                   <td className="p-4 text-center text-emerald-600">Universal CSV + Webhook</td>
@@ -519,7 +528,7 @@ export default function PricingPage() {
                 <span className="group-hover:translate-x-0.5 transition-transform">→</span>
               </Link>
               <Link
-                href="/#faq"
+                href="/about"
                 className="w-full sm:w-auto px-6 py-3.5 rounded-xl border border-white/20 bg-white/5 hover:bg-white/10 text-white font-medium text-xs sm:text-sm transition-all backdrop-blur-sm hover:border-emerald-400/40 cursor-pointer"
               >
                 Read Methodology Whitepaper

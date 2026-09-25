@@ -157,7 +157,7 @@ export default function CashFloorLogo({
 
           {showTagline && (
             <span className="text-[10px] font-mono tracking-wider text-[var(--cf-text-muted)] group-hover:text-[var(--cf-text)] uppercase -mt-0.5 transition-colors">
-              Runway &amp; Income Equilibrium
+              Runway & Income Equilibrium
             </span>
           )}
         </div>

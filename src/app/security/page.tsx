@@ -14,7 +14,7 @@ export default function SecurityPage() {
     <div className="min-h-screen bg-[var(--cf-bg)] flex flex-col font-sans transition-colors duration-300">
       <MarketingNav />
       
-      <main className="flex-1 flex flex-col items-center justify-start pt-6 pb-24 px-4 sm:px-6 md:px-8 relative z-10 overflow-hidden">
+      <main id="main-content" className="flex-1 flex flex-col items-center justify-start pt-6 pb-24 px-4 sm:px-6 md:px-8 relative z-10 overflow-hidden">
         {/* Ambient background glow */}
         <div 
           className="absolute top-[-20%] left-[50%] -translate-x-1/2 w-[800px] h-[600px] rounded-full blur-[140px] opacity-15 pointer-events-none" 
@@ -70,11 +70,11 @@ export default function SecurityPage() {
             <SecurityCard 
               icon={<Database className="w-6 h-6 text-emerald-600" />}
               title="Local-First Browser Execution"
-              description="Calculations happen in your device's memory via WebAssembly and React state. Your financial models function even with zero internet connection."
+              description="Calculations happen in your device's memory via JavaScript and React state. Your financial models function even with zero internet connection."
             />
             <SecurityCard 
               icon={<Lock className="w-6 h-6 text-emerald-600" />}
-              title="AES-256 &amp; TLS 1.3 Encryption"
+              title="AES-256 & TLS 1.3 Encryption"
               description="For Pro subscribers with cloud backup enabled, data is encrypted in transit using TLS 1.3 and stored at rest using industry-grade AES-256."
             />
             <SecurityCard 

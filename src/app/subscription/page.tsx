@@ -320,7 +320,7 @@ export default function SubscriptionPage() {
                 </div>
                 <div className="flex items-start gap-2.5">
                   <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                  <span>Unlimited Bank &amp; Invoice CSV Imports</span>
+                  <span>Unlimited Bank & Invoice CSV Imports</span>
                 </div>
               </div>
             </div>
@@ -356,7 +356,7 @@ export default function SubscriptionPage() {
             <div>
               <div className="flex items-center justify-between mb-4">
                 <span className="text-xs font-mono font-bold uppercase tracking-wider text-[var(--cf-text-faint)]">
-                  Boutique &amp; Studio
+                  Boutique & Studio
                 </span>
                 <span className="p-2 rounded-xl bg-[var(--cf-surface-alt)] border border-[var(--cf-border-soft)]">
                   <Building2 className="w-4 h-4 text-[var(--cf-text-muted)]" />
@@ -364,7 +364,7 @@ export default function SubscriptionPage() {
               </div>
 
               <h2 className="text-2xl font-serif font-bold text-[var(--cf-text)]">
-                Studio &amp; Agency
+                Studio & Agency
               </h2>
               <p className="text-xs text-[var(--cf-text-muted)] mt-1 mb-6 leading-relaxed">
                 Multi-entity cash flow, subcontractor escrow partitioning, and CPA audit reports for growing firms.
@@ -386,7 +386,7 @@ export default function SubscriptionPage() {
                 </div>
                 <div className="flex items-start gap-2.5">
                   <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                  <span>Multi-Entity &amp; Sub-brand Ledgers</span>
+                  <span>Multi-Entity & Sub-brand Ledgers</span>
                 </div>
                 <div className="flex items-start gap-2.5">
                   <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
@@ -394,7 +394,7 @@ export default function SubscriptionPage() {
                 </div>
                 <div className="flex items-start gap-2.5">
                   <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                  <span>Direct CPA &amp; Bookkeeper Export Packages</span>
+                  <span>Direct CPA & Bookkeeper Export Packages</span>
                 </div>
                 <div className="flex items-start gap-2.5">
                   <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />

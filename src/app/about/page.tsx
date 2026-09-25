@@ -33,7 +33,7 @@ export default function AboutPage() {
   const PILLARS = [
     {
       num: '01',
-      title: 'Tax Escrow Escrow Vault',
+      title: 'Tax Escrow Vault',
       pct: '25% - 30%',
       desc: 'The second an invoice payment clears, your quarterly estimated tax percentage is immediately partitioned. You never treat pre-tax business receipts as personal liquidity.',
       color: '#C98A3E',
@@ -72,7 +72,7 @@ export default function AboutPage() {
     <div className="min-h-screen bg-[var(--cf-bg)] text-[var(--cf-text)] transition-colors duration-300 font-sans flex flex-col">
       <MarketingNav />
 
-      <main className="flex-1 pt-6 pb-24 px-4 sm:px-6 md:px-8 max-w-6xl mx-auto w-full space-y-24 relative overflow-hidden">
+      <main id="main-content" className="flex-1 pt-6 pb-24 px-4 sm:px-6 md:px-8 max-w-6xl mx-auto w-full space-y-24 relative overflow-hidden">
         {/* Ambient background glow */}
         <div 
           className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[600px] rounded-full blur-[140px] opacity-15 pointer-events-none" 

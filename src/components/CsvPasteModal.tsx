@@ -175,10 +175,10 @@ export const CsvPasteModal: React.FC<CsvPasteModalProps> = ({
             </div>
             <div>
               <h2 className="text-lg font-serif font-bold text-[var(--cf-text)]">
-                Universal Ingestion &amp; Sync
+                Universal Ingestion & Sync
               </h2>
               <p className="text-xs text-[var(--cf-text-muted)]">
-                Auto-detects Wise, Stripe, PayPal, Upwork, Wave &amp; Spreadsheet CSVs
+                Auto-detects Wise, Stripe, PayPal, Upwork, Wave & Spreadsheet CSVs
               </p>
             </div>
           </div>

@@ -79,7 +79,7 @@ Warm regards,
               className="font-serif text-lg font-normal tracking-tight"
               style={{ color: 'var(--cf-text)' }}
             >
-              Invoice Aging &amp; DSO Tracker
+              Invoice Aging & DSO Tracker
             </h2>
           </div>
           <p className="text-xs" style={{ color: 'var(--cf-text-muted)' }}>

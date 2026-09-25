@@ -142,7 +142,7 @@
 
   --font-serif: var(--font-fraunces), "Fraunces", Georgia, serif;
   --font-sans: var(--font-plex), "IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono: var(--font-mono), "JetBrains Mono", monospace;
+  --font-code: var(--font-mono), "JetBrains Mono", monospace;
 }
 
 /* ═══════════════════════════════════════════════

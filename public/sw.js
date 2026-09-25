@@ -1,5 +1,5 @@
 // CashFloor Sovereign PWA Service Worker
-const CACHE_NAME = 'cashfloor-cache-v1';
+const CACHE_NAME = 'cashfloor-cache-v2';
 const STATIC_ASSETS = [
   '/',
   '/dashboard',
@@ -7,8 +7,11 @@ const STATIC_ASSETS = [
   '/pricing',
   '/subscription',
   '/account',
+  '/contact',
   '/manifest.webmanifest',
   '/favicon.ico',
+  '/icon-192.svg',
+  '/icon-512.svg',
 ];
 
 self.addEventListener('install', (event) => {

@@ -58,7 +58,7 @@ export default function DailyPage() {
     <div className="min-h-screen flex flex-col bg-[var(--cf-bg)] text-[var(--cf-text)] transition-colors duration-300">
       <DashboardNav />
 
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-8 py-10 space-y-10 lg:space-y-12">
+      <main id="main-content" className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-8 py-10 space-y-10 lg:space-y-12">
         
         {/* Navigation Breadcrumbs & Actions */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -102,7 +102,7 @@ export default function DailyPage() {
               }}
             >
               <Zap className="w-3.5 h-3.5 text-[var(--cf-accent)]" />
-              <span>Sync Stripe &amp; Mercury</span>
+              <span>Sync Stripe & Mercury</span>
             </Link>
           </div>
         </div>

@@ -65,7 +65,7 @@ export const TaxDeadlineReminders: React.FC<TaxDeadlineRemindersProps> = ({
             </span>
           </div>
           <p className="text-[11px] font-mono text-[var(--cf-text-muted)] flex items-center gap-2">
-            <span>IRS &amp; Self-Employment Escrow ({(taxReservePct * 100).toFixed(0)}% Rate)</span>
+            <span>IRS & Self-Employment Escrow ({(taxReservePct * 100).toFixed(0)}% Rate)</span>
             {quarterlyEscrowAmount !== undefined && (
               <>
                 <span>·</span>

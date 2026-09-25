@@ -67,6 +67,7 @@ export default function P20InteractiveSandbox() {
                   min="0"
                   step="100"
                   value={val}
+                  aria-label={`Inflow amount for month ${idx + 1}`}
                   onChange={(e) => updateMonth(idx, e.target.value)}
                   className="w-full pl-6 pr-2 py-2 rounded-xl text-xs font-mono bg-[var(--cf-surface-alt)] border border-[var(--cf-border)] text-[var(--cf-text)] focus:outline-none focus:border-[var(--cf-accent)] transition-colors text-right"
                 />

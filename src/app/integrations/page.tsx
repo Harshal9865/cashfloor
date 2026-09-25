@@ -300,7 +300,7 @@ export default function IntegrationsPage() {
     <div className="min-h-screen flex flex-col bg-[var(--cf-bg)] text-[var(--cf-text)] transition-colors duration-300">
       <DashboardNav />
 
-      <main className="flex-1 max-w-6xl mx-auto w-full px-4 sm:px-6 md:px-8 pt-4 pb-20 space-y-12">
+      <main id="main-content" className="flex-1 max-w-6xl mx-auto w-full px-4 sm:px-6 md:px-8 pt-4 pb-20 space-y-12">
         
         {/* Breadcrumb */}
         <div className="flex items-center justify-between">
@@ -313,7 +313,7 @@ export default function IntegrationsPage() {
           </Link>
 
           <span className="text-xs font-mono text-[var(--cf-text-faint)]">
-            Ecosystem Integrations &amp; Payment Feeds
+            Ecosystem Integrations & Payment Feeds
           </span>
         </div>
 

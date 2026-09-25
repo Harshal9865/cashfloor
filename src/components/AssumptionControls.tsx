@@ -35,7 +35,7 @@ export const AssumptionControls: React.FC<AssumptionControlsProps> = ({
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b pb-4" style={{ borderColor: 'var(--cf-border)' }}>
         <div>
           <h2 className="font-serif text-xl sm:text-2xl font-normal tracking-tight" style={{ color: 'var(--cf-text)' }}>
-            Equilibrium Levers &amp; Sensitivity Modeling
+            Equilibrium Levers & Sensitivity Modeling
           </h2>
           <p className="font-sans text-xs mt-0.5" style={{ color: 'var(--cf-text-muted)' }}>
             Adjust your core parameters to test financial resilience against revenue shocks.
@@ -81,7 +81,7 @@ export const AssumptionControls: React.FC<AssumptionControlsProps> = ({
               </span>
             </div>
             <p className="font-sans text-[11px] mt-1" style={{ color: 'var(--cf-text-muted)' }}>
-              Readily accessible checking &amp; liquid treasury reserve.
+              Readily accessible checking & liquid treasury reserve.
             </p>
           </div>
           <div>

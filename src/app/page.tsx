@@ -17,7 +17,7 @@ export default function MarketingPage() {
       {/* Dark glassmorphism sticky navbar */}
       <MarketingNav />
 
-      <main>
+      <main id="main-content">
         {/* Full-screen immersive hero */}
         <HeroTeaser />
 

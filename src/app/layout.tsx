@@ -10,6 +10,7 @@ import MockCheckoutModal from '@/components/payment/MockCheckoutModal';
 import { PwaRegister } from '@/components/pwa/PwaRegister';
 
 import MobileBottomNav from '@/components/MobileBottomNav';
+import { CookieConsent } from '@/components/CookieConsent';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -132,6 +133,12 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col font-sans selection:bg-[var(--cf-accent)] selection:text-white transition-colors duration-300">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-[var(--cf-accent)] focus:text-white focus:rounded-xl focus:shadow-xl focus:outline-none focus:ring-2 focus:ring-emerald-400 text-xs font-semibold"
+        >
+          Skip to main content
+        </a>
         <ThemeProvider>
           <AuthProvider>
             <PaymentProvider>
@@ -141,6 +148,7 @@ export default function RootLayout({
               <WorkspaceLoader />
               {children}
               <MobileBottomNav />
+              <CookieConsent />
             </PaymentProvider>
           </AuthProvider>
         </ThemeProvider>

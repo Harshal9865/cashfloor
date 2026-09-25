@@ -309,7 +309,7 @@ export default function StudioEnginePage() {
   const hasEnoughData = records.length >= 3;
 
   return (
-    <main className="min-h-screen flex flex-col bg-[var(--cf-bg)] text-[var(--cf-text)] transition-colors duration-300">
+    <main id="main-content" className="min-h-screen flex flex-col bg-[var(--cf-bg)] text-[var(--cf-text)] transition-colors duration-300">
       <DashboardNav
         onResetData={handleResetData}
         onLoadSample={handleLoadSample}

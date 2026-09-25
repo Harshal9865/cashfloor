@@ -240,7 +240,7 @@ export function DailyPaymentLog({
               <Calendar className="w-4 h-4" />
             </span>
             <h2 className="text-xl font-serif font-bold text-[var(--cf-text)]">
-              Daily Payment &amp; Inflow Ledger
+              Daily Payment & Inflow Ledger
             </h2>
             <span className="text-[10px] font-mono px-2 py-0.5 rounded-full font-semibold bg-[var(--cf-surface-alt)] border border-[var(--cf-border)] text-[var(--cf-text-muted)]">
               September 2026 Feed
@@ -291,7 +291,7 @@ export function DailyPaymentLog({
             <AnimatedCounter value={totalOutflow} prefix={`-${currencySymbol}`} />
           </div>
           <span className="text-[10px] font-mono text-[var(--cf-text-muted)] mt-0.5 block">
-            Rent, software &amp; tax escrow transfers
+            Rent, software & tax escrow transfers
           </span>
         </div>
 

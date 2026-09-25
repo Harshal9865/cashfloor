@@ -172,6 +172,7 @@ https://cashfloor.app
           <button
             type="button"
             onClick={closeCheckout}
+            aria-label="Close checkout modal"
             className="p-1.5 rounded-xl text-[var(--cf-text-muted)] hover:text-[var(--cf-text)] hover:bg-[var(--cf-surface)] transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
