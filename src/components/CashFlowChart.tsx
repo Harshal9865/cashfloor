@@ -175,24 +175,30 @@ export const CashFlowChart: React.FC<CashFlowChartProps> = ({
 
   if (!records || records.length === 0) return null;
 
-  const dailyFloor = floorIncome / 30.4167;
-  const dailyBurn = avgExpenses / 30.4167;
+  const dailyFloor = (Number(floorIncome) || 0) / 30.4167;
+  const dailyBurn = (Number(avgExpenses) || 0) / 30.4167;
 
   // 1. Monthly Macro Data
   const monthlyData = useMemo(() => {
-    let rolling = currentSavings;
-    return records.map((r) => {
-      const tax = Math.round(r.income * taxReservePct);
-      const net = r.income - tax - r.expenses;
+    let rolling = Number(currentSavings) || 0;
+    const safeTaxPct = Number(taxReservePct) || 0.25;
+    const safeFloor = Number(floorIncome) || 0;
+
+    return (records || []).map((r) => {
+      const inc = Number(r.income) || 0;
+      const exp = Number(r.expenses) || 0;
+      const tax = Math.round(inc * safeTaxPct);
+      const net = inc - tax - exp;
       rolling += net;
-      const isLean = r.income < floorIncome;
-      const isPeak = r.income >= floorIncome * 1.4;
+      const isLean = inc < safeFloor;
+      const isPeak = inc >= safeFloor * 1.4;
+      const mStr = String(r.month || '');
 
       return {
-        label: r.month.length > 4 ? r.month.slice(0, 3) : r.month,
-        fullMonth: r.month,
-        income: r.income,
-        expenses: r.expenses,
+        label: mStr.length > 4 ? mStr.slice(0, 3) : mStr,
+        fullMonth: mStr,
+        income: inc,
+        expenses: exp,
         tax,
         balance: Math.round(rolling),
         netFlow: net,
@@ -354,9 +360,9 @@ export const CashFlowChart: React.FC<CashFlowChartProps> = ({
       </div>
 
       {/* ── Dynamic Chart Rendering ── */}
-      <div className="h-[250px] sm:h-auto sm:flex-1 sm:min-h-[250px] min-w-0 w-full relative">
+      <div className="w-full min-w-0 relative" style={{ width: '100%', height: 350, minHeight: 320 }}>
         {mounted ? (
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height={350} minHeight={320}>
             {viewMode === '12_months' ? (
               <ComposedChart data={monthlyData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--cf-border)" vertical={false} />
@@ -397,7 +403,7 @@ export const CashFlowChart: React.FC<CashFlowChartProps> = ({
             )}
           </ResponsiveContainer>
         ) : (
-          <div className="w-full h-full rounded-2xl bg-[var(--cf-surface-alt)]/40 animate-pulse flex items-center justify-center text-xs font-mono text-[var(--cf-text-muted)]">
+          <div className="w-full h-[350px] rounded-2xl bg-[var(--cf-surface-alt)]/40 animate-pulse flex items-center justify-center text-xs font-mono text-[var(--cf-text-muted)]">
             <span>Synchronizing Solvency Trajectory...</span>
           </div>
         )}

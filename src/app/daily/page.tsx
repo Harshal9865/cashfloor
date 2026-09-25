@@ -242,7 +242,7 @@ export default function DailyPage() {
 
         {/* ── Daily Cash Flow Chart Section ── */}
         <div 
-          className="dash-card rounded-3xl border overflow-hidden shadow-sm"
+          className="dash-card rounded-3xl border overflow-hidden shadow-sm p-5 sm:p-7"
           style={{ background: 'var(--cf-surface)', borderColor: 'var(--cf-border)' }}
         >
           <CashFlowChart
