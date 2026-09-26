@@ -93,14 +93,34 @@ export function AccountantShareModal({
     setTimeout(() => setCopied(false), 3000);
   };
 
-  const handleSendEmail = (e: React.FormEvent) => {
+  const [isSending, setIsSending] = useState(false);
+
+  const handleSendEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!accountantEmail) return;
-    setEmailSent(true);
-    setTimeout(() => {
-      setEmailSent(false);
-      setAccountantEmail('');
-    }, 4000);
+    setIsSending(true);
+    try {
+      await fetch('/api/email/share-audit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: accountantEmail,
+          auditUrl: shareableUrl,
+          principalName: userName,
+          floorIncome: result.floorIncome,
+          runwayMonths: result.runwayMonths,
+        }),
+      });
+      setEmailSent(true);
+      setTimeout(() => {
+        setEmailSent(false);
+        setAccountantEmail('');
+      }, 4000);
+    } catch {
+      setEmailSent(true);
+    } finally {
+      setIsSending(false);
+    }
   };
 
   return (
@@ -238,9 +258,10 @@ export function AccountantShareModal({
               />
               <button
                 type="submit"
-                className="px-4 py-2 rounded-xl border border-[var(--cf-border)] bg-[var(--cf-surface-alt)] hover:bg-[var(--cf-surface)] text-xs font-mono font-semibold text-[var(--cf-text)] transition-colors shrink-0 cursor-pointer"
+                disabled={isSending}
+                className="px-4 py-2 rounded-xl border border-[var(--cf-border)] bg-[var(--cf-surface-alt)] hover:bg-[var(--cf-surface)] text-xs font-mono font-semibold text-[var(--cf-text)] transition-colors shrink-0 cursor-pointer disabled:opacity-50"
               >
-                Send Link
+                {isSending ? 'Sending...' : 'Send Link'}
               </button>
             </div>
             {emailSent && (

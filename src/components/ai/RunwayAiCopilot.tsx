@@ -119,7 +119,7 @@ export function RunwayAiCopilot({
     }
   }, [messages, isOpen]);
 
-  const handleAskPrompt = (prompt: string) => {
+  const handleAskPrompt = async (prompt: string) => {
     if (!prompt.trim() || isThinking || !analysis) return;
 
     const userMsg: Message = {
@@ -132,6 +132,46 @@ export function RunwayAiCopilot({
     setMessages((prev) => [...prev, userMsg]);
     setInputValue('');
     setIsThinking(true);
+
+    try {
+      const res = await fetch('/api/ai/copilot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt,
+          context: {
+            p20Income: analysis.p20Income,
+            meanExpenses: analysis.meanExpenses,
+            savings: analysis.savings,
+            runway: analysis.runway,
+            stressedRunway: analysis.stressedRunway,
+            taxReservePct: assumptions.taxReservePct,
+          },
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.text) {
+          const aiMsg: Message = {
+            id: String(Date.now() + 1),
+            sender: 'ai',
+            text: data.text,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            metrics: [
+              { label: 'P20 Income Floor', value: `${currencySymbol}${analysis.p20Income.toLocaleString()}`, status: 'good' },
+              { label: 'Runway Buffer', value: `${analysis.runway} mo`, status: 'good' },
+              { label: 'Intelligence', value: 'Gemini 1.5 Flash', status: 'good' },
+            ],
+          };
+          setMessages((prev) => [...prev, aiMsg]);
+          setIsThinking(false);
+          return;
+        }
+      }
+    } catch {
+      // Graceful fallback to deterministic engine
+    }
 
     setTimeout(() => {
       let reply: Message;
