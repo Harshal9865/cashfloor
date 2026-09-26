@@ -18,12 +18,12 @@ export default function GlobalError({
   return (
     <div className="min-h-screen bg-[var(--cf-bg)] text-[var(--cf-text)] flex flex-col items-center justify-center p-6 font-sans">
       <div className="max-w-md w-full p-8 rounded-3xl border border-amber-500/30 bg-[var(--cf-surface)] shadow-2xl text-center space-y-6">
-        <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-600 flex items-center justify-center mx-auto">
+        <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto">
           <AlertTriangle className="w-7 h-7" />
         </div>
 
         <div className="space-y-2">
-          <span className="font-mono text-xs uppercase tracking-widest text-amber-600 font-semibold">
+          <span className="font-mono text-xs uppercase tracking-widest text-amber-600 dark:text-amber-400 font-semibold">
             Calculation State Interrupted
           </span>
           <h1 className="text-2xl font-serif font-bold text-[var(--cf-text)]">

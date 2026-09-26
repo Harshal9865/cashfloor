@@ -83,7 +83,7 @@ export function SolvencyReportModal({
           <div className="flex items-center gap-3">
             <CashFloorLogo size="sm" />
             <div className="h-4 w-px bg-[var(--cf-border)]" />
-            <div className="flex items-center gap-1.5 text-xs font-mono text-emerald-600 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
+            <div className="flex items-center gap-1.5 text-xs font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
               <ShieldCheck className="w-3.5 h-3.5" />
               <span>CPA & Lease Underwriting Report Ready</span>
             </div>
@@ -134,7 +134,7 @@ export function SolvencyReportModal({
 
             <div className="text-right font-mono text-xs text-[var(--cf-text-muted)] space-y-1">
               <div>Date: <span className="font-bold text-[var(--cf-text)]">{reportDate}</span></div>
-              <div>Standard: <span className="text-emerald-600 font-bold">20th-Percentile Conservative</span></div>
+              <div>Standard: <span className="text-emerald-600 dark:text-emerald-400 font-bold">20th-Percentile Conservative</span></div>
               <div>Privacy: <span className="font-semibold text-[var(--cf-text)]">Zero Bank Surveillance</span></div>
             </div>
           </div>
@@ -165,7 +165,7 @@ export function SolvencyReportModal({
               <span className="text-[10px] font-mono uppercase text-[var(--cf-text-muted)] block">
                 Liquid Cash Reserves
               </span>
-              <p className="text-xl sm:text-2xl font-serif font-bold text-emerald-600">
+              <p className="text-xl sm:text-2xl font-serif font-bold text-emerald-600 dark:text-emerald-400">
                 {currencySymbol}{result.currentSavings.toLocaleString()}
               </p>
               <span className="text-[10px] font-mono text-[var(--cf-text-muted)] block">
@@ -227,7 +227,7 @@ export function SolvencyReportModal({
               <span className="text-[10px] font-mono uppercase text-[var(--cf-text-muted)] block">
                 Capital Health Status
               </span>
-              <p className="text-xl sm:text-2xl font-serif font-bold text-emerald-600 flex items-center gap-1.5">
+              <p className="text-xl sm:text-2xl font-serif font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
                 <CheckCircle2 className="w-5 h-5" />
                 <span>Solvent</span>
               </p>
@@ -277,7 +277,7 @@ export function SolvencyReportModal({
                           <td className="p-2.5 text-right text-amber-600 dark:text-amber-400">
                             {currencySymbol}{tax.toLocaleString()}
                           </td>
-                          <td className={`p-2.5 text-right font-semibold ${net >= 0 ? 'text-emerald-600' : 'text-[#B4573F]'}`}>
+                          <td className={`p-2.5 text-right font-semibold ${net >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                             {net >= 0 ? '+' : ''}{currencySymbol}{net.toLocaleString()}
                           </td>
                           <td className="p-2.5 text-right font-bold">
@@ -295,7 +295,7 @@ export function SolvencyReportModal({
           {/* Underwriting & CPA Certification Addendum */}
           <div className="p-4 rounded-2xl border border-[var(--cf-border)] bg-[var(--cf-surface-alt)] space-y-2 text-xs text-[var(--cf-text-muted)] leading-relaxed">
             <h4 className="font-serif font-bold text-[var(--cf-text)] flex items-center gap-2">
-              <Lock className="w-3.5 h-3.5 text-emerald-600" />
+              <Lock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
               <span>Note to Mortgage Underwriters, Landlords & CPAs</span>
             </h4>
             <p>

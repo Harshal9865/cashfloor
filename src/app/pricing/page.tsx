@@ -154,7 +154,7 @@ export default function PricingPage() {
 
         {/* Hero Header */}
         <div className="text-center max-w-3xl mx-auto space-y-6">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-medium text-emerald-600 bg-emerald-500/10 border border-emerald-500/20">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20">
             <Zap className="w-3.5 h-3.5" />
             <span>Predictive Financial Engineering</span>
           </div>
@@ -308,18 +308,18 @@ export default function PricingPage() {
                     <ul className="space-y-2.5">
                       {plan.features.map((feat) => (
                         <li key={feat} className="flex items-start gap-2.5 text-xs text-[var(--cf-text)]">
-                          <div className="w-4 h-4 rounded-full bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
+                          <div className="w-4 h-4 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
                             <Check className="w-3 h-3" />
                           </div>
                           <span>{feat}</span>
                         </li>
                       ))}
                       {plan.notIncluded.map((notFeat) => (
-                        <li key={notFeat} className="flex items-start gap-2.5 text-xs text-[var(--cf-text-muted)] opacity-50">
-                          <div className="w-4 h-4 rounded-full bg-[var(--cf-surface-alt)] text-[var(--cf-text-muted)] flex items-center justify-center shrink-0 mt-0.5">
+                        <li key={notFeat} className="flex items-start gap-2.5 text-xs text-[var(--cf-text-muted)]">
+                          <div className="w-4 h-4 rounded-full bg-[var(--cf-surface-alt)] border border-[var(--cf-border-soft)] text-[var(--cf-text-muted)] flex items-center justify-center shrink-0 mt-0.5">
                             <X className="w-3 h-3" />
                           </div>
-                          <span className="line-through">{notFeat}</span>
+                          <span className="line-through decoration-[var(--cf-border)]">{notFeat}</span>
                         </li>
                       ))}
                     </ul>

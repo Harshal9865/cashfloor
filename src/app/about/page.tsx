@@ -101,7 +101,7 @@ export default function AboutPage() {
         {/* ── 2. The Core Problems We Solve ── */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
           <div className="p-7 rounded-3xl bg-[var(--cf-surface)] border border-[var(--cf-border)] space-y-4 shadow-sm hover:border-[var(--cf-accent)]/50 transition-colors">
-            <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-600 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center">
               <Scale className="w-6 h-6" />
             </div>
             <h3 className="font-serif font-bold text-lg text-[var(--cf-text)]">
@@ -113,7 +113,7 @@ export default function AboutPage() {
           </div>
 
           <div className="p-7 rounded-3xl bg-[var(--cf-surface)] border border-[var(--cf-border)] space-y-4 shadow-sm hover:border-[var(--cf-accent)]/50 transition-colors">
-            <div className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-600 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center">
               <Lock className="w-6 h-6" />
             </div>
             <h3 className="font-serif font-bold text-lg text-[var(--cf-text)]">
@@ -125,7 +125,7 @@ export default function AboutPage() {
           </div>
 
           <div className="p-7 rounded-3xl bg-[var(--cf-surface)] border border-[var(--cf-border)] space-y-4 shadow-sm hover:border-[var(--cf-accent)]/50 transition-colors">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
               <Building2 className="w-6 h-6" />
             </div>
             <h3 className="font-serif font-bold text-lg text-[var(--cf-text)]">

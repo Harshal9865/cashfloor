@@ -18,8 +18,8 @@
 
   /* Text */
   --cf-text:        #16232B;
-  --cf-text-muted:  #5C6D77;
-  --cf-text-faint:  #8E9EA7;
+  --cf-text-muted:  #435560;
+  --cf-text-faint:  #5A6C77;
 
   /* Borders */
   --cf-border:      rgba(22,35,43,0.10);
@@ -69,8 +69,8 @@
 
   /* Text */
   --cf-text:        #E8EDF2;
-  --cf-text-muted:  #7A8B96;
-  --cf-text-faint:  #4A6070;
+  --cf-text-muted:  #9BB0BD;
+  --cf-text-faint:  #788D9B;
 
   /* Borders */
   --cf-border:      rgba(255,255,255,0.08);

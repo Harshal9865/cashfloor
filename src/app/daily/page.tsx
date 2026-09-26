@@ -147,8 +147,8 @@ export default function DailyPage() {
           >
             <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 border ${
               simulateDelay
-                ? 'bg-amber-500/10 text-amber-600 border-amber-500/20'
-                : 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
+                ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
+                : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
             }`}>
               <DollarSign className="w-5 h-5" />
             </div>
@@ -159,7 +159,7 @@ export default function DailyPage() {
               <div className="text-xl font-bold font-mono tabular-nums text-[var(--cf-text)]">
                 {currencySymbol}{todayInflow.toLocaleString()}
               </div>
-              <span className={`text-[10px] font-mono ${simulateDelay ? 'text-amber-600 font-semibold' : 'text-emerald-600'}`}>
+              <span className={`text-[10px] font-mono ${simulateDelay ? 'text-amber-600 dark:text-amber-400 font-semibold' : 'text-emerald-600 dark:text-emerald-400'}`}>
                 {simulateDelay ? `⚠️ ${currencySymbol}${Math.round(displayedMonths[0]?.income - todayInflow).toLocaleString()} payment delayed` : '+2 transactions logged'}
               </span>
             </div>
@@ -171,7 +171,7 @@ export default function DailyPage() {
           >
             <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 border ${
               simulateDelay
-                ? 'bg-red-500/10 text-rose-600 border-red-500/20'
+                ? 'bg-red-500/10 text-rose-600 dark:text-rose-400 border-red-500/20'
                 : 'bg-[var(--cf-accent-bg)] text-[var(--cf-accent)] border-[var(--cf-accent)]/20'
             }`}>
               <Clock className="w-5 h-5" />
@@ -180,7 +180,7 @@ export default function DailyPage() {
               <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--cf-text-muted)] block">
                 Intra-Month Lag Risk
               </span>
-              <div className={`text-xl font-bold font-mono ${simulateDelay ? 'text-rose-600' : 'text-emerald-600'}`}>
+              <div className={`text-xl font-bold font-mono ${simulateDelay ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
                 {simulateDelay ? '14-Day Danger Gap' : 'Protected (0 Days)'}
               </div>
               <span className="text-[10px] font-mono text-[var(--cf-text-muted)]">
@@ -193,7 +193,7 @@ export default function DailyPage() {
             className="p-5 sm:p-6 rounded-3xl border flex items-center gap-5 transition-all"
             style={{ background: 'var(--cf-surface)', borderColor: 'var(--cf-border)' }}
           >
-            <div className="w-11 h-11 rounded-2xl bg-amber-500/10 text-amber-600 flex items-center justify-center shrink-0 border border-amber-500/20">
+            <div className="w-11 h-11 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 border border-amber-500/20">
               <Activity className="w-5 h-5" />
             </div>
             <div>

@@ -78,34 +78,34 @@ export const ScenarioSimulator: React.FC<ScenarioSimulatorProps> = ({
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 hairline-b pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[var(--cf-border-soft)] pb-4">
         <div>
           <div className="flex items-center space-x-3">
-            <h2 className="font-serif text-xl sm:text-2xl text-[#16232B] font-normal tracking-tight">
+            <h2 className="font-serif text-xl sm:text-2xl text-[var(--cf-text)] font-normal tracking-tight">
               Stress Testing & Scenario Simulator
             </h2>
-            <span className="text-[10px] font-mono uppercase tracking-wider bg-[#E8EDE9] px-2 py-0.5 border border-[#16232B]/10 text-[#5C6D77]">
+            <span className="text-[10px] font-mono uppercase tracking-wider bg-[var(--cf-surface-alt)] px-2 py-0.5 border border-[var(--cf-border)] text-[var(--cf-text-muted)] rounded">
               Financial Stress Lab
             </span>
           </div>
-          <p className="font-sans text-xs text-[#5C6D77] mt-0.5">
+          <p className="font-sans text-xs text-[var(--cf-text-muted)] mt-0.5">
             Test how unexpected macro events, lost retainers, and windfalls impact your survival horizon.
           </p>
         </div>
-        <span className="text-xs font-mono text-[#5C6D77]">
-          ACTIVE: <strong className="text-[#16232B]">{currentScenario.toUpperCase()}</strong>
+        <span className="text-xs font-mono text-[var(--cf-text-muted)]">
+          ACTIVE: <strong className="text-[var(--cf-text)]">{currentScenario.toUpperCase()}</strong>
         </span>
       </div>
 
-      {/* Scenario Selector Tabs with Sharp 0px corners */}
+      {/* Scenario Selector Tabs with rounded corners and accessible contrast */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
         <button
           type="button"
           onClick={() => handleSelectScenario('conservative')}
-          className={`p-3 text-left transition-colors cursor-pointer border ${
+          className={`p-3 text-left transition-all cursor-pointer border rounded-xl ${
             currentScenario === 'conservative'
-              ? 'bg-[#16232B] text-[#F1F4F2] border-[#16232B]'
-              : 'bg-[#F1F4F2] text-[#5C6D77] border-[#16232B]/15 hover:border-[#16232B]'
+              ? 'bg-[var(--cf-accent)] text-white border-[var(--cf-accent)] shadow-sm'
+              : 'bg-[var(--cf-surface-alt)] text-[var(--cf-text-muted)] border-[var(--cf-border)] hover:text-[var(--cf-text)] hover:border-[var(--cf-accent)]'
           }`}
         >
           <span className="font-mono font-semibold block text-[11px]">Conservative</span>
@@ -115,10 +115,10 @@ export const ScenarioSimulator: React.FC<ScenarioSimulatorProps> = ({
         <button
           type="button"
           onClick={() => handleSelectScenario('base')}
-          className={`p-3 text-left transition-colors cursor-pointer border ${
+          className={`p-3 text-left transition-all cursor-pointer border rounded-xl ${
             currentScenario === 'base'
-              ? 'bg-[#16232B] text-[#F1F4F2] border-[#16232B]'
-              : 'bg-[#F1F4F2] text-[#5C6D77] border-[#16232B]/15 hover:border-[#16232B]'
+              ? 'bg-[var(--cf-accent)] text-white border-[var(--cf-accent)] shadow-sm'
+              : 'bg-[var(--cf-surface-alt)] text-[var(--cf-text-muted)] border-[var(--cf-border)] hover:text-[var(--cf-text)] hover:border-[var(--cf-accent)]'
           }`}
         >
           <span className="font-mono font-semibold block text-[11px]">Base Case</span>
@@ -128,10 +128,10 @@ export const ScenarioSimulator: React.FC<ScenarioSimulatorProps> = ({
         <button
           type="button"
           onClick={() => handleSelectScenario('client_loss')}
-          className={`p-3 text-left transition-colors cursor-pointer border ${
+          className={`p-3 text-left transition-all cursor-pointer border rounded-xl ${
             currentScenario === 'client_loss'
-              ? 'bg-[#B4573F] text-[#F1F4F2] border-[#B4573F]'
-              : 'bg-[#F1F4F2] text-[#5C6D77] border-[#16232B]/15 hover:border-[#B4573F]'
+              ? 'bg-rose-600 dark:bg-rose-700 text-white border-rose-600 shadow-sm'
+              : 'bg-[var(--cf-surface-alt)] text-[var(--cf-text-muted)] border-[var(--cf-border)] hover:border-rose-500 hover:text-[var(--cf-text)]'
           }`}
         >
           <div className="flex items-center gap-1 font-mono font-semibold text-[11px]">
@@ -144,10 +144,10 @@ export const ScenarioSimulator: React.FC<ScenarioSimulatorProps> = ({
         <button
           type="button"
           onClick={() => handleSelectScenario('dry_spell')}
-          className={`p-3 text-left transition-colors cursor-pointer border ${
+          className={`p-3 text-left transition-all cursor-pointer border rounded-xl ${
             currentScenario === 'dry_spell'
-              ? 'bg-[#B4573F] text-[#F1F4F2] border-[#B4573F]'
-              : 'bg-[#F1F4F2] text-[#5C6D77] border-[#16232B]/15 hover:border-[#B4573F]'
+              ? 'bg-rose-600 dark:bg-rose-700 text-white border-rose-600 shadow-sm'
+              : 'bg-[var(--cf-surface-alt)] text-[var(--cf-text-muted)] border-[var(--cf-border)] hover:border-rose-500 hover:text-[var(--cf-text)]'
           }`}
         >
           <div className="flex items-center gap-1 font-mono font-semibold text-[11px]">
@@ -160,14 +160,14 @@ export const ScenarioSimulator: React.FC<ScenarioSimulatorProps> = ({
         <button
           type="button"
           onClick={() => handleSelectScenario('windfall')}
-          className={`p-3 text-left transition-colors cursor-pointer border ${
+          className={`p-3 text-left transition-all cursor-pointer border rounded-xl ${
             currentScenario === 'windfall'
-              ? 'bg-[#2F6F62] text-[#F1F4F2] border-[#2F6F62]'
-              : 'bg-[#F1F4F2] text-[#5C6D77] border-[#16232B]/15 hover:border-[#2F6F62]'
+              ? 'bg-emerald-600 dark:bg-emerald-700 text-white border-emerald-600 shadow-sm'
+              : 'bg-[var(--cf-surface-alt)] text-[var(--cf-text-muted)] border-[var(--cf-border)] hover:border-emerald-500 hover:text-[var(--cf-text)]'
           }`}
         >
           <div className="flex items-center gap-1 font-mono font-semibold text-[11px]">
-            <Sparkles className="w-3 h-3 text-[#C98A3E]" />
+            <Sparkles className="w-3 h-3 text-amber-300" />
             <span>Windfall</span>
           </div>
           <span className="text-[10px] opacity-80 block font-sans">Lump sum injection</span>
@@ -176,14 +176,14 @@ export const ScenarioSimulator: React.FC<ScenarioSimulatorProps> = ({
         <button
           type="button"
           onClick={() => handleSelectScenario('late_invoice')}
-          className={`p-3 text-left transition-colors cursor-pointer border ${
+          className={`p-3 text-left transition-all cursor-pointer border rounded-xl ${
             currentScenario === 'late_invoice'
-              ? 'bg-[#B4573F] text-[#F1F4F2] border-[#B4573F]'
-              : 'bg-[#F1F4F2] text-[#5C6D77] border-[#16232B]/15 hover:border-[#B4573F]'
+              ? 'bg-amber-600 dark:bg-amber-700 text-white border-amber-600 shadow-sm'
+              : 'bg-[var(--cf-surface-alt)] text-[var(--cf-text-muted)] border-[var(--cf-border)] hover:border-amber-500 hover:text-[var(--cf-text)]'
           }`}
         >
           <div className="flex items-center gap-1 font-mono font-semibold text-[11px]">
-            <TrendingDown className="w-3 h-3 text-white" />
+            <TrendingDown className="w-3 h-3" />
             <span>Late Invoice</span>
           </div>
           <span className="text-[10px] opacity-80 block font-sans">60 days overdue</span>
@@ -191,15 +191,15 @@ export const ScenarioSimulator: React.FC<ScenarioSimulatorProps> = ({
       </div>
 
       {/* Scenario Detail Panel */}
-      <div className="p-4 bg-[#E8EDE9] hairline-all text-xs text-[#16232B] font-sans space-y-3">
-        <div className="flex items-center space-x-2 font-mono text-[11px] text-[#2F6F62] font-semibold">
+      <div className="p-4 bg-[var(--cf-surface-alt)] rounded-2xl border border-[var(--cf-border)] text-xs text-[var(--cf-text)] font-sans space-y-3">
+        <div className="flex items-center space-x-2 font-mono text-[11px] text-[var(--cf-accent)] font-semibold">
           <CheckCircle2 className="w-3.5 h-3.5" />
           <span>{scenarioImpactDescription}</span>
         </div>
 
         {currentScenario === 'client_loss' && (
-          <div className="flex flex-wrap items-center gap-4 pt-2 hairline-t">
-            <label htmlFor="client-loss-slider" className="text-xs text-[#5C6D77] font-sans">
+          <div className="flex flex-wrap items-center gap-4 pt-2 border-t border-[var(--cf-border-soft)]">
+            <label htmlFor="client-loss-slider" className="text-xs text-[var(--cf-text-muted)] font-sans">
               Simulated contract drop:
             </label>
             <input
@@ -212,20 +212,20 @@ export const ScenarioSimulator: React.FC<ScenarioSimulatorProps> = ({
               onChange={(e) => onChange({ ...assumptions, clientLossPercentage: Number(e.target.value) })}
               className="w-40"
             />
-            <span className="font-mono font-semibold text-[#B4573F] tabular-nums text-sm">
+            <span className="font-mono font-semibold text-rose-600 dark:text-rose-400 tabular-nums text-sm">
               -{Math.round((assumptions.clientLossPercentage ?? 0.30) * 100)}% Gross Inflow
             </span>
           </div>
         )}
 
         {currentScenario === 'windfall' && windfallAllocation && (
-          <div className="space-y-3 pt-2 hairline-t">
+          <div className="space-y-3 pt-2 border-t border-[var(--cf-border-soft)]">
             <div className="flex flex-wrap items-center gap-4">
-              <label htmlFor="windfall-input" className="text-xs text-[#5C6D77]">
+              <label htmlFor="windfall-input" className="text-xs text-[var(--cf-text-muted)]">
                 Unexpected invoice payment:
               </label>
               <div className="relative">
-                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-[#5C6D77] font-mono">
+                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-[var(--cf-text-muted)] font-mono">
                   {currencySymbol}
                 </span>
                 <input
@@ -237,28 +237,28 @@ export const ScenarioSimulator: React.FC<ScenarioSimulatorProps> = ({
                   onChange={(e) =>
                     onChange({ ...assumptions, windfallAmount: Math.max(0, Number(e.target.value) || 0) })
                   }
-                  className="pl-6 pr-3 py-1 bg-white border border-[#16232B]/20 text-xs font-mono font-semibold tabular-nums w-32 focus:outline-hidden"
+                  className="pl-6 pr-3 py-1 bg-[var(--cf-surface)] border border-[var(--cf-border)] text-xs font-mono font-semibold tabular-nums w-32 focus:outline-hidden rounded-lg text-[var(--cf-text)]"
                 />
               </div>
             </div>
 
             {/* Windfall Waterfall Allocation Pillars */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-              <div className="p-3 bg-white border border-[#16232B]/15">
-                <span className="text-[10px] font-mono text-[#5C6D77] uppercase block">1. Statutory Tax Escrow</span>
-                <span className="font-mono text-sm font-bold text-[#875205] tabular-nums mt-0.5 block">
+              <div className="p-3 bg-[var(--cf-surface)] border border-[var(--cf-border)] rounded-xl">
+                <span className="text-[10px] font-mono text-[var(--cf-text-muted)] uppercase block">1. Statutory Tax Escrow</span>
+                <span className="font-mono text-sm font-bold text-amber-600 dark:text-amber-400 tabular-nums mt-0.5 block">
                   {currencySymbol}{windfallAllocation.taxAllocation.toLocaleString()}
                 </span>
               </div>
-              <div className="p-3 bg-white border border-[#16232B]/15">
-                <span className="text-[10px] font-mono text-[#5C6D77] uppercase block">2. Safety Buffer Sunk</span>
-                <span className="font-mono text-sm font-bold text-[#2F6F62] tabular-nums mt-0.5 block">
+              <div className="p-3 bg-[var(--cf-surface)] border border-[var(--cf-border)] rounded-xl">
+                <span className="text-[10px] font-mono text-[var(--cf-text-muted)] uppercase block">2. Safety Buffer Sunk</span>
+                <span className="font-mono text-sm font-bold text-emerald-600 dark:text-emerald-400 tabular-nums mt-0.5 block">
                   {currencySymbol}{windfallAllocation.bufferAllocation.toLocaleString()}
                 </span>
               </div>
-              <div className="p-3 bg-white border border-[#16232B]/15">
-                <span className="text-[10px] font-mono text-[#5C6D77] uppercase block">3. Guilt-Free Owner Bonus</span>
-                <span className="font-mono text-sm font-bold text-[#C98A3E] tabular-nums mt-0.5 block">
+              <div className="p-3 bg-[var(--cf-surface)] border border-[var(--cf-border)] rounded-xl">
+                <span className="text-[10px] font-mono text-[var(--cf-text-muted)] uppercase block">3. Guilt-Free Owner Bonus</span>
+                <span className="font-mono text-sm font-bold text-blue-600 dark:text-blue-400 tabular-nums mt-0.5 block">
                   {currencySymbol}{windfallAllocation.bonusPaycheckAllocation.toLocaleString()}
                 </span>
               </div>

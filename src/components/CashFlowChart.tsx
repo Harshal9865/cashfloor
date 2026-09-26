@@ -368,7 +368,7 @@ export const CashFlowChart: React.FC<CashFlowChartProps> = ({
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--cf-border)" vertical={false} />
                 <XAxis dataKey="label" tick={{ fill: 'var(--cf-text-muted)', fontSize: 11, fontFamily: 'var(--font-mono)' }} axisLine={{ stroke: 'var(--cf-border)' }} tickLine={false} />
                 <YAxis yAxisId="left" tick={{ fill: 'var(--cf-text-muted)', fontSize: 10, fontFamily: 'var(--font-mono)' }} tickFormatter={(v) => `${currencySymbol}${v >= 1000 ? `${Math.round(v / 1000)}k` : v}`} axisLine={false} tickLine={false} width={40} />
-                <YAxis yAxisId="right" orientation="right" tick={{ fill: 'var(--cf-text-faint)', fontSize: 10, fontFamily: 'var(--font-mono)' }} tickFormatter={(v) => `${currencySymbol}${Math.round(v / 1000)}k`} axisLine={false} tickLine={false} width={45} />
+                <YAxis yAxisId="right" orientation="right" tick={{ fill: 'var(--cf-text-muted)', fontSize: 10, fontFamily: 'var(--font-mono)' }} tickFormatter={(v) => `${currencySymbol}${Math.round(v / 1000)}k`} axisLine={false} tickLine={false} width={45} />
                 <Tooltip content={<CustomMonthlyTooltip currencySymbol={currencySymbol} floorIncome={floorIncome} bufferTarget={bufferTarget} />} />
                 <ReferenceLine yAxisId="left" y={floorIncome} stroke="var(--cf-accent)" strokeDasharray="4 3" strokeWidth={1.5} label={{ value: `Floor ${fmt(floorIncome)}`, fill: 'var(--cf-accent)', fontSize: 10, fontFamily: 'var(--font-mono)', position: 'insideTopLeft' }} />
                 <Bar yAxisId="left" dataKey="income" radius={[4, 4, 0, 0]} maxBarSize={28}>
@@ -384,7 +384,7 @@ export const CashFlowChart: React.FC<CashFlowChartProps> = ({
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--cf-border)" vertical={false} />
                 <XAxis dataKey="label" tick={{ fill: 'var(--cf-text-muted)', fontSize: 10, fontFamily: 'var(--font-mono)' }} interval={2} axisLine={{ stroke: 'var(--cf-border)' }} tickLine={false} />
                 <YAxis yAxisId="left" tick={{ fill: 'var(--cf-text-muted)', fontSize: 10, fontFamily: 'var(--font-mono)' }} tickFormatter={(v) => `${currencySymbol}${v >= 1000 ? `${(v / 1000).toFixed(1)}k` : v}`} axisLine={false} tickLine={false} width={42} />
-                <YAxis yAxisId="right" orientation="right" tick={{ fill: 'var(--cf-text-faint)', fontSize: 10, fontFamily: 'var(--font-mono)' }} tickFormatter={(v) => `${currencySymbol}${Math.round(v / 1000)}k`} axisLine={false} tickLine={false} width={45} />
+                <YAxis yAxisId="right" orientation="right" tick={{ fill: 'var(--cf-text-muted)', fontSize: 10, fontFamily: 'var(--font-mono)' }} tickFormatter={(v) => `${currencySymbol}${Math.round(v / 1000)}k`} axisLine={false} tickLine={false} width={45} />
                 <Tooltip content={<CustomDailyTooltip currencySymbol={currencySymbol} dailyFloor={dailyFloor} />} />
                 <ReferenceLine yAxisId="left" y={dailyFloor} stroke="var(--cf-accent)" strokeDasharray="3 3" strokeWidth={1.5} label={{ value: `Floor ${fmt(dailyFloor)}/d`, fill: 'var(--cf-accent)', fontSize: 9, fontFamily: 'var(--font-mono)', position: 'insideTopLeft' }} />
                 <Bar yAxisId="left" dataKey="inflow" fill="#3DE8C8" radius={[3, 3, 0, 0]} maxBarSize={14} />
@@ -395,7 +395,7 @@ export const CashFlowChart: React.FC<CashFlowChartProps> = ({
               <ComposedChart data={droughtData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--cf-border)" vertical={false} />
                 <XAxis dataKey="label" tick={{ fill: 'var(--cf-text-muted)', fontSize: 10, fontFamily: 'var(--font-mono)' }} axisLine={{ stroke: 'var(--cf-border)' }} tickLine={false} />
-                <YAxis yAxisId="right" orientation="right" tick={{ fill: 'var(--cf-text-faint)', fontSize: 10, fontFamily: 'var(--font-mono)' }} tickFormatter={(v) => `${currencySymbol}${Math.round(v / 1000)}k`} axisLine={false} tickLine={false} width={45} />
+                <YAxis yAxisId="right" orientation="right" tick={{ fill: 'var(--cf-text-muted)', fontSize: 10, fontFamily: 'var(--font-mono)' }} tickFormatter={(v) => `${currencySymbol}${Math.round(v / 1000)}k`} axisLine={false} tickLine={false} width={45} />
                 <Tooltip formatter={(v: any) => [`${currencySymbol}${Number(v).toLocaleString()}`, 'Remaining Cash']} />
                 <ReferenceLine yAxisId="right" y={0} stroke="var(--cf-caution)" strokeWidth={2} label={{ value: 'Exhaustion Line ($0)', fill: 'var(--cf-caution)', fontSize: 10, fontFamily: 'var(--font-mono)' }} />
                 <Area yAxisId="right" type="monotone" dataKey="balance" stroke="var(--cf-caution)" fill="rgba(180,87,63,0.15)" strokeWidth={2} />

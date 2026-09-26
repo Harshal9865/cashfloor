@@ -337,7 +337,7 @@ export default function IntegrationModal({
                       onClick={handleCopyWebhook}
                       className="px-3.5 py-2 rounded-xl text-xs font-mono border border-[var(--cf-border)] bg-[var(--cf-surface)] text-[var(--cf-text)] hover:border-[var(--cf-accent)] transition-all cursor-pointer flex items-center gap-1.5 shrink-0"
                     >
-                      {copiedWebhook ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                      {copiedWebhook ? <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                       <span>{copiedWebhook ? 'Copied' : 'Copy'}</span>
                     </button>
                   </div>
@@ -466,12 +466,12 @@ export default function IntegrationModal({
                   >
                     <div className="flex items-center justify-between border-b border-[var(--cf-border-soft)] pb-2.5">
                       <div className="flex items-center gap-2">
-                        <Check className="w-4 h-4 text-emerald-600" />
+                        <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                         <span className="text-xs font-mono font-semibold text-[var(--cf-text)]">
                           Format Detected: {parsedPreview.detectedFormat}
                         </span>
                       </div>
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 font-bold">
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-bold">
                         {parsedPreview.transactionCount} Transactions Validated
                       </span>
                     </div>

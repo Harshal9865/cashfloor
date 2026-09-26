@@ -58,13 +58,13 @@ export const LedgerRows: React.FC<LedgerRowsProps> = ({
           let borderOpacity = '33';
           
           if (pillar.solvencyType === 'safe') {
-            badgeStyle = 'bg-amber-500/10 text-amber-600 border-amber-500/20';
+            badgeStyle = 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20';
             borderOpacity = '40';
           } else if (pillar.solvencyType === 'warning') {
-            badgeStyle = 'bg-rose-500/10 text-rose-600 border-rose-500/20';
+            badgeStyle = 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20';
             borderOpacity = '30';
           } else if (pillar.solvencyType === 'surplus') {
-            badgeStyle = 'bg-amber-500/10 text-amber-600 border-amber-500/20';
+            badgeStyle = 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20';
             borderOpacity = '40';
           }
 
