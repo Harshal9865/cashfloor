@@ -43,24 +43,42 @@ export default function HeroTeaser() {
       className="relative w-full min-h-screen overflow-hidden flex flex-col"
       style={{ background: 'var(--cf-bg)' }}
     >
-      {/* ── Interactive cursor spotlight ── */}
+      {/* ── Ambient base architectural grid (active in both Day and Night mode) ── */}
+      <div
+        className="absolute inset-0 pointer-events-none z-0 transition-opacity duration-500"
+        style={{
+          backgroundImage: 'linear-gradient(var(--cf-grid-base) 1px, transparent 1px), linear-gradient(90deg, var(--cf-grid-base) 1px, transparent 1px)',
+          backgroundSize: '64px 64px',
+          maskImage: 'radial-gradient(ellipse 85% 65% at 50% 10%, black 40%, transparent 100%)',
+          WebkitMaskImage: 'radial-gradient(ellipse 85% 65% at 50% 10%, black 40%, transparent 100%)',
+        }}
+      />
+
+      {/* ── Interactive cursor-illuminated mesh layer (glows on mouse move in Day & Night) ── */}
+      <motion.div
+        className="absolute inset-0 pointer-events-none z-0"
+        style={{
+          backgroundImage: 'linear-gradient(var(--cf-grid-glow) 1px, transparent 1px), linear-gradient(90deg, var(--cf-grid-glow) 1px, transparent 1px)',
+          backgroundSize: '64px 64px',
+          maskImage: useTransform(
+            [smoothX, smoothY],
+            ([x, y]) => `radial-gradient(380px circle at ${x}px ${y}px, black 0%, transparent 100%)`
+          ),
+          WebkitMaskImage: useTransform(
+            [smoothX, smoothY],
+            ([x, y]) => `radial-gradient(380px circle at ${x}px ${y}px, black 0%, transparent 100%)`
+          ),
+        }}
+      />
+
+      {/* ── Interactive cursor ambient spotlight glow ── */}
       <motion.div
         className="absolute inset-0 pointer-events-none z-0"
         style={{
           background: useTransform(
             [smoothX, smoothY],
-            ([x, y]) => `radial-gradient(700px circle at ${x}px ${y}px, var(--cf-accent-bg), transparent 75%)`
+            ([x, y]) => `radial-gradient(650px circle at ${x}px ${y}px, var(--cf-mesh-spotlight), transparent 75%)`
           ),
-        }}
-      />
-
-      {/* ── Ambient grid ── */}
-      <div className="absolute inset-0 pointer-events-none z-0"
-        style={{
-          backgroundImage: 'linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)',
-          backgroundSize: '72px 72px',
-          maskImage: 'radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 100%)',
-          WebkitMaskImage: 'radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 100%)',
         }}
       />
 

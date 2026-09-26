@@ -49,6 +49,11 @@
   /* Hairlines */
   --cf-hairline:    rgba(22,35,43,0.10);
 
+  /* Interactive Mesh & Grid */
+  --cf-grid-base:       rgba(22, 35, 43, 0.065);
+  --cf-grid-glow:       rgba(47, 111, 98, 0.32);
+  --cf-mesh-spotlight:  rgba(47, 111, 98, 0.14);
+
   /* Shared */
   color-scheme: light;
 }
@@ -94,6 +99,11 @@
 
   /* Hairlines */
   --cf-hairline:    rgba(255,255,255,0.08);
+
+  /* Interactive Mesh & Grid */
+  --cf-grid-base:       rgba(255, 255, 255, 0.035);
+  --cf-grid-glow:       rgba(61, 232, 200, 0.25);
+  --cf-mesh-spotlight:  rgba(61, 232, 200, 0.10);
 
   color-scheme: dark;
 }
